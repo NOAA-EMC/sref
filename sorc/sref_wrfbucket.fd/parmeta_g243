@@ -1,0 +1,2 @@
+! grid 243
+      PARAMETER (IM=126,JM=101)

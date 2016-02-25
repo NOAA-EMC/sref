@@ -1,0 +1,56 @@
+#!/bin/sh
+
+set -aeux
+
+SREFDIR=/meso/save/${LOGNAME}/sref.v7.0.0
+cd $SREFDIR/run
+
+cyc=$1
+FLENGTH=87
+INCR=3
+INCRBUFR=1
+ymdh=`cat /com/date/t${cyc}z | cut -c7-16`
+
+ymdh=20150331${1}
+
+export SMSBIN=${HOME}/sms
+export MACHINE=wcoss
+export RES=16km
+export IOFORM=2
+export runflag=3hrly
+#export runflag=hrly
+export OUTGRD=255
+#export OUTGRD=132
+
+PDY=`echo $ymdh | cut -c1-8`
+CYC=`echo $ymdh | cut -c9-10`
+
+#rm -rf /ptmpp1/$LOGNAME/sref
+#mkdir -p /ptmpp1/$LOGNAME/tmpnwprd
+#rm -rf /ptmpp1/$LOGNAME/tmpnwprd/jlogfile_sref
+
+#rm -f *.bsub *.log
+
+for MODEL in ARW NMB ; do
+#for MODEL in ARW; do
+
+for MEMBER in ctl n01 p01 n02 p02 n03 p03 n04 p04 n05 p05 n06 p06; do
+#for MEMBER in n01; do
+
+cat SREF_BUFR.bsub.in | \
+    sed s:_PDY_:$PDY:g | \
+    sed s:_CYC_:$CYC:g | \
+    sed s:_FLENGTH_:$FLENGTH:g | \
+    sed s:_INCR_:$INCRBUFR:g | \
+    sed s:_SREFDIR_:$SREFDIR:g | \
+    sed s:_MODEL_:$MODEL:g | \
+    sed s:_MEMBER_:$MEMBER:g | \
+    sed s:_RES_:$RES:g | \
+    sed s:_MACHINE_:$MACHINE:g > SREF_BUFR_${MODEL}_${MEMBER}.bsub
+
+bsub < SREF_BUFR_${MODEL}_${MEMBER}.bsub
+echo "SREF waiting ${MODEL} ${MEMBER} BUFR" >> /ptmpp1/$LOGNAME/tmpnwprd/jlogfile_sref
+
+done
+
+done

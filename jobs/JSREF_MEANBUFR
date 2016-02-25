@@ -1,0 +1,163 @@
+#!/bin/sh
+
+############################################
+# Set up environment for WRF BUFR JOB
+# Change log:
+#
+# 08/01/2007, Jun Du: Initial Implementation
+# 07/18/2008, Jun Du: upgraded to new mpiio wrfbufr version for 
+#                     both WRF cores in order to match WRFv2.2
+#
+# MODEL(MEMBER ...)=NMM(ctl,p01,n01,p02,n02,p03,n03)
+#                  +ARW(ctl,p01,n01,p02,n02,p03,n03)
+#                  +NMB(ctl,p01,n01,p02,n02,p03,n03)
+# 9/20/2009, Julia Zhu   Scripts are modified to be sharable
+#                        between EMC and NCO
+# 3/26/2012, Geoff Manikin   adapted for meanbufr
+# 
+#         Please note that variable "RUN_ENVIR" is set and used
+#         in the development enviroment only.
+############################################
+set -xa
+# ###################################
+# SET SHELL PROCESSING VARIABLES
+# ###################################
+export PS4='$SECONDS + ' 
+date
+
+export OMP_NUM_THREADS=1
+export MP_EUIDEVICE=sn_all
+export MP_EUILIB=us
+export MP_MPILIB=mpich2
+export MP_TASK_AFFINITY=core:1
+
+. /usrx/local/Modules/default/init/ksh
+module load grib_util
+
+export RUN_ENVIR=${RUN_ENVIR:-nco}
+
+export NET=sref
+export RUN=sref
+
+
+###########################################
+# Run sref_config to get input parameters
+###########################################
+if [ "$RUN_ENVIR" != nco ]      ### For Developers, "group_name" is passed from the ecFflow script
+then
+  CONFIG_FILE=${CONFIG_FILE:-/meso/save/${LOGNAME}/sref${NWROOTp1}/parm/sref_para_config}
+  . $CONFIG_FILE
+  export userid=$LOGNAME
+  export DATA_IN=${DATA_IN:-/ptmpp1/$userid}
+  export jlogfile=${jlogfile:-$DATA_IN/jlogfile}
+
+  export SENDCOM=${SENDCOM:-YES}
+  export SENDDBN=${SENDDBN:-NO}
+  export SENDECF=${SENDECF:-YES}
+  export SENDCOM=${SENDCOM:-YES}
+  export SENDDBN=${SENDDBN:-NO}
+  export SENDECF=${SENDECF:-YES}
+
+  export HOMEsref=${HOMEsref:-${NWROOT}}
+  export EXECsref=${EXECsref:-$HOMEsref/exec}
+  export FIXsref=${FIXsref:-$HOMEsref/fix}
+  export PARMsref=${PARMsref:-$HOMEsref/parm}
+  export USHsref=${USHsref:-$HOMEsref/ush}
+
+# export HOMEnam=${NWROOTp1}
+# export HOMEnam=${HOMEnam:-${NWROOTp1}/nam.${nam_ver}}
+# export HOMEnam=${HOMEnam:-${HOMEsref}}
+# export EXECnam=$HOMEnam/exec
+# export FIXnam=$HOMEnam/fix
+# export PARMnam=$HOMEnam/parm
+# export USHnam=$HOMEnam/ush
+
+  export COMIN=$COM_IN/${RUN}.${PDY}/${cyc}
+  export COMOUT=$COM_OUT/${RUN}.${PDY}/$cyc
+  export COMIN_PROF=/ptmpp1/$LOGNAME/${COMROOTp1}/${NET}/${envir}/${RUN}.${PDY}/$cyc/bufr
+fi
+
+###############################################################
+# This block can be modified for different test environment
+###############################################################
+if [ $RUN_ENVIR = nco -a $envir != prod ]; then
+  export SENDDBN=${SENDDBN:-NO}
+# export DBNROOT=${NWROOTp1}/spa_util/fakedbn
+# export jlogfile=${jlogfile:-${COMROOT}/logs/${envir}/jlogfile}
+  export RM_TMPDIR=${RM_TMPDIR:-NO}
+fi
+
+# 
+# obtain unique process id (pid) and make temp directories
+#
+export pid=$$
+export DATA_IN=${DATA_IN:-${DATAROOT}}
+
+export DATA=$DATA_IN/${job}.${pid}
+
+rm -rf $DATA
+mkdir -p $DATA
+cd $DATA 
+
+####################################
+# Determine Job Output Name on System
+####################################
+export outid="LL$job"
+export jobid="${outid}.o${pid}"
+export pgmout="OUTPUT.${pid}"
+
+export CYC=$cyc
+export cycle=t${cyc}z 
+
+# Run setpdy and initialize PDY variables
+setpdy.sh
+. ./PDY
+
+##################################################
+# SAVEGES  - Copy Files From TMPDIR to $GESdir
+# SENDECF  - Flag Events on ecFflow
+# SENDCOM  - Copy Files From TMPDIR to $COMOUT
+# SENDDBN  - Issue DBNet Client Calls
+# RERUN    - Rerun fcst from beginning (default no)
+##################################################
+export SENDCOM=${SENDCOM:-YES}
+export SENDECF=${SENDECF:-YES}
+export SENDDBN=${SENDDBN:-YES}
+
+export HOMEsref=${HOMEsref:-${NWROOT}/${NET}.${sref_ver}}
+export EXECsref=${EXECsref:-$HOMEsref/exec}
+export FIXsref=${FIXsref:-$HOMEsref/fix}
+export PARMsref=${PARMsref:-$HOMEsref/parm}
+export USHsref=${USHsref:-$HOMEsref/ush}
+
+msg="JOB $job HAS BEGUN"
+postmsg "$jlogfile" "$msg"
+
+#############################################
+# COMIN and COMOUT
+#############################################
+export COMIN=${COMROOT}/${NET}/${envir}/${RUN}.${PDY}/$cyc
+export COMOUT=${COMROOT}/${NET}/${envir}/${RUN}.${PDY}/$cyc
+export COMIN_PROF=${COMROOT}/${NET}/${envir}/${RUN}.${PDY}/$cyc/bufr
+
+mkdir -p $COMOUT
+
+env
+
+###################################################
+# Execute the Script
+#
+$HOMEsref/scripts/exsref_meanbufr.sh.ecf
+###################################################
+cat $pgmout
+
+msg="JOB $job HAS COMPLETED NORMALLY."
+postmsg "$jlogfile" "$msg"
+
+################################
+# Remove the Working Directory
+################################
+cd $DATA_IN
+if [ ${RM_TMPDIR:-YES} = YES ] ; then rm -rf $DATA ; fi
+
+date

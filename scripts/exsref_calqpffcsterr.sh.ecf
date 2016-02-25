@@ -1,0 +1,531 @@
+################################################################
+# UNIX Script Documentation Block
+#
+# Script name:         exsref_calqpffcsterr.sh.sms
+# Script description:  This program is to calculate previous day 
+#                      forecast error fields and pdf distributions 
+#                      for post-calibrating precipitation fcst
+#
+# Author:      Jun Du       Org: NP21         Date: 2010-09
+#
+# Change log:
+#  09/30/2010: Jun Du, modified from the SREF's basic variable bias correction
+#                      job script and applied it to precipitation bias correction
+#  11/04/2011: Jun Du, generalized it to use for both individual members and 
+#  11/04/2011: Jun Du, generalized it to use for both individual members and 
+#                      ensemble mean
+#  03/09/2015: Jun Du, modified for the new SREFv7.0.0 (eliminated NMMB model
+#                      and increased membership from 21 to 26)
+#
+################################################################
+#!/bin/ksh
+set -x
+XLFRTEOPTS="namelist=old"
+export XLFRTEOPTS
+XLSMPOPTS="parthds=2"
+export XLSMPOPTS
+
+
+cd $DATA
+cp $FIXsref/sref_regmask_212 regmask
+
+#back 4 days
+#firstday=$PDYm4
+#back 5 days (due to ccpa's later availability)
+firstday=$PDYm5
+date=${firstday}${cyc}
+
+date24=` $NDATE +24 $date`
+date48=` $NDATE +48 $date`
+date72=` $NDATE +72 $date`
+date96=` $NDATE +96 $date`
+adate1=`echo ${date} | cut -c1-8`
+adate2=`echo ${date24} | cut -c1-8`
+adate3=`echo ${date48} | cut -c1-8`
+adate4=`echo ${date72} | cut -c1-8`
+adate5=`echo ${date96} | cut -c1-8`
+
+#MODEL=C21
+#MODEL=SMN
+MODEL=$1
+SYS=opl
+if [ $MODEL = C21 ]; then
+ fmem=26
+ type=
+fi
+if [ $MODEL = SMN ]; then
+ fmem=1
+ type=mean
+fi
+
+let fmax1=fmem+1 
+let fmax=fmax1
+
+# date of the verifying ensemble fcst (e.g., 4 or 5 days back):
+yy=`echo ${date} | cut -c1-4`
+mm=`echo ${date} | cut -c5-6`
+dd=`echo ${date} | cut -c7-8`
+hh=`echo ${date} | cut -c9-10`
+
+# dates for anl data (Note: grib info of date is 3hr earlier
+# than verif time since it's accumulation over the past 3hr period
+# -->below is corresponding to 3h, 6h, ..., 87h fcsts)
+HR=0
+while [ $HR -le $ENDHOUR ]
+do
+ adate=` $NDATE +$HR $date`
+export  y$HR=`echo ${adate} | cut -c1-4`
+export  m$HR=`echo ${adate} | cut -c5-6`
+export  d$HR=`echo ${adate} | cut -c7-8`
+export  h$HR=`echo ${adate} | cut -c9-10`
+ HR=`expr $HR + $INCHOUR`
+done
+
+# dates for past training period
+startday=24                    #in hour, 1-day back from the verifying ensemble forecast date
+endday=`expr $startday + 456`  #19days=19x24 (456) hours, so 20-day training period including startday
+#endday=`expr $startday + 0`    #0days=0x24 (0) hours, so 1-day training period including startday
+incday=24                      #24hr
+ 
+backday=$startday
+while [ $backday -le $endday ]
+do
+ numerator=`expr $backday - $startday + 24`
+ id=`expr $numerator / 24`
+ pdate=` $NDATE -$backday $date`
+ export  py$id=`echo ${pdate} | cut -c1-4`
+ export  pm$id=`echo ${pdate} | cut -c5-6`
+ export  pd$id=`echo ${pdate} | cut -c7-8`
+ backday=`expr $backday + $incday`
+done
+
+nmbdata=${COM_IN}/sref.$firstday/${cyc}/pgrb
+nmmdata=${COM_IN}/sref.$firstday/${cyc}/pgrb
+arwdata=${COM_IN}/sref.$firstday/${cyc}/pgrb
+prddata=${COM_IN}/sref.$firstday/${cyc}/ensprod
+
+#################################
+today=${COM_OUT}/sref.$PDY/$cyc/misc
+mkdir -p $today
+yesterday=${COM_OUT}/sref.$PDYm1/$cyc/misc
+
+if [ $MODEL = C21 ]; then
+echo " $y0 $y3 $y6 $y9 $y12 $y15 $y18 $y21 $y24 $y27 $y30 $y33 $y36 $y39 $y42 $y45 $y48 $y51 $y54 $y57 $y60 $y63 $y66 $y69 $y72 $y75 $y78 $y81 $y84
+       $m0 $m3 $m6 $m9 $m12 $m15 $m18 $m21 $m24 $m27 $m30 $m33 $m36 $m39 $m42 $m45 $m48 $m51 $m54 $m57 $m60 $m63 $m66 $m69 $m72 $m75 $m78 $m81 $m84
+       $d0 $d3 $d6 $d9 $d12 $d15 $d18 $d21 $d24 $d27 $d30 $d33 $d36 $d39 $d42 $d45 $d48 $d51 $d54 $d57 $d60 $d63 $d66 $d69 $d72 $d75 $d78 $d81 $d84
+       $h0 $h3 $h6 $h9 $h12 $h15 $h18 $h21 $h24 $h27 $h30 $h33 $h36 $h39 $h42 $h45 $h48 $h51 $h54 $h57 $h60 $h63 $h66 $h69 $h72 $h75 $h78 $h81 $h84
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00 " > headinfo 
+fi
+
+if [ $MODEL = SMN ]; then
+echo " $y0 $y3 $y6 $y9 $y12 $y15 $y18 $y21 $y24 $y27 $y30 $y33 $y36 $y39 $y42 $y45 $y48 $y51 $y54 $y57 $y60 $y63 $y66 $y69 $y72 $y75 $y78 $y81 $y84
+       $m0 $m3 $m6 $m9 $m12 $m15 $m18 $m21 $m24 $m27 $m30 $m33 $m36 $m39 $m42 $m45 $m48 $m51 $m54 $m57 $m60 $m63 $m66 $m69 $m72 $m75 $m78 $m81 $m84
+       $d0 $d3 $d6 $d9 $d12 $d15 $d18 $d21 $d24 $d27 $d30 $d33 $d36 $d39 $d42 $d45 $d48 $d51 $d54 $d57 $d60 $d63 $d66 $d69 $d72 $d75 $d78 $d81 $d84
+       $h0 $h3 $h6 $h9 $h12 $h15 $h18 $h21 $h24 $h27 $h30 $h33 $h36 $h39 $h42 $h45 $h48 $h51 $h54 $h57 $h60 $h63 $h66 $h69 $h72 $h75 $h78 $h81 $h84
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00 " > headinfo 
+fi
+
+ln -f -s headinfo fort.7
+
+if [ $cyc = 03 -o $cyc = 09 -o $cyc = 15  -o $cyc = 21 ]; then
+ HR=03
+else
+ HR=00
+fi 
+while [ $HR -le $ENDHOUR ]
+do
+ if [ $MODEL = C21 ]; then
+  echo 'fetching $MODEL ensemble data'
+  if [ $SYS = opl ]; then
+  cp $nmbdata/sref_nmb.t${cyc}z.pgrb212.ctl.f$HR  r_gribawips1.f$HR
+  cp $nmbdata/sref_nmb.t${cyc}z.pgrb212.n1.f$HR   r_gribawips2.f$HR
+  cp $nmbdata/sref_nmb.t${cyc}z.pgrb212.p1.f$HR   r_gribawips3.f$HR
+  cp $nmbdata/sref_nmb.t${cyc}z.pgrb212.n2.f$HR   r_gribawips4.f$HR
+  cp $nmbdata/sref_nmb.t${cyc}z.pgrb212.p2.f$HR   r_gribawips5.f$HR
+  cp $nmbdata/sref_nmb.t${cyc}z.pgrb212.n3.f$HR   r_gribawips6.f$HR
+  cp $nmbdata/sref_nmb.t${cyc}z.pgrb212.p3.f$HR   r_gribawips7.f$HR
+  cp $nmbdata/sref_nmb.t${cyc}z.pgrb212.n4.f$HR   r_gribawips8.f$HR
+  cp $nmbdata/sref_nmb.t${cyc}z.pgrb212.p4.f$HR   r_gribawips9.f$HR
+  cp $nmbdata/sref_nmb.t${cyc}z.pgrb212.n5.f$HR   r_gribawips10.f$HR
+  cp $nmbdata/sref_nmb.t${cyc}z.pgrb212.p5.f$HR   r_gribawips11.f$HR
+  cp $nmbdata/sref_nmb.t${cyc}z.pgrb212.n6.f$HR   r_gribawips12.f$HR
+  cp $nmbdata/sref_nmb.t${cyc}z.pgrb212.p6.f$HR   r_gribawips13.f$HR
+  cp $arwdata/sref_arw.t${cyc}z.pgrb212.ctl.f$HR   r_gribawips14.f$HR
+  cp $arwdata/sref_arw.t${cyc}z.pgrb212.n1.f$HR    r_gribawips15.f$HR
+  cp $arwdata/sref_arw.t${cyc}z.pgrb212.p1.f$HR    r_gribawips16.f$HR
+  cp $arwdata/sref_arw.t${cyc}z.pgrb212.n2.f$HR    r_gribawips17.f$HR
+  cp $arwdata/sref_arw.t${cyc}z.pgrb212.p2.f$HR    r_gribawips18.f$HR
+  cp $arwdata/sref_arw.t${cyc}z.pgrb212.n3.f$HR    r_gribawips19.f$HR
+  cp $arwdata/sref_arw.t${cyc}z.pgrb212.p3.f$HR    r_gribawips20.f$HR
+  cp $arwdata/sref_arw.t${cyc}z.pgrb212.n4.f$HR    r_gribawips21.f$HR
+  cp $arwdata/sref_arw.t${cyc}z.pgrb212.p4.f$HR    r_gribawips22.f$HR
+  cp $arwdata/sref_arw.t${cyc}z.pgrb212.n5.f$HR    r_gribawips23.f$HR
+  cp $arwdata/sref_arw.t${cyc}z.pgrb212.p5.f$HR    r_gribawips24.f$HR
+  cp $arwdata/sref_arw.t${cyc}z.pgrb212.n6.f$HR    r_gribawips25.f$HR
+  cp $arwdata/sref_arw.t${cyc}z.pgrb212.p6.f$HR    r_gribawips26.f$HR
+  fi
+  echo 'fetching $MODEL ensemble data finished'
+ fi
+ if [ $MODEL = SMN ]; then
+  echo 'fetching $MODEL ensemble data'
+  if [ $SYS = opl ]; then
+  cp $prddata/sref.t${cyc}z.pgrb212.mean_fvs.f$HR  r_gribawips1.f$HR
+  $FSYNC r_gribawips1.f$HR
+  fi
+  echo 'fetching $MODEL ensemble data finished'
+ fi
+
+ HR=`expr $HR + $INCHOUR`
+ if [ $HR -lt 10 ];then HR=0$HR;fi
+done
+
+# get regional analysis
+#-----------------
+export getppt=$USHsref/sref_getobsppt.sh
+
+echo 'obtaining observed 3hrly-precip data...'
+if [ $hh -eq 03 ]; then
+$getppt $adate1
+ mv ppt03 r_gribawips.anl.f00
+ mv ppt06 r_gribawips.anl.f03
+ mv ppt09 r_gribawips.anl.f06
+ mv ppt12 r_gribawips.anl.f09
+ mv ppt15 r_gribawips.anl.f12
+ mv ppt18 r_gribawips.anl.f15
+ mv ppt21 r_gribawips.anl.f18
+ rm -f ppt*
+$getppt $adate2
+ mv ppt00 r_gribawips.anl.f21
+ mv ppt03 r_gribawips.anl.f24
+ mv ppt06 r_gribawips.anl.f27
+ mv ppt09 r_gribawips.anl.f30
+ mv ppt12 r_gribawips.anl.f33
+ mv ppt15 r_gribawips.anl.f36
+ mv ppt18 r_gribawips.anl.f39
+ mv ppt21 r_gribawips.anl.f42
+ rm -f ppt*
+$getppt $adate3
+ mv ppt00 r_gribawips.anl.f45
+ mv ppt03 r_gribawips.anl.f48
+ mv ppt06 r_gribawips.anl.f51
+ mv ppt09 r_gribawips.anl.f54
+ mv ppt12 r_gribawips.anl.f57
+ mv ppt15 r_gribawips.anl.f60
+ mv ppt18 r_gribawips.anl.f63
+ mv ppt21 r_gribawips.anl.f66
+ rm -f ppt*
+$getppt $adate4
+ mv ppt00 r_gribawips.anl.f69
+ mv ppt03 r_gribawips.anl.f72
+ mv ppt06 r_gribawips.anl.f75
+ mv ppt09 r_gribawips.anl.f78
+ mv ppt12 r_gribawips.anl.f81
+ mv ppt15 r_gribawips.anl.f84
+ mv ppt18 r_gribawips.anl.f87
+ rm -f ppt*
+ err9=$?
+ if test "$err9" -ne 0
+ then
+  echo "problem with fetching ppt obs so exit"
+  exit
+ else
+   echo 'fetching ppt obs finished'
+ fi
+fi
+
+if [ $hh -eq 09 ]; then
+$getppt $adate1
+ mv ppt09 r_gribawips.anl.f00
+ mv ppt12 r_gribawips.anl.f03
+ mv ppt15 r_gribawips.anl.f06
+ mv ppt18 r_gribawips.anl.f09
+ mv ppt21 r_gribawips.anl.f12
+ rm -f ppt*
+$getppt $adate2
+ mv ppt00 r_gribawips.anl.f15
+ mv ppt03 r_gribawips.anl.f18
+ mv ppt06 r_gribawips.anl.f21
+ mv ppt09 r_gribawips.anl.f24
+ mv ppt12 r_gribawips.anl.f27
+ mv ppt15 r_gribawips.anl.f30
+ mv ppt18 r_gribawips.anl.f33
+ mv ppt21 r_gribawips.anl.f36
+ rm -f ppt*
+$getppt $adate3
+ mv ppt00 r_gribawips.anl.f39
+ mv ppt03 r_gribawips.anl.f42
+ mv ppt06 r_gribawips.anl.f45
+ mv ppt09 r_gribawips.anl.f48
+ mv ppt12 r_gribawips.anl.f51
+ mv ppt15 r_gribawips.anl.f54
+ mv ppt18 r_gribawips.anl.f57
+ mv ppt21 r_gribawips.anl.f60
+ rm -f ppt*
+$getppt $adate4
+ mv ppt00 r_gribawips.anl.f63
+ mv ppt03 r_gribawips.anl.f66
+ mv ppt06 r_gribawips.anl.f69
+ mv ppt09 r_gribawips.anl.f72
+ mv ppt12 r_gribawips.anl.f75
+ mv ppt15 r_gribawips.anl.f78
+ mv ppt18 r_gribawips.anl.f81
+ mv ppt21 r_gribawips.anl.f84
+ rm -f ppt*
+$getppt $adate5
+ mv ppt00 r_gribawips.anl.f87
+ rm -f ppt*
+ err9=$?
+ if test "$err9" -ne 0
+ then
+  echo "problem with fetching ppt obs so exit"
+  exit
+ else
+   echo 'fetching ppt obs finished'
+ fi
+fi
+
+if [ $hh -eq 15 ]; then
+$getppt $adate1
+ mv ppt15 r_gribawips.anl.f00
+ mv ppt18 r_gribawips.anl.f03
+ mv ppt21 r_gribawips.anl.f06
+ rm -f ppt*
+$getppt $adate2
+ mv ppt00 r_gribawips.anl.f09
+ mv ppt03 r_gribawips.anl.f12
+ mv ppt06 r_gribawips.anl.f15
+ mv ppt09 r_gribawips.anl.f18
+ mv ppt12 r_gribawips.anl.f21
+ mv ppt15 r_gribawips.anl.f24
+ mv ppt18 r_gribawips.anl.f27
+ mv ppt21 r_gribawips.anl.f30
+ rm -f ppt*
+$getppt $adate3
+ mv ppt00 r_gribawips.anl.f33
+ mv ppt03 r_gribawips.anl.f36
+ mv ppt06 r_gribawips.anl.f39
+ mv ppt09 r_gribawips.anl.f42
+ mv ppt12 r_gribawips.anl.f45
+ mv ppt15 r_gribawips.anl.f48
+ mv ppt18 r_gribawips.anl.f51
+ mv ppt21 r_gribawips.anl.f54
+ rm -f ppt*
+$getppt $adate4
+ mv ppt00 r_gribawips.anl.f57
+ mv ppt03 r_gribawips.anl.f60
+ mv ppt06 r_gribawips.anl.f63
+ mv ppt09 r_gribawips.anl.f66
+ mv ppt12 r_gribawips.anl.f69
+ mv ppt15 r_gribawips.anl.f72
+ mv ppt18 r_gribawips.anl.f75
+ mv ppt21 r_gribawips.anl.f78
+ rm -f ppt*
+$getppt $adate5
+ mv ppt00 r_gribawips.anl.f81
+ mv ppt03 r_gribawips.anl.f84
+ mv ppt06 r_gribawips.anl.f87
+ rm -f ppt*
+ err9=$?
+ if test "$err9" -ne 0
+ then
+  echo "problem with fetching ppt obs so exit"
+  exit
+ else
+   echo 'fetching ppt obs finished'
+ fi
+fi
+
+if [ $hh -eq 21 ]; then
+$getppt $adate1
+ mv ppt21 r_gribawips.anl.f00
+ rm -f ppt*
+$getppt $adate2
+ mv ppt00 r_gribawips.anl.f03
+ mv ppt03 r_gribawips.anl.f06
+ mv ppt06 r_gribawips.anl.f09
+ mv ppt09 r_gribawips.anl.f12
+ mv ppt12 r_gribawips.anl.f15
+ mv ppt15 r_gribawips.anl.f18
+ mv ppt18 r_gribawips.anl.f21
+ mv ppt21 r_gribawips.anl.f24
+ rm -f ppt*
+$getppt $adate3
+ mv ppt00 r_gribawips.anl.f27
+ mv ppt03 r_gribawips.anl.f30
+ mv ppt06 r_gribawips.anl.f33
+ mv ppt09 r_gribawips.anl.f36
+ mv ppt12 r_gribawips.anl.f39
+ mv ppt15 r_gribawips.anl.f42
+ mv ppt18 r_gribawips.anl.f45
+ mv ppt21 r_gribawips.anl.f48
+ rm -f ppt*
+$getppt $adate4
+ mv ppt00 r_gribawips.anl.f51
+ mv ppt03 r_gribawips.anl.f54
+ mv ppt06 r_gribawips.anl.f57
+ mv ppt09 r_gribawips.anl.f60
+ mv ppt12 r_gribawips.anl.f63
+ mv ppt15 r_gribawips.anl.f66
+ mv ppt18 r_gribawips.anl.f69
+ mv ppt21 r_gribawips.anl.f72
+ rm -f ppt*
+$getppt $adate5
+ mv ppt00 r_gribawips.anl.f75
+ mv ppt03 r_gribawips.anl.f78
+ mv ppt06 r_gribawips.anl.f81
+ mv ppt09 r_gribawips.anl.f84
+ mv ppt12 r_gribawips.anl.f87
+ rm -f ppt*
+ err9=$?
+ if test "$err9" -ne 0
+ then
+  echo "problem with fetching ppt obs so exit"
+  exit
+ else
+   echo 'fetching ppt obs finished'
+ fi
+fi
+
+HR=03
+OHR=03
+while [ $HR -le $ENDHOUR ]
+do
+ mv r_gribawips.anl.f$OHR r_gribawips$fmax.f$HR
+ $FSYNC r_gribawips$fmax.f$HR
+ OHR=`expr $OHR + $INCHOUR`
+ HR=`expr $HR + $INCHOUR`
+ if [ $OHR -lt 10 ];then OHR=0$OHR;fi
+ if [ $HR -lt 10 ];then HR=0$HR;fi
+done
+ls -l *anl* 
+ls -l r_gribawips$fmax.f*
+
+rm -f *anl*
+echo 'end of preparing the observed 3hrly-precip data'
+
+##############################
+dataOK=0
+fnum=1
+while [ ${fnum} -le ${fmax} ]
+do
+
+# check if data is all ok
+ HR=03
+ while [ $HR -le $ENDHOUR ]
+ do
+  str=`ls -s r_gribawips${fnum}.f$HR`  #get file size in block (1024 bytes)
+  set -A fsize $str
+  if [ -s r_gribawips${fnum}.f$HR ] && [ ${fsize[0]} -gt 0 ] ; then
+   echo r_gribawips${fnum}.f$HR "is OK"
+  else
+   echo r_gribawips${fnum}.f$HR "not exist"
+   dataOK=1
+  fi
+ HR=`expr $HR + $INCHOUR`
+ if [ $HR -lt 10 ];then HR=0$HR;fi
+ done
+
+   if [ ${fnum} -le 9 ]; then
+cat                        r_gribawips${fnum}.f03 \
+    r_gribawips${fnum}.f06 r_gribawips${fnum}.f09 \
+    r_gribawips${fnum}.f12 r_gribawips${fnum}.f15 \
+    r_gribawips${fnum}.f18 r_gribawips${fnum}.f21 \
+    r_gribawips${fnum}.f24 r_gribawips${fnum}.f27 \
+    r_gribawips${fnum}.f30 r_gribawips${fnum}.f33 \
+    r_gribawips${fnum}.f36 r_gribawips${fnum}.f39 \
+    r_gribawips${fnum}.f42 r_gribawips${fnum}.f45 \
+    r_gribawips${fnum}.f48 r_gribawips${fnum}.f51 \
+    r_gribawips${fnum}.f54 r_gribawips${fnum}.f57 \
+    r_gribawips${fnum}.f60 r_gribawips${fnum}.f63 \
+    r_gribawips${fnum}.f66 r_gribawips${fnum}.f69 \
+    r_gribawips${fnum}.f72 r_gribawips${fnum}.f75 \
+    r_gribawips${fnum}.f78 r_gribawips${fnum}.f81 \
+    r_gribawips${fnum}.f84 r_gribawips${fnum}.f87 > r_gribawips0${fnum}
+    ${GRBINDEX} r_gribawips0${fnum} r_gribawips0${fnum}.i
+   else
+cat                        r_gribawips${fnum}.f03 \
+    r_gribawips${fnum}.f06 r_gribawips${fnum}.f09 \
+    r_gribawips${fnum}.f12 r_gribawips${fnum}.f15 \
+    r_gribawips${fnum}.f18 r_gribawips${fnum}.f21 \
+    r_gribawips${fnum}.f24 r_gribawips${fnum}.f27 \
+    r_gribawips${fnum}.f30 r_gribawips${fnum}.f33 \
+    r_gribawips${fnum}.f36 r_gribawips${fnum}.f39 \
+    r_gribawips${fnum}.f42 r_gribawips${fnum}.f45 \
+    r_gribawips${fnum}.f48 r_gribawips${fnum}.f51 \
+    r_gribawips${fnum}.f54 r_gribawips${fnum}.f57 \
+    r_gribawips${fnum}.f60 r_gribawips${fnum}.f63 \
+    r_gribawips${fnum}.f66 r_gribawips${fnum}.f69 \
+    r_gribawips${fnum}.f72 r_gribawips${fnum}.f75 \
+    r_gribawips${fnum}.f78 r_gribawips${fnum}.f81 \
+    r_gribawips${fnum}.f84 r_gribawips${fnum}.f87 > r_gribawips${fnum}
+    ${GRBINDEX} r_gribawips${fnum} r_gribawips${fnum}.i
+   fi
+ let fnum=fnum+1
+done
+
+rm -f *awips*.f*
+
+##############################
+
+cat <<paramEOF >input
+ &namin
+   yy1=${yy},mm1=${mm},dd1=${dd},hh1=${hh},mdl='$MODEL',reg='$region',dataOK=$dataOK
+ &end
+paramEOF
+
+$EXECsref/sref_cal_${type}qpffcsterr <input >error.out_qpfcalfcsterr_$MODEL
+export err=$?; err_chk
+
+# copyover the most recent day's error
+#cp data.out  $COMOUT/pdf_${region}_03h${type}apcp.$date
+cp data.out  $today/pdf_${region}_03h${type}apcp.$date
+
+# copyover the past 19-day data
+cp $yesterday/pdf_${region}_03h${type}apcp.$py1$pm1$pd1$cyc $today/.
+cp $yesterday/pdf_${region}_03h${type}apcp.$py2$pm2$pd2$cyc $today/.
+cp $yesterday/pdf_${region}_03h${type}apcp.$py3$pm3$pd3$cyc $today/.
+cp $yesterday/pdf_${region}_03h${type}apcp.$py4$pm4$pd4$cyc $today/.
+cp $yesterday/pdf_${region}_03h${type}apcp.$py5$pm5$pd5$cyc $today/.
+cp $yesterday/pdf_${region}_03h${type}apcp.$py6$pm6$pd6$cyc $today/.
+cp $yesterday/pdf_${region}_03h${type}apcp.$py7$pm7$pd7$cyc $today/.
+cp $yesterday/pdf_${region}_03h${type}apcp.$py8$pm8$pd8$cyc $today/.
+cp $yesterday/pdf_${region}_03h${type}apcp.$py9$pm9$pd9$cyc $today/.
+cp $yesterday/pdf_${region}_03h${type}apcp.$py10$pm10$pd10$cyc $today/.
+cp $yesterday/pdf_${region}_03h${type}apcp.$py11$pm11$pd11$cyc $today/.
+cp $yesterday/pdf_${region}_03h${type}apcp.$py12$pm12$pd12$cyc $today/.
+cp $yesterday/pdf_${region}_03h${type}apcp.$py13$pm13$pd13$cyc $today/.
+cp $yesterday/pdf_${region}_03h${type}apcp.$py14$pm14$pd14$cyc $today/.
+cp $yesterday/pdf_${region}_03h${type}apcp.$py15$pm15$pd15$cyc $today/.
+cp $yesterday/pdf_${region}_03h${type}apcp.$py16$pm16$pd16$cyc $today/.
+cp $yesterday/pdf_${region}_03h${type}apcp.$py17$pm17$pd17$cyc $today/.
+cp $yesterday/pdf_${region}_03h${type}apcp.$py18$pm18$pd18$cyc $today/.
+cp $yesterday/pdf_${region}_03h${type}apcp.$py19$pm19$pd19$cyc $today/.
+
+exit

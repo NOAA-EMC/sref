@@ -1,0 +1,2 @@
+! grid 216
+      PARAMETER (IM=139,JM=107)

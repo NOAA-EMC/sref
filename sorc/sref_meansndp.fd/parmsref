@@ -1,0 +1,8 @@
+C NSOIL=2          #eta 4,  rsm 2
+C LM1=28           #eta 60, rsm 28
+C NSTP=64          #eta 64, rsm 64
+C LCL1SL1=46       #eta 50, rsm 46
+C ETOP=200.0       #eta 25.0, rsm 200.0
+      PARAMETER (NSOIL=4)
+      PARAMETER (LM1NMM=40,LM1EM=40,LM=40)
+      PARAMETER (NSTP=88) 

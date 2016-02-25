@@ -1,0 +1,197 @@
+#!/bin/ksh
+
+########################################
+# Runs SREF Postprocessing up to 87 hours
+# change log
+# 6/16/2005, Jun Du: change forecast lead time from 
+#             63hr to 87hr
+# 12/08/2005, Jun Du: WRF_nmm and WRF_em SREF members are added
+#
+########################################
+
+set -xa
+# #### 08/25/1999 ###################
+# SET SHELL PROCESSING VARIABLES
+# ###################################
+export PS4='$SECONDS + ' 
+date
+
+#
+# Specify whether the run is production or development
+#
+export RUN_ENVIR=${RUN_ENVIR:-nco}
+
+#####################################################################################
+# Run config file to get input parameters
+# This config file should define the following variables
+# DATA_IN: Location of working directory, default to ${DATAROOT}
+# DEV_SMS: If the job is to be running using ecFflow, default to YES
+# SENDDBN: Set to NO for developers, default to YES
+# COM_IN:  Directory for input files, default to ${COMROOT}/$NET/${envir}
+# COM_OUT: Directory for output file, default to ${COMROOT}/$NET/${envir}
+# gespath: Directory for the guess or restart files, default to ${GESROOT}/${envir}
+#####################################################################################
+if [ "$RUN_ENVIR" != nco ]      ### For Developers, "group_name" is passed from the ecFflow script
+then
+  CONFIG_FILE=${CONFIG_FILE:-/meso/save/${LOGNAME}/sref${NWROOTp1}/parm/sref_para_config}
+  . $CONFIG_FILE
+  export userid=$LOGNAME
+  export DATA_IN=${DATA_IN:-/ptmpp1/$userid}
+fi
+
+###############################################################
+# This block can be modified for different test environment
+###############################################################
+if [ $RUN_ENVIR = nco -a $envir != prod ]; then
+  export SENDDBN=${SENDDBN:-YES}
+#  export DBNROOT=${NWROOTp1}/spa_util/fakedbn
+#  export jlogfile=${jlogfile:-${COMROOT}/logs/${envir}/jlogfile}
+fi
+
+# 
+# obtain unique process id (pid) and make temp directories
+#
+export pid=$$
+export DATA_IN=${DATA_IN:-${DATAROOT}}
+
+export DATA=$DATA_IN/${job}.${pid}
+mkdir $DATA
+cd $DATA 
+
+####################################
+# File To Log Msgs
+####################################
+export jlogfile=${COMROOT}/logs/jlogfiles/jlogfile.${job}.${pid}
+
+####################################
+# Determine Job Output Name on System
+####################################
+export outid="LL$job"
+export jobid="${outid}.o${pid}"
+export pgmout="OUTPUT.${pid}"
+export pgmerr=errfile
+
+export cycle=t${cyc}z
+
+###############################
+# Specify NET and RUN name
+##############################
+export NET=sref
+export RUN=sref
+export fend=00
+export finc=03
+export fstart=00
+export GRIB=
+export EXT=""
+
+##################################################
+# SAVEGES  - Copy Files From TMPDIR to $GESdir
+# SENDECF  - Flag Events on ecFflow
+# SENDCOM  - Copy Files From TMPDIR to $COMOUT
+# SENDDBN  - Issue DBNet Client Calls
+# RERUN    - Rerun fcst from beginning (default no)
+##################################################
+export SENDCOM=${SENDCOM:-YES}
+export SENDECF=${SENDECF:-YES}
+export SENDDBN=${SENDDBN:-YES}
+
+export HOMEsref=${HOMEsref:-${NWROOT}/${NET}.${sref_ver}}
+export GEMPAKsref=${GEMPAKsref:-$HOMEsref/gempak}
+
+###################################
+# Load the GRIB Utilities module
+####################################
+. /usrx/local/Modules/default/init/ksh
+module load grib_util
+
+###################################
+# Set up the UTILITIES
+###################################
+#export utilscript=${NWROOTp1}/util/ush
+#export utilities=${NWROOTp1}/util/ush
+#export utilexec=${NWROOTp1}/util/exec
+
+# Run setup to initialize working directory and utility scripts
+## setup.sh  # no need, since using module load prod_util 
+# Run setpdy and initialize PDY variables
+setpdy.sh
+. PDY
+
+#
+# Now set up GEMPAK/NTRANS environment
+#
+. ${NWROOTp1}/gempak/.gempak
+
+#
+# Copy special table wmogrib2.tbl, ncepgrib2.tbl
+# and vcrdgrib1.tbl into $DATA
+#
+cp $GEMPAKsref/fix/sref_wmogrib2.tbl wmogrib2.tbl
+cp $GEMPAKsref/fix/sref_ncepgrib2.tbl ncepgrib2.tbl
+cp $GEMPAKsref/fix/sref_vcrdgrib1.tbl vcrdgrib1.tbl
+cp $GEMPAKsref/fix/g2varsncep1.tbl g2varsncep1.tbl
+cp $GEMPAKsref/fix/g2varswmo2.tbl g2varswmo2.tbl
+cp $GEMPAKsref/fix/g2vcrdncep1.tbl g2vcrdncep1.tbl
+cp $GEMPAKsref/fix/g2vcrdwmo2.tbl g2vcrdwmo2.tbl
+
+########################################################
+# define COMIN and COMOUT
+########################################################
+export com=${COMROOT}/${NET}/${envir}
+export COMOUT=${COMROOT}/nawips/${envir}/${RUN}.${PDY}/biasc
+
+if [ ! -f $COMOUT ] ; then
+  mkdir -p -m 775 $COMOUT
+fi
+ 
+env
+
+########################################################
+# Execute the script.
+########################################################
+export COMIN=${COMROOT}/${NET}/${envir}/${RUN}.${PDY}/${cyc}/pgrb_biasc
+
+#modelname="em nmm nmb"
+modelname="arw nmb"
+for model in $modelname
+do
+  ens_mem="ctl n1 p1 n2 p2 n3 p3 n4 p4 n5 p5 n6 p6"
+  for member in $ens_mem
+  do
+    export model
+    export member
+    if [ $model = arw ]; then
+      MODEL=ARW
+    else
+      MODEL=`echo $model | tr [a-z] [A-Z]`
+    fi
+    export DBN_ALERT_TYPE=`echo ${RUN}_${MODEL}_GEMPAK | tr [a-z] [A-Z]`
+    $HOMEsref/scripts/exsref_nawips.sh.ecf $member
+  done
+done
+
+
+export DBN_ALERT_TYPE=`echo ${RUN}_GEMPAK | tr [a-z] [A-Z]`
+export COMIN=${COMROOT}/${NET}/${envir}/${RUN}.${PDY}/${cyc}/ensprod_biasc
+
+export model=""
+ens_mem="mean spread prob"
+for member in $ens_mem
+do
+  export member
+  $HOMEsref/scripts/exsref_nawips.sh.ecf $member
+done
+########################################################
+
+cat $pgmout
+
+msg="JOB COMPLETED NORMALLY"
+postmsg "$jlogfile" "$msg"
+
+################################
+# Remove the Working Directory
+################################
+cd $DATA_IN
+if [ ${RM_TMPDIR:-YES} = YES ]; then rm -rf $DATA; fi
+
+date

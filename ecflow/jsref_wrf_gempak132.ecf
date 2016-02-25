@@ -1,0 +1,59 @@
+#BSUB -J %E%sref_wrf%MOD%_gempak132_%MEM%_%CYC%
+#BSUB -o /%COM%/output/%ENVIR%/today/sref_wrf%MOD%_gempak132_%MEM%_%CYC%.o%J
+#BSUB -e /%COM%/output/%ENVIR%/today/sref_wrf%MOD%_gempak132_%MEM%_%CYC%.o%J
+#BSUB -L /bin/sh
+#BSUB -q %QUEUE%_shared
+#BSUB -n 1
+#BSUB -W 01:30
+#BSUB -cwd /tmpnwprd
+#BSUB -P %PROJ%
+#BSUB -R rusage[mem=5000] -R affinity[core]
+
+%include <head.h>
+%include <envir-p2.h>
+
+
+set -x
+
+module load grib_util
+
+export cyc=%CYC%
+export ens_mem=%MEM%
+export model=%MOD%
+export RUN=sref
+
+
+
+# versions file for SREF model $sref_ver
+VERSION_FILE=$NWROOT/versions/sref.ver
+if [ -f $VERSION_FILE ]; then
+  . $VERSION_FILE
+else
+  exit
+fi
+
+$NWROOT/sref.${sref_ver}/jobs/JSREF_GEMPAK
+
+if [ $? -ne 0 ]; then
+  ecflow_client --msg="***JOB ${ECF_NAME} ERROR RUNNING J-SCRIPT ***"
+  ecflow_client --abort
+  exit
+fi
+
+
+%include <tail.h>
+%manual
+######################################################################
+#
+#  PURPOSE:  To submit the job creates SREF Eta ctl1 GEMPAK grids.
+#
+######################################################################
+
+######################################################################
+# Job specific troubleshooting instructions:
+#  see generic troubleshoot manual page
+#
+######################################################################
+
+# include manual page below
+%end

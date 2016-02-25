@@ -1,0 +1,52 @@
+#BSUB -J %E%spcsref_gempak_f27_%CYC%
+#BSUB -o /%COM%/output/%ENVIR%/today/spcsref_gempak_f27_%CYC%.o%J
+#BSUB -e /%COM%/output/%ENVIR%/today/spcsref_gempak_f27_%CYC%.o%J
+#BSUB -L /bin/sh
+#BSUB -q %QUEUE%
+#BSUB -n 1
+#BSUB -W 01:00
+#BSUB -cwd /tmpnwprd
+#BSUB -P %PROJ%
+#BSUB -a poe
+#BSUB -R rusage[mem=5000] -R affinity[core:distribute=balance]
+
+%include <head.h>
+%include <envir-p2.h>
+
+set -x
+
+export job=spcsref_gempak_f27_%CYC%
+export cyc=%CYC%
+export fcst_hr="27"
+export fcsthrp3="30"
+export lag_hr=00
+export maxmem=26
+
+
+
+# versions file for SREF model $sref_ver
+VERSION_FILE=$NWROOT/versions/sref.ver
+if [ -f $VERSION_FILE ]; then
+  . $VERSION_FILE
+else
+  exit
+fi
+
+$NWROOT/sref.${spcsref_ver}/jobs/JSPCSREF_GEMPAK
+
+%include <tail.h>
+%manual
+######################################################################
+#
+#  PURPOSE:  To execute the job that runs the SREF GEMPAK processing.
+#
+######################################################################
+
+######################################################################
+# Job specific troubleshooting instructions:
+#  see generic troubleshoot manual page
+#
+######################################################################
+
+# include manual page below
+%end

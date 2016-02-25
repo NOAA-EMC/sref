@@ -1,0 +1,66 @@
+#!/bin/sh -l
+
+#PBS -o out_geogrid
+#PBS -e err_geogrid
+#PBS -N run_geogrid
+#PBS -A rm
+#PBS -l nodes=12:ppn=4
+##PBS -l procs=12
+#PBS -l walltime=00:30:00
+
+set -aeux
+
+export MPI_COMM_MAX=1024
+export MPI_GROUP_MAX=1024
+export MPI_BUFS_PER_PROC=512
+export MPI_BUFS_PER_HOST=512
+export MPI_GROUP_MAX=128
+export MPI_IB_RAILS=2
+
+module load intel
+module load mpt
+module load netcdf
+module load adaptive
+module load grads
+
+ulimit -s 512000
+
+cd $PBS_O_WORKDIR
+
+#GEOG_DATA_PATH=/scratch2/portfolios/NCEPDEV/ptmp/George.Vandenberghe.old/ncep/nwprod.vapor.0126.2012/fix/hwrf_wps_geo'
+GEOG_DATA_PATH=/scratch2/portfolios/NCEPDEV/meso/noscrub/Matthew.Pyle/geog
+
+RES=25km
+IOFORM=2
+
+CORE=NMM
+
+cat ../parm/sref_namelist.wps.in.${CORE}_${RES} | sed s:GEOG_DATA_PATH:${GEOG_DATA_PATH}: |
+                                                  sed s:IOFORM:$IOFORM: > namelist.wps
+ln -sf ../sorc/sref_wps_v3.4.fd/geogrid/GEOGRID.TBL.${CORE} GEOGRID.TBL
+
+mpiexec_mpt -prefix "[%g]" -np $PBS_NP ../exec/sref_geogrid
+mv geo_nmm.d01.nc ../fix/sref_geo_nmm.d01.nc_${RES}
+#mv geo_nmm.d01.int ../fix/sref_geo_nmm.d01.int
+
+
+CORE=ARW
+
+cat ../parm/sref_namelist.wps.in.${CORE}_${RES} | sed s:GEOG_DATA_PATH:${GEOG_DATA_PATH}: |
+                                                  sed s:IOFORM:$IOFORM: > namelist.wps
+ln -sf ../sorc/sref_wps_v3.4.fd/geogrid/GEOGRID.TBL.${CORE} GEOGRID.TBL
+
+mpiexec_mpt -prefix "[%g]" -np $PBS_NP ../exec/sref_geogrid
+mv geo_em.d01.nc ../fix/sref_geo_em.d01.nc_${RES}
+#mv geo_em.d01.int ../fix/sref_geo_em.d01.int
+
+
+CORE=NMB
+
+cat ../parm/sref_namelist.wps.in.${CORE}_${RES} | sed s:GEOG_DATA_PATH:${GEOG_DATA_PATH}: > namelist.nps
+ln -sf ../sorc/sref_nps.fd/geogrid/GEOGRID.TBL.${CORE} GEOGRID.TBL
+# Created if GWD option turned on:
+cp testb_${RES}_zeus.nml fort.81
+
+mpiexec_mpt -prefix "[%g]" -np $PBS_NP ../exec/sref_geogrid_nems
+mv geo_nmb.d01.dio ../fix/sref_geo_nmb.d01.int_${RES}

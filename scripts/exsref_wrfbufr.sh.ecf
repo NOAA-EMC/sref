@@ -1,0 +1,302 @@
+#! /bin/ksh
+################################################################################
+# UNIX Script Documentation Block                                              #
+#                                                                              #
+# Script name:         exsref_wrfbufr.sh.sms                                   #
+# Script description:  Runs WRF-NMM or WRF-EM bufr sounding and Gempak output  #
+#                                                                              #
+# Author:        Jun Du       Org: NP22         Date: 2007-07-30               #
+#                                                                              #
+# Script history log:                                                          #
+# 2007-07-30  Jun Du  - initial operational script and implementation          #
+# 2008-07-18  Jun Du -  (1) upgrade to new mpiio version; (2) breakout         #
+#                       class1 bufr file into individual stations;             #
+#                       (3) separate bufr and Gempak directories               #
+# 2011-08-03  Jun Du -  (1) updated codes for NMMv3.3 and ARWv3.3;             #
+#                       (2) generalized codes to apply to NMMB model too       #
+# 2015-02-25  Jun Du -  Increased members for ARW and NMMB and rename em to arw#
+#                                                                              #
+################################################################################
+set -x
+
+msg="JOB $job FOR SREF-${MODEL}"
+postmsg "$jlogfile" "$msg"
+
+# ------------------------------------------------------------------------------
+# DIRECTORY WHERE THE BUFR-JOB IS DONE
+# ------------------------------------------------------------------------------
+cd $DATA
+
+## setup.sh  # no need, since using module load prod_util 
+
+# -----------------------------------------------------------------------------
+# WRFBUFR RELATED STUFF
+# -----------------------------------------------------------------------------
+if [ $MODEL = NMM ];then CORE=nmm;fi
+#if [ $MODEL = ARW ];then CORE=em;fi
+if [ $MODEL = ARW ];then CORE=arw;fi
+if [ $MODEL = NMB ];then CORE=nmb;fi
+if [ $MEMBER = ctl ];then PAIR=ctl;fi
+if [ $MEMBER = p01 ];then PAIR=p1;fi
+if [ $MEMBER = n01 ];then PAIR=n1;fi
+if [ $MEMBER = p02 ];then PAIR=p2;fi
+if [ $MEMBER = n02 ];then PAIR=n2;fi
+if [ $MEMBER = p03 ];then PAIR=p3;fi
+if [ $MEMBER = n03 ];then PAIR=n3;fi
+if [ $MEMBER = p04 ];then PAIR=p4;fi
+if [ $MEMBER = n04 ];then PAIR=n4;fi
+if [ $MEMBER = p05 ];then PAIR=p5;fi
+if [ $MEMBER = n05 ];then PAIR=n5;fi
+if [ $MEMBER = p06 ];then PAIR=p6;fi
+if [ $MEMBER = n06 ];then PAIR=n6;fi
+export tmmark=tm00
+
+YYYY=`echo $PDY | cut -c1-4`
+MM=`echo $PDY | cut -c5-6`
+DD=`echo $PDY | cut -c7-8`
+STARTDATE=${YYYY}-${MM}-${DD}_${CYC}:00:00
+
+INCRmin=`expr ${INCR} \* 60 `
+
+fhr=00
+while [ $fhr -le $LENGTH ]
+do
+
+min=`expr ${fhr} \* 60 `
+
+date=`$NDATE $fhr $PDY$CYC`
+wyr=`echo $date | cut -c1-4`
+wmn=`echo $date | cut -c5-6`
+wdy=`echo $date | cut -c7-8`
+whr=`echo $date | cut -c9-10`
+timeform=${wyr}"-"${wmn}"-"${wdy}"_"${whr}":00:00"
+
+aftdate=`$NDATE +$INCR $date`
+aftyr=`echo $aftdate | cut -c1-4`
+aftmn=`echo $aftdate | cut -c5-6`
+aftdy=`echo $aftdate | cut -c7-8`
+afthr=`echo $aftdate | cut -c9-10`
+afttimeform=${aftyr}"-"${aftmn}"-"${aftdy}"_"${afthr}":00:00"
+
+predate=`$NDATE -$INCR $date`
+preyr=`echo $predate | cut -c1-4`
+premn=`echo $predate | cut -c5-6`
+predy=`echo $predate | cut -c7-8`
+prehr=`echo $predate | cut -c9-10`
+pretimeform=${preyr}"-"${premn}"-"${predy}"_"${prehr}":00:00"
+if [ $fhr -eq 00 ] ; then
+ pretimeform=$timeform
+fi
+
+# check if a specific fcst is done
+if [ $CORE = nmm -o $CORE = em -o $CORE = arw ];then
+if [ $fhr -eq $LENGTH ];then
+ until test -s $FCSTDIR/fcst.$MEMBER.done
+ do
+      sleep 600
+ done
+else
+ until test -s $FCSTDIR/wrfout_d01_${afttimeform}
+ do
+      sleep 600
+ done
+fi
+fi
+
+if [ $CORE = nmb ];then
+if [ $fhr -eq $LENGTH ];then
+ until test -s $FCSTDIR/fcst.$MEMBER.done
+ do
+      sleep 600
+ done
+else
+ afterincr=`expr $fhr + $INCR`
+ if [ $afterincr -lt 10 ];then afterincr=0$afterincr;fi
+ until test -s $FCSTDIR/nmmb_hst_01_nio_00${afterincr}h_00m_00.00s
+ do
+      sleep 600
+ done
+fi
+fi
+
+if [ $CORE = nmm -o $CORE = em -o $CORE = arw ];then
+ ln -sf $FCSTDIR/wrfout_d01_${timeform}    wrfout_d01_${timeform}
+ ln -sf $FCSTDIR/wrfout_d01_${pretimeform} wrfout_d01_${pretimeform}
+ OUTFIL=wrfout_d01_${timeform}
+ prefilename=wrfout_d01_${pretimeform}
+fi
+if [ $CORE = nmb ];then
+ ln -sf $FCSTDIR/nmmb_hst_01_nio_00${fhr}h_00m_00.00s nmm_b_history_nemsio.0${fhr}h_00m_00.00s
+ OUTFIL=nmm_b_history_nemsio.0${fhr}h_00m_00.00s
+fi
+
+if [ $CORE = nmm ] ; then 
+ POSTMOD=NCEP
+fi
+if [ $CORE = em -o $CORE = arw ] ; then 
+ POSTMOD=NCAR
+fi
+if [ $CORE = nmb ] ; then 
+ POSTMOD=NMMB
+fi
+
+if [ $CORE = nmm -o $CORE = em -o $CORE = arw ];then
+cat > itag <<EOF
+$OUTFIL
+$POSTMOD
+netcdf
+$STARTDATE
+1
+$INCR
+$fhr
+$prefilename
+EOF
+fi
+
+if [ $CORE = nmb ];then
+cat > itag <<EOF
+$OUTFIL
+$POSTMOD
+nemsio
+$STARTDATE
+1
+$INCRmin
+$min
+EOF
+fi
+
+# ----------------------------------------------------------------------------
+# RUN BUFR
+# ----------------------------------------------------------------------------
+rm -f fort.*
+export pgm=sref_${MODEL}_bufr
+prep_step
+
+cp $PARMsref/sref_${CORE}_profdat_1642_$RES      profdat
+ln -sf profdat       fort.19
+ln -sf intermed.bufr fort.79
+#ln -sf itag          fort.11
+
+startmsg
+#$EXECsref/sref_bufr < itag > outpost.$fhr
+mpirun.lsf $EXECsref/sref_bufr < itag > outpost.$fhr
+
+mv intermed.bufr intermed.bufr.$fhr
+cat intermed.bufr.$fhr >> total.bufr
+#rm -f intermed.bufr.$fhr
+
+export err=$?; err_chk
+echo "done executing the bufr" > $DATA/bufrdone${fhr}
+
+fhr=`expr $fhr + $INCR`
+if [ $fhr -lt 10 ];then fhr=0$fhr;fi
+
+done
+
+# Save the total bufr files to /com area for Geoff Manikin:
+mkdir -p $COMOUT/bufr
+cp total.bufr $COMOUT/bufr/${CORE}_${PAIR}.t${CYC}z.profilm.${tmmark}
+
+#------------------
+# run bufr sounding
+#------------------
+export XLFRTEOPTS="unit_vars=yes"
+cp $PARMsref/sref_sndp.parm.mono                sndp.parm
+cp $PARMsref/sref_bufr.tbl                      eta_bufr.tbl
+cp $PARMsref/sref_${MODEL}_modtop.parm          modtop.parm
+export FORT11=sndp.parm
+export FORT32=eta_bufr.tbl
+export FORT66=total.bufr
+export FORT78=class1.bufr
+ 
+startmsg
+mpirun.lsf $EXECsref/sref_${CORE}_sndp < modtop.parm > sndp.out
+#$EXECsref/sref_${CORE}_sndp < modtop.parm > sndp.out
+
+if [ -e err_chk ]
+then
+export err=$?;err_chk
+fi
+
+#----------------------------
+# breakout bufr per station
+#----------------------------
+cp class1.bufr $COMOUT/bufr/${CORE}_${PAIR}.t${CYC}z.class1.bufr.${tmmark}
+
+mkdir -p $COMOUT/bufr/${CORE}_${PAIR}
+cat <<EOF > stnmlist_input
+1
+class1.bufr
+$COMOUT/bufr/${CORE}_${PAIR}/${CORE}_${PAIR}
+EOF
+
+export FORT20=class1.bufr
+#XXW export XLFUNIT_20=class1.bufr
+date
+#mpirun.lsf $EXECnam/nam_stnmlist < stnmlist_input > nam_stnmlist.out
+mpirun.lsf $EXECsref/sref_stnmlist < stnmlist_input > sref_stnmlist.out
+
+export UCASE_MODEL=`echo $MODEL | tr 'a-z' 'A-Z'`
+
+if [ "$SENDDBN" = 'YES' ]; then
+  $DBNROOT/bin/dbn_alert MODEL SREF_BUFR${UCASE_MODEL} $job \
+    $COMOUT/bufr/${CORE}_${PAIR}.t${CYC}z.class1.bufr.${tmmark}
+fi
+
+############## WANG ###################################
+# Tar and gzip the individual bufr files and send them to /com
+cd ${COMOUT}/bufr/${CORE}_${PAIR}
+tar -cf - . | /usr/bin/gzip > ../${CORE}_${PAIR}.${cycle}.bufrsnd.tar.gz
+cd $DATA
+
+#Send the alerts
+if test "$SENDDBN" = 'YES'
+  then
+   $DBNROOT/bin/dbn_alert MODEL SREF_BUFRSND_TAR $job $COMOUT/bufr/${CORE}_${PAIR}.${cycle}.bufrsnd.tar.gz
+fi
+############## WANG ############################################
+
+echo "sndp done!"
+
+#------------------
+# run GEMPAK
+#------------------
+mkdir -p $COMOUT/gempak
+PARMgempak1=${NWROOTp1}/gempak/nawips1/gempak/tables/pack
+# PARMgempak is the same as PARMgempak1
+#${NWROOTp1}/ush/cwordsh unblk class1.bufr class1.bufr_unblk
+${NWROOTp1}/ush/cwordsh block class1.bufr class1.bufr_blk
+. ${NWROOTp1}/gempak/.gempak
+/bin/rm -f *.nts
+        
+namsnd << EOF > /dev/null
+ SNBUFR   = class1.bufr_blk
+ SNOUTF   = bufr.snd
+ SFOUTF   = bufr.sfc+
+ SNPRMF   = $PARMgempak1/sneta.prm
+ SFPRMF   = $PARMgempak1/sfeta.prm
+ TIMSTN   = 88/1642
+        
+l
+ru
+exit
+EOF
+
+mv bufr.snd      $COMOUT/gempak/${CORE}_${PAIR}.${PDY}${CYC}.snd
+mv bufr.sfc      $COMOUT/gempak/${CORE}_${PAIR}.${PDY}${CYC}.sfc
+mv bufr.sfc_aux  $COMOUT/gempak/${CORE}_${PAIR}.${PDY}${CYC}.sfc_aux
+
+if [ "$SENDDBN" = 'YES' ]; then
+  $DBNROOT/bin/dbn_alert MODEL SREF_SND${UCASE_MODEL} $job \
+    $COMOUT/gempak/${CORE}_${PAIR}.${PDY}${CYC}.snd
+  $DBNROOT/bin/dbn_alert MODEL SREF_SFC${UCASE_MODEL} $job \
+    $COMOUT/gempak/${CORE}_${PAIR}.${PDY}${CYC}.sfc
+  $DBNROOT/bin/dbn_alert MODEL SREF_SFC${UCASE_MODEL} $job \
+    $COMOUT/gempak/${CORE}_${PAIR}.${PDY}${CYC}.sfc_aux
+fi
+
+    
+exit
+# ------------------------------------------------------------------------------
+#                                             END
+# -----------------------------------------------------------------------------
