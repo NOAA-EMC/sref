@@ -1,0 +1,154 @@
+#!/bin/sh
+
+#############################################################
+# Description: Runs SPC SREF post processing up to 87 hours
+#
+# 9/20/2009, Julia Zhu   Scripts are modified to be sharable
+#                        between EMC and NCO
+#         Please note that variable "RUN_ENVIR" is set and used
+#         in the development enviroment only.
+#
+#############################################################
+
+set -xa
+# #### 08/25/1999 ###################
+# SET SHELL PROCESSING VARIABLES
+# ###################################
+export PS4='$SECONDS + ' 
+date
+
+export RUN_ENVIR=${RUN_ENVIR:-nco}
+
+###############################
+# Specify NET and RUN name
+##############################
+export NET=sref
+export RUN=sref
+
+#####################################################################################
+# Run config file to get input parameters
+# This config file should define the following variables
+# DATA_IN: Location of working directory, default to ${DATAROOT}
+# DEV_SMS: If the job is to be running using ecFflow, default to YES
+# SENDDBN: Set to NO for developers, default to YES
+# COM_IN:  Directory for input files, default to ${COMROOT}/$NET/${envir}
+# COM_OUT: Directory for output file, default to ${COMROOT}/$NET/${envir}
+# gespath: Directory for the guess or restart files, default to ${GESROOT}/${envir}
+#####################################################################################
+if [ "$RUN_ENVIR" != nco ]      ### For Developers, "group_name" is passed from the ecFflow script
+then
+  CONFIG_FILE=${CONFIG_FILE:-/meso/save/${LOGNAME}/sref${NWROOTp1}/parm/sref_para_config}
+  . $CONFIG_FILE
+  export userid=$LOGNAME
+  export DATA_IN=${DATA_IN:-/ptmpp1/$userid}
+
+  export COM=${COM:-/meso/noscrub/$LOGNAME${COMROOT}/${NET}/${envir}}
+  export COM_IN=${COM_IN:-/meso/noscrub/$LOGNAME${COMROOT}/${NET}/${envir}}
+  export COM_OUT=${COM_OUT:-/meso/noscrub/$LOGNAME${COMROOT}/nawips/${envir}}
+# export COMOUT=$COM_OUT/${RUN}.${PDYm4}/$cyc/misc
+fi
+
+###############################################################
+# This block can be modified for different test environment
+###############################################################
+if [ $RUN_ENVIR = nco -a $envir != prod ]; then
+  export SENDDBN=${SENDDBN:-NO}
+# export DBNROOT=${NWROOTp1}/spa_util/fakedbn
+# export jlogfile=${jlogfile:-${COMROOT}/logs/${envir}/jlogfile}
+fi
+
+###########################################################
+# obtain unique process id (pid) and make temp directories
+# Note: ctl member needs to be run only once and can be used
+# for both NMM and ARW cores!
+###########################################################
+export pid=$$
+export DATA_IN=${DATA_IN:-${DATAROOT}}
+
+export DATA=$DATA_IN/${job}.${pid}
+# Remove old directory if it exists
+rm -rf $DATA
+mkdir -p $DATA
+cd $DATA
+
+####################################
+# File To Log Msgs
+####################################
+export jlogfile=${jlogfile:-${COMROOT}/logs/jlogfiles/jlogfile.${job}.${pid}}
+
+####################################
+# Determine Job Output Name on System
+####################################
+export outid="LL$job"
+export jobid="${outid}.o${pid}"
+export pgmout="OUTPUT.${pid}"
+export pgmerr=errfile
+
+export cycle=t${cyc}z
+
+##################################################
+# SAVEGES  - Copy Files From TMPDIR to $GESdir
+# SENDECF  - Flag Events on ecFflow
+# SENDCOM  - Copy Files From TMPDIR to $COMOUT
+# SENDDBN  - Issue DBNet Client Calls
+# RERUN    - Rerun fcst from beginning (default no)
+##################################################
+export SENDCOM=${SENDCOM:-YES}
+export SENDECF=${SENDECF:-YES}
+export SENDDBN=${SENDDBN:-YES}
+export VERBOSE=${VERBOSE:-YES}
+
+export HOMEsref=${HOMEsref:-${NWROOT}/${NET}.${sref_ver}}
+export EXECsref=${EXECsref:-$HOMEsref/exec}
+export FIXsref=${FIXsref:-$HOMEsref/fix}
+export PARMsref={PARMsref:-$HOMEsref/parm}
+export USHsref=${USHsref:-$HOMEsref/ush}
+export GEMPAKsref=${GEMPAKsref:-$HOMEsref/gempak}
+
+###############################
+# Specify NET and RUN name
+##############################
+export NET=sref
+export RUN=sref
+
+###################################
+# Set up the UTILITIES
+###################################
+#export utilscript=${NWROOTp1}/util/ush
+#export utilities=${NWROOTp1}/util/ush
+#export utilexec=${NWROOTp1}/util/exec
+
+## setup.sh  # no need, since using module load prod_util 
+# Run setpdy and initialize PDY variables
+setpdy.sh
+. ./PDY
+
+####################################
+# Determine COMIN and COMOUT
+####################################
+export COM_IN=${COM_IN:-${COMROOT}/${NET}/${envir}}
+export COMIN=${COMIN:-${COM_IN}/${RUN}.${PDY}/${cyc}/pgrb}
+export COMOUT=${COMOUT:-${COMROOT}/nawips/${envir}/${RUN}.${PDY}}
+
+if [ ! -f $COMOUT ] ; then
+  mkdir -p -m 775 $COMOUT
+fi
+ 
+env
+
+########################################################
+# Execute the script.
+$HOMEsref/scripts/exsref_gempak_pmgr.sh.ecf
+########################################################
+
+cat $pgmout
+
+msg="JOB COMPLETED NORMALLY"
+postmsg "$jlogfile" "$msg"
+################################
+# Remove the Working Directory
+################################
+cd $DATA_IN
+if [ ${RM_TMPDIR:-YES} = YES ]; then rm -rf $DATA; fi
+
+date

@@ -1,0 +1,63 @@
+#BSUB -J %E%sref_wrf%MOD%_real_%MEM%_%CYC%
+#BSUB -o /%COM%/output/%ENVIR%/today/sref_wrf%MOD%_real_%MEM%_%CYC%.o%J
+#BSUB -e /%COM%/output/%ENVIR%/today/sref_wrf%MOD%_real_%MEM%_%CYC%.o%J
+#BSUB -cwd /tmpnwprd
+#BSUB -L /bin/sh
+#BSUB -q %QUEUE%
+#BSUB -a poe
+#BSUB -network "type=sn_all:mode=US"
+#BSUB -R "span[ptile=8]"
+#BSUB -n 32
+#BSUB -W 01:00
+#BSUB -P %PROJ%
+#BSUB -x    # not_shared
+#BSUB -R affinity[core:distribute=balance]
+
+%include <head.h>
+%include <envir-p2.h>
+
+
+set -x
+module load grib_util
+
+export cyc=%CYC%
+export DOMNAM="na32"
+export MODEL="%MODEL%"
+export MEMBER="%MEM0%"
+
+#  PURPOSE:      To execute the SREF Pre Processing
+
+
+
+# versions file for SREF model $sref_ver
+VERSION_FILE=$NWROOT/versions/sref.ver
+if [ -f $VERSION_FILE ]; then
+  . $VERSION_FILE
+else
+  exit
+fi
+
+$NWROOT/sref.${sref_ver}/jobs/JSREF_WRF_REAL
+
+if [ $? -ne 0 ]; then
+  ecflow_client --msg="***JOB ${ECF_NAME} ERROR RUNNING J-SCRIPT ***"
+  ecflow_client --abort
+  exit
+fi
+
+
+%include <tail.h>
+%manual
+######################################################################
+#
+#
+######################################################################
+
+######################################################################
+# Job specific troubleshooting instructions:
+#  see generic troubleshoot manual page
+#
+######################################################################
+
+# include manual page below
+%end

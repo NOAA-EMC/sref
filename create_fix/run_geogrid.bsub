@@ -1,0 +1,67 @@
+#!/bin/bash
+
+#BSUB -oo out_geogrid
+#BSUB -eo err_geogrid
+#BSUB -J run_geogrid
+#BSUB -n 32
+#BSUB -x
+#BSUB -R span[ptile=8]
+#BSUB -W 00:30
+#BSUB -q "dev"
+#BSUB -a poe
+
+set -aeux
+
+N_TASK=32
+
+. /usrx/local/Modules/3.2.9/init/bash
+module load ibmpe
+module load ics
+
+export OMP_NUM_THREADS=1
+export MP_EUIDEVICE=sn_all
+export MP_EUILIB=us
+export MP_MPILIB=pempi
+export MP_TASK_AFFINITY=core:1
+
+GEOG_DATA_PATH=/meso/noscrub/Matthew.Pyle/geog
+
+IOFORM=2
+
+#for RES in 16km 20km 25km;
+for RES in 16km;
+do
+
+CORE=NMM
+
+cat ../parm/sref_namelist.wps.in.${CORE}_${RES} | sed s:GEOG_DATA_PATH:${GEOG_DATA_PATH}: |
+                                                  sed s:IOFORM:$IOFORM: > namelist.wps
+ln -sf ../sorc/sref_wps_v3.5.1.fd/geogrid/GEOGRID.TBL.${CORE} GEOGRID.TBL
+
+mpirun.lsf ../exec/sref_geogrid
+#mv geo_nmm.d01.nc ../fix/sref_geo_nmm.d01.nc_${RES}
+
+
+CORE=ARW
+
+cat ../parm/sref_namelist.wps.in.${CORE}_${RES} | sed s:GEOG_DATA_PATH:${GEOG_DATA_PATH}: |
+                                                  sed s:IOFORM:$IOFORM: > namelist.wps
+ln -sf ../sorc/sref_wps_v3.5.1.fd/geogrid/GEOGRID.TBL.${CORE} GEOGRID.TBL
+
+mpirun.lsf ../exec/sref_geogrid
+#mv geo_em.d01.nc ../fix/sref_geo_em.d01.nc_${RES}
+
+
+CORE=NMB
+
+cat ../parm/sref_namelist.wps.in.${CORE}_${RES} | sed s:GEOG_DATA_PATH:${GEOG_DATA_PATH}: > namelist.nps
+ln -sf ../sorc/sref_nps.fd/geogrid/GEOGRID.TBL.${CORE} GEOGRID.TBL
+# Created if GWD option turned on:
+cp testb_${RES}_wcoss.nml fort.81
+
+mpirun.lsf ../exec/sref_geogrid_nems
+#mv geo_nmb.d01.dio ../fix/sref_geo_nmb.d01.int_${RES}
+
+done
+
+exit "Done."

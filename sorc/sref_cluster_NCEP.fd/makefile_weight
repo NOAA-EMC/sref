@@ -1,0 +1,15 @@
+SHELL=/bin/sh
+SRCS 	= clusterweight.f
+OBJS	= clusterweight.o
+
+FC 	= ifort -O3 
+#FC 	= ifort -O3 -mcmodel=medium
+#FC 	= ifort -O3 -convert big_endian
+LDFLAGS =
+LIBS 	= ${W3NCO_LIB4} ${W3EMC_LIB4} ${BACIO_LIB4} 
+CMD 	= sref_clusterweight
+
+all:	$(CMD)
+
+$(CMD):	 ${OBJS}
+	$(FC) $(LDFLAGS) -o $(@) $(OBJS) $(LIBS)

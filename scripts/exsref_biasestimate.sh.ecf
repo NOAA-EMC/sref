@@ -1,0 +1,334 @@
+#!/bin/ksh
+################################################################
+# UNIX Script Documentation Block
+#
+# Script name:         exsref_biasestimate.sh.sms
+# Script description:  This program is to estimate model bias and
+#                      remove it from each SREF members
+#
+# Author:      Jun Du       Org: NP21         Date: 2007-05
+#
+# Change log:
+#  7/16/2007:  Jun Du, initial implementation for the SREF operation
+#  7/28/2008:  Jun Du, increased wrf membership from 6 to 10 and 
+#                      reduced eta membership from 10 to 6
+#  7/27/2010:  Jun Du, add a check point of data file size to prevent
+#                      bad data from inputing
+#  11/2/2011:  Jun Du, modified to the new 2012 NEMS-based SREF (v6.0.0)
+#                      by reducing grouping from 4 (Eta, RSM, NMM and ARW)
+#                      to 3 (NMMB, NMM and ARW)
+#  03/9/2015:  Jun Du, modified to the new 2015 SREFv7.0.0 (Eliminated
+#                      NMM model and increased membership from 21 to 26)
+#
+################################################################
+set -x
+XLFRTEOPTS="namelist=old"
+export XLFRTEOPTS
+XLSMPOPTS="parthds=2"
+export XLSMPOPTS
+
+# ensemble fcst initiation date:
+date=${PDY}${cyc}
+yy=`echo ${date} | cut -c1-4`
+mm=`echo ${date} | cut -c5-6`
+dd=`echo ${date} | cut -c7-8`
+hh=`echo ${date} | cut -c9-10`
+
+yesdate=` $NDATE -24 $date`
+export  yesyy=`echo ${yesdate} | cut -c1-4`
+export  yesmm=`echo ${yesdate} | cut -c5-6`
+export  yesdd=`echo ${yesdate} | cut -c7-8`
+
+MODEL=C21
+SYS=opl
+if [ $MODEL = C21 ]; then
+ fmem=26
+fi
+
+let fmax=fmem
+
+meth=2
+# 1-simple average
+# 2-decaying average
+# 3-regime-selective average
+
+# dates for past training period
+startday=96                    #in hour, 4-day back
+endday=`expr $startday + 456`  #19days=19x24 (456) hours, so 20-day training period including startday
+incday=24                      #24hr
+
+backday=$startday
+while [ $backday -le $endday ]
+do
+ numerator=`expr $backday - $startday + 24`
+ id=`expr $numerator / 24`
+ pdate=` $NDATE -$backday $date`
+ export  py$id=`echo ${pdate} | cut -c1-4`
+ export  pm$id=`echo ${pdate} | cut -c5-6`
+ export  pd$id=`echo ${pdate} | cut -c7-8`
+ backday=`expr $backday + $incday`
+done
+
+#pastdata=${COMROOT}/sref/${envir}/sref.$py1$pm1$pd1/$hh/misc
+#biasdata=${COMROOT}/sref/${envir}/sref.$yesyy$yesmm$yesdd/$hh/misc
+pastdata=${COM_IN}/sref.$py1$pm1$pd1/$hh/misc
+biasdata=${COM_IN}/sref.$yesyy$yesmm$yesdd/$hh/misc
+#dirarch=${COMOUT}
+#mkdir -p $dirarch
+
+#################################
+
+#cd  $DATA/pgrb_biasc
+
+# check if it's a cold (2) or warm (1) start?
+if [ -s $biasdata/grb_bias2.01.f87 -a \
+     -s $biasdata/grb_bias2.02.f87 ];then
+ TYPE=1
+else
+ TYPE=2
+fi
+
+echo " $py1 $py2 $py3 $py4 $py5 $py6 $py7 $py8 $py9 $py10 $py11 $py12 $py13 $py14 $py15 $py16 $py17 $py18 $py19 $py20
+       $pm1 $pm2 $pm3 $pm4 $pm5 $pm6 $pm7 $pm8 $pm9 $pm10 $pm11 $pm12 $pm13 $pm14 $pm15 $pm16 $pm17 $pm18 $pm19 $pm20
+       $pd1 $pd2 $pd3 $pd4 $pd5 $pd6 $pd7 $pd8 $pd9 $pd10 $pd11 $pd12 $pd13 $pd14 $pd15 $pd16 $pd17 $pd18 $pd19 $pd20 " > pastinfo
+
+echo " $yesyy $yesmm $yesdd " > yesterdayinfo
+
+
+if [ $MODEL = C21 ]; then
+echo " 03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87 " > headinfo
+fi
+ln -f -s headinfo fort.7
+ln -f -s pastinfo fort.8
+ln -f -s yesterdayinfo fort.9
+
+cat <<paramEOF >input
+ &namin
+   yy1=${yy},mm1=${mm},dd1=${dd},hh1=${hh},method=${meth},type=$TYPE,nvar0=1,nvar=33
+ &end
+paramEOF
+
+# obtain SREF data
+#----------------------
+HR=03
+while [ $HR -le $ENDHOUR ]
+do
+ if [ $MODEL = C21 ]; then
+  echo 'fetching $MODEL ensemble data'
+  if [ $SYS = opl ]; then
+   cp ${COMIN}/sref_nmb.t${hh}z.pgrb212.ctl.f$HR  r_gribawips1.f$HR
+   cp ${COMIN}/sref_nmb.t${hh}z.pgrb212.n1.f$HR   r_gribawips2.f$HR
+   cp ${COMIN}/sref_nmb.t${hh}z.pgrb212.p1.f$HR   r_gribawips3.f$HR
+   cp ${COMIN}/sref_nmb.t${hh}z.pgrb212.n2.f$HR   r_gribawips4.f$HR
+   cp ${COMIN}/sref_nmb.t${hh}z.pgrb212.p2.f$HR   r_gribawips5.f$HR
+   cp ${COMIN}/sref_nmb.t${hh}z.pgrb212.n3.f$HR   r_gribawips6.f$HR
+   cp ${COMIN}/sref_nmb.t${hh}z.pgrb212.p3.f$HR   r_gribawips7.f$HR
+   cp ${COMIN}/sref_nmb.t${hh}z.pgrb212.n4.f$HR   r_gribawips8.f$HR
+   cp ${COMIN}/sref_nmb.t${hh}z.pgrb212.p4.f$HR   r_gribawips9.f$HR
+   cp ${COMIN}/sref_nmb.t${hh}z.pgrb212.n5.f$HR   r_gribawips10.f$HR
+   cp ${COMIN}/sref_nmb.t${hh}z.pgrb212.p5.f$HR   r_gribawips11.f$HR
+   cp ${COMIN}/sref_nmb.t${hh}z.pgrb212.n6.f$HR   r_gribawips12.f$HR
+   cp ${COMIN}/sref_nmb.t${hh}z.pgrb212.p6.f$HR   r_gribawips13.f$HR
+   cp ${COMIN}/sref_arw.t${hh}z.pgrb212.ctl.f$HR   r_gribawips14.f$HR
+   cp ${COMIN}/sref_arw.t${hh}z.pgrb212.n1.f$HR    r_gribawips15.f$HR
+   cp ${COMIN}/sref_arw.t${hh}z.pgrb212.p1.f$HR    r_gribawips16.f$HR
+   cp ${COMIN}/sref_arw.t${hh}z.pgrb212.n2.f$HR    r_gribawips17.f$HR
+   cp ${COMIN}/sref_arw.t${hh}z.pgrb212.p2.f$HR    r_gribawips18.f$HR
+   cp ${COMIN}/sref_arw.t${hh}z.pgrb212.n3.f$HR    r_gribawips19.f$HR
+   cp ${COMIN}/sref_arw.t${hh}z.pgrb212.p3.f$HR    r_gribawips20.f$HR
+   cp ${COMIN}/sref_arw.t${hh}z.pgrb212.n4.f$HR    r_gribawips21.f$HR
+   cp ${COMIN}/sref_arw.t${hh}z.pgrb212.p4.f$HR    r_gribawips22.f$HR
+   cp ${COMIN}/sref_arw.t${hh}z.pgrb212.n5.f$HR    r_gribawips23.f$HR
+   cp ${COMIN}/sref_arw.t${hh}z.pgrb212.p5.f$HR    r_gribawips24.f$HR
+   cp ${COMIN}/sref_arw.t${hh}z.pgrb212.n6.f$HR    r_gribawips25.f$HR
+   cp ${COMIN}/sref_arw.t${hh}z.pgrb212.p6.f$HR    r_gribawips26.f$HR
+
+# check if input data file is ok?
+fnum=1
+while [ ${fnum} -le ${fmem} ]
+do
+  str=`ls -l r_gribawips${fnum}.f$HR | awk ' { print $5 } '`  #get file size in byte
+  set -A fsize $str
+  if [ -s r_gribawips${fnum}.f$HR ] && [ ${fsize[0]} -gt 10000000 ] ; then
+   echo r_gribawips${fnum}.f$HR "is OK"
+  else
+   echo r_gribawips${fnum}.f$HR "is bad"
+   msg="ABORTING because r_gribawips${fnum}.f$HR is bad"
+   err_exit $msg
+  fi
+ let fnum=fnum+1
+done
+
+  fi
+ echo 'fetching $MODEL ensemble data finished'
+ fi
+
+ HR=`expr $HR + $INCHOUR`
+ if [ $HR -lt 10 ];then HR=0$HR;fi
+done
+
+# obtain past bias data:
+rm -f grb_*
+#group="01 02 03"
+group="01 02"
+for subgroup in $group
+do
+
+#ENDHOUR=87
+#INCHOUR=03
+HR=03
+if [ $TYPE -eq 1 ]; then
+while [ $HR -le $ENDHOUR ]
+ do
+ cat $pastdata/grb_pasterro$subgroup.f$HR >> grb_pasterro.$subgroup 
+ cat $pastdata/grb_pastfcst$subgroup.f$HR >> grb_pastfcst.$subgroup 
+ cat $pastdata/grb_pastsprd$subgroup.f$HR >> grb_pastsprd.$subgroup 
+ cat $biasdata/grb_bias2.$subgroup.f$HR   >> grb_pastbias.$subgroup 
+ HR=`expr $HR + $INCHOUR`
+ if [ $HR -lt 10 ];then HR=0$HR;fi
+ done
+ ${GRBINDEX} grb_pasterro.$subgroup grb_pasterro.$subgroup.i
+ ${GRBINDEX} grb_pastfcst.$subgroup grb_pastfcst.$subgroup.i
+ ${GRBINDEX} grb_pastsprd.$subgroup grb_pastsprd.$subgroup.i
+ ${GRBINDEX} grb_pastbias.$subgroup grb_pastbias.$subgroup.i
+else
+while [ $HR -le $ENDHOUR ]
+ do
+ cat $pastdata/grb_pasterro$subgroup.f$HR >> grb_pasterro.$subgroup 
+ cat $pastdata/grb_pastfcst$subgroup.f$HR >> grb_pastfcst.$subgroup 
+ cat $pastdata/grb_pastsprd$subgroup.f$HR >> grb_pastsprd.$subgroup 
+ HR=`expr $HR + $INCHOUR`
+ if [ $HR -lt 10 ];then HR=0$HR;fi
+ done
+ ${GRBINDEX} grbindex grb_pasterro.$subgroup grb_pasterro.$subgroup.i
+ ${GRBINDEX} grbindex grb_pastfcst.$subgroup grb_pastfcst.$subgroup.i
+ ${GRBINDEX} grbindex grb_pastsprd.$subgroup grb_pastsprd.$subgroup.i
+fi
+
+done
+##############################
+fnum=1
+while [ ${fnum} -le ${fmax} ]
+do
+ if [ ${fnum} -le 9 ]; then
+cat r_gribawips${fnum}.f03 \
+    r_gribawips${fnum}.f06 r_gribawips${fnum}.f09 \
+    r_gribawips${fnum}.f12 r_gribawips${fnum}.f15 \
+    r_gribawips${fnum}.f18 r_gribawips${fnum}.f21 \
+    r_gribawips${fnum}.f24 r_gribawips${fnum}.f27 \
+    r_gribawips${fnum}.f30 r_gribawips${fnum}.f33 \
+    r_gribawips${fnum}.f36 r_gribawips${fnum}.f39 \
+    r_gribawips${fnum}.f42 r_gribawips${fnum}.f45 \
+    r_gribawips${fnum}.f48 r_gribawips${fnum}.f51 \
+    r_gribawips${fnum}.f54 r_gribawips${fnum}.f57 \
+    r_gribawips${fnum}.f60 r_gribawips${fnum}.f63 \
+    r_gribawips${fnum}.f66 r_gribawips${fnum}.f69 \
+    r_gribawips${fnum}.f72 r_gribawips${fnum}.f75 \
+    r_gribawips${fnum}.f78 r_gribawips${fnum}.f81 \
+    r_gribawips${fnum}.f84 r_gribawips${fnum}.f87 > r_gribawips0${fnum}
+    ${GRBINDEX} r_gribawips0${fnum} r_gribawips0${fnum}.i
+ else
+cat r_gribawips${fnum}.f03 \
+    r_gribawips${fnum}.f06 r_gribawips${fnum}.f09 \
+    r_gribawips${fnum}.f12 r_gribawips${fnum}.f15 \
+    r_gribawips${fnum}.f18 r_gribawips${fnum}.f21 \
+    r_gribawips${fnum}.f24 r_gribawips${fnum}.f27 \
+    r_gribawips${fnum}.f30 r_gribawips${fnum}.f33 \
+    r_gribawips${fnum}.f36 r_gribawips${fnum}.f39 \
+    r_gribawips${fnum}.f42 r_gribawips${fnum}.f45 \
+    r_gribawips${fnum}.f48 r_gribawips${fnum}.f51 \
+    r_gribawips${fnum}.f54 r_gribawips${fnum}.f57 \
+    r_gribawips${fnum}.f60 r_gribawips${fnum}.f63 \
+    r_gribawips${fnum}.f66 r_gribawips${fnum}.f69 \
+    r_gribawips${fnum}.f72 r_gribawips${fnum}.f75 \
+    r_gribawips${fnum}.f78 r_gribawips${fnum}.f81 \
+    r_gribawips${fnum}.f84 r_gribawips${fnum}.f87 > r_gribawips${fnum}
+    ${GRBINDEX} r_gribawips${fnum} r_gribawips${fnum}.i
+  fi
+let fnum=fnum+1
+done
+rm -f *awips*.f*
+
+#########################
+# execute program
+#########################
+cp $PARMsref/sref_bias_variable.tbl variable.tbl
+
+$EXECsref/sref_estimate_bias <input > $pgmout 2>errfile
+export err=$?; err_chk
+
+###################################################
+# output grib data with proper file names
+###################################################
+# ${COMROOT}/sref/prod/sref.20070716/(03,09,15,21)/(pgrb,pgrb_bc,bufr,ensprod,misc)
+cp asc_wgts*   $COMOUT_MISC/.
+cp grb_bias*   $COMOUT_MISC/.
+
+#time="03 06 09 12 15 18 21 24 27 30 33 36 39 42 45 48 51 54 57 60 63 66 69 72 75 78 81 84 87"
+#for HR in $time
+HR=03
+while [ $HR -le $ENDHOUR ]
+do
+ cat BC${meth}_nmb.pgrb212.c1.f$HR  >> ${COMOUT}/sref_nmb.t${hh}z.pgrb212.ctl.f$HR
+ cat BC${meth}_nmb.pgrb212.n1.f$HR  >> ${COMOUT}/sref_nmb.t${hh}z.pgrb212.n1.f$HR
+ cat BC${meth}_nmb.pgrb212.p1.f$HR  >> ${COMOUT}/sref_nmb.t${hh}z.pgrb212.p1.f$HR
+ cat BC${meth}_nmb.pgrb212.n2.f$HR  >> ${COMOUT}/sref_nmb.t${hh}z.pgrb212.n2.f$HR
+ cat BC${meth}_nmb.pgrb212.p2.f$HR  >> ${COMOUT}/sref_nmb.t${hh}z.pgrb212.p2.f$HR
+ cat BC${meth}_nmb.pgrb212.n3.f$HR  >> ${COMOUT}/sref_nmb.t${hh}z.pgrb212.n3.f$HR
+ cat BC${meth}_nmb.pgrb212.p3.f$HR  >> ${COMOUT}/sref_nmb.t${hh}z.pgrb212.p3.f$HR
+ cat BC${meth}_nmb.pgrb212.n4.f$HR  >> ${COMOUT}/sref_nmb.t${hh}z.pgrb212.n4.f$HR
+ cat BC${meth}_nmb.pgrb212.p4.f$HR  >> ${COMOUT}/sref_nmb.t${hh}z.pgrb212.p4.f$HR
+ cat BC${meth}_nmb.pgrb212.n5.f$HR  >> ${COMOUT}/sref_nmb.t${hh}z.pgrb212.n5.f$HR
+ cat BC${meth}_nmb.pgrb212.p5.f$HR  >> ${COMOUT}/sref_nmb.t${hh}z.pgrb212.p5.f$HR
+ cat BC${meth}_nmb.pgrb212.n6.f$HR  >> ${COMOUT}/sref_nmb.t${hh}z.pgrb212.n6.f$HR
+ cat BC${meth}_nmb.pgrb212.p6.f$HR  >> ${COMOUT}/sref_nmb.t${hh}z.pgrb212.p6.f$HR
+
+ cat BC${meth}_arw.pgrb212.c1.f$HR  >> ${COMOUT}/sref_arw.t${hh}z.pgrb212.ctl.f$HR
+ cat BC${meth}_arw.pgrb212.n1.f$HR  >> ${COMOUT}/sref_arw.t${hh}z.pgrb212.n1.f$HR
+ cat BC${meth}_arw.pgrb212.p1.f$HR  >> ${COMOUT}/sref_arw.t${hh}z.pgrb212.p1.f$HR
+ cat BC${meth}_arw.pgrb212.n2.f$HR  >> ${COMOUT}/sref_arw.t${hh}z.pgrb212.n2.f$HR
+ cat BC${meth}_arw.pgrb212.p2.f$HR  >> ${COMOUT}/sref_arw.t${hh}z.pgrb212.p2.f$HR
+ cat BC${meth}_arw.pgrb212.n3.f$HR  >> ${COMOUT}/sref_arw.t${hh}z.pgrb212.n3.f$HR
+ cat BC${meth}_arw.pgrb212.p3.f$HR  >> ${COMOUT}/sref_arw.t${hh}z.pgrb212.p3.f$HR
+ cat BC${meth}_arw.pgrb212.n4.f$HR  >> ${COMOUT}/sref_arw.t${hh}z.pgrb212.n4.f$HR
+ cat BC${meth}_arw.pgrb212.p4.f$HR  >> ${COMOUT}/sref_arw.t${hh}z.pgrb212.p4.f$HR
+ cat BC${meth}_arw.pgrb212.n5.f$HR  >> ${COMOUT}/sref_arw.t${hh}z.pgrb212.n5.f$HR
+ cat BC${meth}_arw.pgrb212.p5.f$HR  >> ${COMOUT}/sref_arw.t${hh}z.pgrb212.p5.f$HR
+ cat BC${meth}_arw.pgrb212.n6.f$HR  >> ${COMOUT}/sref_arw.t${hh}z.pgrb212.n6.f$HR
+ cat BC${meth}_arw.pgrb212.p6.f$HR  >> ${COMOUT}/sref_arw.t${hh}z.pgrb212.p6.f$HR
+ HR=`expr $HR + $INCHOUR`
+ if [ $HR -lt 10 ];then HR=0$HR;fi
+done
+
+sleep 10
+
+if [ $SENDECF = YES ]; then
+  ecflow_client --event release_biasc_gempak
+fi
+
+exit
