@@ -1,0 +1,18 @@
+  5       raw variables and mean/spread/prob info
+U10M   33   105  M1   10  
+V10M   34   105  M1   10
+T2M    11   105  M1    2  P1  2     < T1 273.0
+T2M    11   105  M0       P1  2     > T1 298.8
+Q2m    51   105  M1    2  P1  2     > T1 0.015
+  1      special derived variables, each  of which, needs code to process specially
+WIND   32   105  M1   10  P1 10     > T3 12.89 17.5 25.78
+  4      Max, min,mode, 10,25,50,75 and 90% 
+U10M   33   105  Q1   10
+V10M   34   105  Q1   10
+T2M    11   105  Q1    2 
+Q2M    51   105  Q1    2 
+
+CAPE TCLD still has error
+
+NOTE: M/S*1.94 -> KNOT
+      

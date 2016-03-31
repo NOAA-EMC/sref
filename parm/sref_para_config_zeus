@@ -1,0 +1,52 @@
+#######################################################
+# This file defines the various input varibles for the
+# SREF model run
+#######################################################
+  export HOMEsref=/scratch2/portfolios/NCEPDEV/meso/save/${LOGNAME}/sref.v7.0.0
+  export EXECsref=$HOMEsref/exec
+  export FIXsref=$HOMEsref/fix
+  export PARMsref=$HOMEsref/parm
+  export USHsref=$HOMEsref/ush
+  export SCRIPTSsref=$HOMEsref/scripts
+
+  export HOMEglobal=/scratch2/portfolios/NCEPDEV/meso/save/${LOGNAME}/sref.v7.0.0
+  export EXECglobal=$HOMEglobal/exec
+  export FIXglobal=$HOMEglobal/fix
+  export PARMglobal=$HOMEglobal/parm
+  export PARMGLOBAL=$HOMEglobal/parm
+  export USHglobal=$HOMEglobal/ush
+  export USHGLOBAL=$HOMEglobal/ush
+  export POSTGPSH=$USHglobal/global_nceppost.sh
+
+  export SENDCOM=NO
+  export SENDCOM_GB2=NO
+  export SENDDBN=NO
+  export SENDDBN_GB2=NO
+  export SENDSMS=NO
+
+  export RUN_TCTRACK=NO
+
+  #PTMP=/scratch2/portfolios/NCEPDEV/ptmp/${LOGNAME}
+  PTMP=/scratch2/portfolios/NCEPDEV/meso/noscrub/$LOGNAME/sref_tmp
+
+  export DATA_IN=$PTMP/tmpnwprd
+  export jlogfile=$DATA_IN/jlogfile
+
+  export com=$PTMP/com/sref/${envir}
+  export COM=$PTMP/com/sref/${envir}
+  export COM_OUT=$PTMP/com/sref/${envir}
+  export gespath=$PTMP/nwges/${envir}
+
+
+  export DATA_PREFIX=/scratch2/portfolios/NCEPDEV/meso/noscrub/$LOGNAME/sref_input
+  export DATA_PREFIX=$PTMP
+
+  export COM_IN=$DATA_PREFIX/com/sref/prod
+  export COMGFS=$DATA_PREFIX/com/gfs/prod
+  export COMENS=$DATA_PREFIX/com/gens/prod
+  export GESNDAS=$DATA_PREFIX/nwges/prod
+  export COMRTMA=$DATA_PREFIX/com/rtma/prod
+  export COMNAM=$DATA_PREFIX/com/nam/prod
+  export COMRAP=$DATA_PREFIX/com/rap/prod
+
+  export COPYGB=/scratch2/portfolios/NCEPDEV/meso/save/Dusan.Jovic/nwprod/util/exec/copygb

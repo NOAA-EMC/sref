@@ -1,0 +1,88 @@
+#!/bin/ksh
+######################################################################
+####  UNIX Script Documentation Block
+#                      .                                             .
+# Script name:         exnam_sndpost.sh
+# Script description:  Trigger nam sounding post job
+#
+# Author:        Eric Rogers       Org: NP22         Date: 1999-06-23
+#
+# Abstract: This script triggers the nam sounding post job, which
+#           creates a piece of the model sounding profile whose
+#           time interval is determined by the input forecast hours.
+#
+# Script history log:
+# 2000-05-16  Eric Rogers
+# 2006-01-20  Eric Rogers -- extended to 84-h and modified for WRF-NMM NAM
+#
+set -x
+
+cd $DATA
+
+export MP_I_BINDPROC=NO
+export MP_BINDPROC=NO
+
+export tmmark=tm00
+echo $PDY$cyc > startdate.${tmmark}
+
+ystart=`cat startdate.${tmmark} | cut -c1-4`
+mstart=`cat startdate.${tmmark} | cut -c5-6`
+dstart=`cat startdate.${tmmark} | cut -c7-8`
+hstart=`cat startdate.${tmmark} | cut -c9-10`
+
+. $GESDIR/nam.t${cyc}z.envir.sh
+
+cp $FIXnam/nam_profdat $DATA/nam_profdat
+
+typeset -Z2 fhr
+
+OUTTYP=nemsio
+model=NMMB
+# increment is now in minutes
+INCR=60
+
+let NFILE=1
+
+startd=$ystart$mstart$dstart
+
+######
+STARTDATE=${ystart}-${mstart}-${dstart}_${hstart}:00:00
+######
+
+timeform=$STARTDATE
+
+curtime=`/nwprod/util/exec/ndate +${fhr} $ystart$mstart$dstart$hstart`
+ycur=`echo $curtime | cut -c1-4`
+mcur=`echo $curtime | cut -c5-6`
+dcur=`echo $curtime | cut -c7-8`
+hrcur=`echo $curtime | cut -c9-10`
+ 
+timeform=${ycur}-${mcur}-${dcur}_${hrcur}:00:00
+OUTFIL=$FCSTDIR/nmm_b_history_nemsio.0${fhr}h_00m_00.00s
+
+min=`expr ${fhr} \* 60 `
+
+cat > itag <<EOF
+$OUTFIL
+$model
+$OUTTYP
+$STARTDATE
+$NFILE
+$INCR
+$min
+EOF
+ 
+export pgm=nam_post0
+. prep_step
+export XLFUNIT_19=$DATA/nam_profdat
+export XLFUNIT_79=$DATA/profilm.c1.${tmmark}
+
+startmsg
+$EXECnam/nam_post0 < itag >> $pgmout 2>errfile 
+export err=$?;err_chk
+
+mv $DATA/profilm.c1.${tmmark} $FCSTDIR/profilm.c1.${tmmark}.f${fhr}
+echo done > $FCSTDIR/sndpostdone${fhr}.${tmmark}
+
+echo EXITING $0 with return code $err
+exit $err

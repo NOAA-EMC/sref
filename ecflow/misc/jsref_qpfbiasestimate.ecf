@@ -1,0 +1,59 @@
+#BSUB -J %E%sref_qpfbiasestimate_%CYC%
+#BSUB -o /%COM%/output/%ENVIR%/today/sref_qpfbiasestimate_%CYC%.o%J
+#BSUB -e /%COM%/output/%ENVIR%/today/sref_qpfbiasestimate_%CYC%.o%J
+#BSUB -cwd /tmpnwprd
+#BSUB -L /bin/sh
+#BSUB -q %QUEUE%
+#BSUB -a poe
+#BSUB -x
+#BSUB -n 1
+#BSUB -R span[ptile=1]
+#BSUB -W 01:30
+#BSUB -P %PROJ%
+
+%include <head.h>
+%include <envir-p2.h>
+%include <envir-p2.h>
+
+
+set -x
+module load grib_util
+
+export cyc=%CYC%
+
+#  PURPOSE:      To execute the SREF Post Processing
+
+
+
+# versions file for SREF model $sref_ver
+VERSION_FILE=$NWROOT/versions/sref.ver
+if [ -f $VERSION_FILE ]; then
+  . $VERSION_FILE
+else
+  exit
+fi
+
+$NWROOT/sref.${sref_ver}/jobs/JSREF_QPFBIASESTIMATE
+
+if [ $? -ne 0 ]; then
+  ecflow_client --msg="***JOB ${ECF_NAME} ERROR RUNNING J-SCRIPT ***"
+  ecflow_client --abort
+  exit
+fi
+
+
+%include <tail.h>
+%manual
+######################################################################
+#
+#
+######################################################################
+
+######################################################################
+# Job specific troubleshooting instructions:
+#  see generic troubleshoot manual page
+#
+######################################################################
+
+# include manual page below
+%end

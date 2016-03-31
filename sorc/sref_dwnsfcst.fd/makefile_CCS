@@ -1,0 +1,10 @@
+SHELL=	/bin/sh
+LIBS=   -L/nwprod/lib/ -lbacio_4 -lw3_4 -lbufr_4_32 -lip_4 -lsp_4
+SRCS=	sref_dvrtma_debias.f90
+CMD=	sref_dvrtma_debias 
+FC=	ncepxlf90
+FFLAGS=	-O3 -qsuffix=f=f90 -qlist -qsource -qlanglvl=90PURE -bnoquiet 
+#FFLAGS=	-O3 -qsuffix=f=f90 -qlist -qsource -bnoquiet 
+
+$(CMD):	$(SRCS)
+	$(FC) $(SRCS) $(FFLAGS) -o $(@) $(OBJS) $(LIBS)

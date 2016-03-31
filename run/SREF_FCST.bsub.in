@@ -1,0 +1,61 @@
+#!/bin/bash
+
+#BSUB -oo _SREFDIR_/run/sref_fcst__MODEL___MEMBER_.log
+#BSUB -eo _SREFDIR_/run/sref_fcst__MODEL___MEMBER_.log
+#BSUB -J SREF_FCST__MODEL___MEMBER_
+#BSUB -n 96
+#BSUB -x
+#BSUB -R span[ptile=16]
+#BSUB -W 03:00
+#BSUB -q "devhigh"
+#BSUB -P SREF-T2O
+#BSUB -a poe
+
+set -aeux
+
+trap 'echo "SREF error _MODEL_ _MEMBER_ FCST" >> /ptmpp1/$LOGNAME/tmpnwprd/jlogfile_sref' INT TERM ERR
+echo "SREF started _MODEL_ _MEMBER_ FCST" >> /ptmpp1/$LOGNAME/tmpnwprd/jlogfile_sref
+
+. /usrx/local/Modules/default/init/bash
+module purge
+module load lsf
+module load ibmpe
+module load ics
+module load NetCDF
+
+export OMP_NUM_THREADS=1
+export MP_EUIDEVICE=sn_all
+export MP_EUILIB=us
+export MP_MPILIB=mpich2
+export MP_TASK_AFFINITY=core:1
+
+export RUN_ENVIR=para
+export envir=prod
+export job=$$
+
+export CONFIG_FILE=_SREFDIR_/parm/sref_para_config_wcoss
+
+export PDY=_PDY_
+export cyc=_CYC_
+export FLENGTH=_FLENGTH_
+export INCR=_INCR_
+export MODEL=_MODEL_
+export MEMBER=_MEMBER_
+export IOFORM=_IOFORM_
+export RES=_RES_
+export MACHINE=_MACHINE_
+export N_TASK=$LSB_DJOB_NUMPROC
+
+_SREFDIR_/jobs/JSREF_WRF_FCST
+
+echo "SREF finished _MODEL_ _MEMBER_ FCST" >> /ptmpp1/$LOGNAME/tmpnwprd/jlogfile_sref
+
+bsub < _SREFDIR_/run/SREF_POST__MODEL___MEMBER_.bsub
+bsub < _SREFDIR_/run/SREF_POST2__MODEL___MEMBER_.bsub
+bsub < _SREFDIR_/run/SREF_POST3__MODEL___MEMBER_.bsub
+bsub < _SREFDIR_/run/SREF_POST4__MODEL___MEMBER_.bsub
+echo "SREF waiting _MODEL_ _MEMBER_ POST" >> /ptmpp1/$LOGNAME/tmpnwprd/jlogfile_sref
+echo "SREF waiting _MODEL_ _MEMBER_ POST2" >> /ptmpp1/$LOGNAME/tmpnwprd/jlogfile_sref
+echo "SREF waiting _MODEL_ _MEMBER_ POST3" >> /ptmpp1/$LOGNAME/tmpnwprd/jlogfile_sref
+echo "SREF waiting _MODEL_ _MEMBER_ POST4" >> /ptmpp1/$LOGNAME/tmpnwprd/jlogfile_sref
+

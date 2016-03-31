@@ -1,0 +1,336 @@
+################################################################
+# UNIX Script Documentation Block
+#
+# Script name:         exsref_memberranking.sh.sms
+# Script description:  This program is to predict individual ensemble 
+#                      member's relative performance (such as best and 
+#                      worst members) based on the Du-Zhou Ranking Method 
+#                      (Du and Zhou, Oct. 2011, MWR) and produces relative 
+#                      weights for each ensemble members to be weighted 
+#                      differently in ensemble averaging based on their
+#                      predicted performaces.
+#
+# Author:      Jun Du       Org: NP21         Date: 2011-11
+#
+# Change log:
+#  11/05/2011: Jun Du, Initial program for its first implementation
+#  03/11/2015: Jun Du, Modified to the 2-model, 26-member SREF.v7.0.0
+#
+################################################################
+#!/bin/ksh
+set -x
+ulimit -s unlimited 
+#limit stacksize unlimited
+
+XLFRTEOPTS="namelist=old"
+export XLFRTEOPTS
+
+XLSMPOPTS="parthds=2"
+export XLSMPOPTS
+
+SYS=$1
+#SYS=raw
+#SYS=BC
+grid=212
+
+fmem=26
+let fmax=fmem
+
+# ensemble fcst initiation date:
+date=$PDY$cyc
+yy=`echo ${date} | cut -c1-4`
+mm=`echo ${date} | cut -c5-6`
+dd=`echo ${date} | cut -c7-8`
+hh=`echo ${date} | cut -c9-10`
+
+#dirarch=${COM_MISC}
+if [ $SYS = raw ];then
+ dirarch=${COMOUT}
+fi
+if [ $SYS = BC ];then
+ dirarch=${COMOUT_BC}
+fi
+mkdir -p $dirarch
+
+#################################
+#dirwork=$DATA/ranking
+#mkdir -p $dirwork
+#cd $dirwork  || exit
+
+echo " 00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87 " >> headinfo 
+
+ln -f -s headinfo fort.7
+
+cat <<paramEOF >input
+ &namin
+   yy=${yy},mm=${mm},dd=${dd},hh=${hh}
+ &end
+paramEOF
+
+ HR=00
+ while [ $HR -le $ENDHOUR ]
+ do
+
+  if [ $SYS = raw ]; then
+  cp $COMIN/sref_nmb.t${hh}z.pgrb${grid}.ctl.f$HR  r_gribawips1.f$HR
+  cp $COMIN/sref_nmb.t${hh}z.pgrb${grid}.n1.f$HR   r_gribawips2.f$HR
+  cp $COMIN/sref_nmb.t${hh}z.pgrb${grid}.p1.f$HR   r_gribawips3.f$HR
+  cp $COMIN/sref_nmb.t${hh}z.pgrb${grid}.n2.f$HR   r_gribawips4.f$HR
+  cp $COMIN/sref_nmb.t${hh}z.pgrb${grid}.p2.f$HR   r_gribawips5.f$HR
+  cp $COMIN/sref_nmb.t${hh}z.pgrb${grid}.n3.f$HR   r_gribawips6.f$HR
+  cp $COMIN/sref_nmb.t${hh}z.pgrb${grid}.p3.f$HR   r_gribawips7.f$HR
+  cp $COMIN/sref_nmb.t${hh}z.pgrb${grid}.n4.f$HR   r_gribawips8.f$HR
+  cp $COMIN/sref_nmb.t${hh}z.pgrb${grid}.p4.f$HR   r_gribawips9.f$HR
+  cp $COMIN/sref_nmb.t${hh}z.pgrb${grid}.n5.f$HR   r_gribawips10.f$HR
+  cp $COMIN/sref_nmb.t${hh}z.pgrb${grid}.p5.f$HR   r_gribawips11.f$HR
+  cp $COMIN/sref_nmb.t${hh}z.pgrb${grid}.n6.f$HR   r_gribawips12.f$HR
+  cp $COMIN/sref_nmb.t${hh}z.pgrb${grid}.p6.f$HR   r_gribawips13.f$HR
+  cp $COMIN/sref_arw.t${hh}z.pgrb${grid}.ctl.f$HR   r_gribawips14.f$HR
+  cp $COMIN/sref_arw.t${hh}z.pgrb${grid}.n1.f$HR    r_gribawips15.f$HR
+  cp $COMIN/sref_arw.t${hh}z.pgrb${grid}.p1.f$HR    r_gribawips16.f$HR
+  cp $COMIN/sref_arw.t${hh}z.pgrb${grid}.n2.f$HR    r_gribawips17.f$HR
+  cp $COMIN/sref_arw.t${hh}z.pgrb${grid}.p2.f$HR    r_gribawips18.f$HR
+  cp $COMIN/sref_arw.t${hh}z.pgrb${grid}.n3.f$HR    r_gribawips19.f$HR
+  cp $COMIN/sref_arw.t${hh}z.pgrb${grid}.p3.f$HR    r_gribawips20.f$HR
+  cp $COMIN/sref_arw.t${hh}z.pgrb${grid}.n4.f$HR    r_gribawips21.f$HR
+  cp $COMIN/sref_arw.t${hh}z.pgrb${grid}.p4.f$HR    r_gribawips22.f$HR
+  cp $COMIN/sref_arw.t${hh}z.pgrb${grid}.n5.f$HR    r_gribawips23.f$HR
+  cp $COMIN/sref_arw.t${hh}z.pgrb${grid}.p5.f$HR    r_gribawips24.f$HR
+  cp $COMIN/sref_arw.t${hh}z.pgrb${grid}.n6.f$HR    r_gribawips25.f$HR
+  cp $COMIN/sref_arw.t${hh}z.pgrb${grid}.p6.f$HR    r_gribawips26.f$HR
+  fi
+  if [ $SYS = BC ]; then
+   if [ $HR -eq 00 ]; then
+  cp $COMIN/sref_nmb.t${hh}z.pgrb${grid}.ctl.f$HR  r_gribawips1.f$HR
+  cp $COMIN/sref_nmb.t${hh}z.pgrb${grid}.n1.f$HR   r_gribawips2.f$HR
+  cp $COMIN/sref_nmb.t${hh}z.pgrb${grid}.p1.f$HR   r_gribawips3.f$HR
+  cp $COMIN/sref_nmb.t${hh}z.pgrb${grid}.n2.f$HR   r_gribawips4.f$HR
+  cp $COMIN/sref_nmb.t${hh}z.pgrb${grid}.p2.f$HR   r_gribawips5.f$HR
+  cp $COMIN/sref_nmb.t${hh}z.pgrb${grid}.n3.f$HR   r_gribawips6.f$HR
+  cp $COMIN/sref_nmb.t${hh}z.pgrb${grid}.p3.f$HR   r_gribawips7.f$HR
+  cp $COMIN/sref_nmb.t${hh}z.pgrb${grid}.n4.f$HR   r_gribawips8.f$HR
+  cp $COMIN/sref_nmb.t${hh}z.pgrb${grid}.p4.f$HR   r_gribawips9.f$HR
+  cp $COMIN/sref_nmb.t${hh}z.pgrb${grid}.n5.f$HR   r_gribawips10.f$HR
+  cp $COMIN/sref_nmb.t${hh}z.pgrb${grid}.p5.f$HR   r_gribawips11.f$HR
+  cp $COMIN/sref_nmb.t${hh}z.pgrb${grid}.n6.f$HR   r_gribawips12.f$HR
+  cp $COMIN/sref_nmb.t${hh}z.pgrb${grid}.p6.f$HR   r_gribawips13.f$HR
+  cp $COMIN/sref_arw.t${hh}z.pgrb${grid}.ctl.f$HR   r_gribawips14.f$HR
+  cp $COMIN/sref_arw.t${hh}z.pgrb${grid}.n1.f$HR    r_gribawips15.f$HR
+  cp $COMIN/sref_arw.t${hh}z.pgrb${grid}.p1.f$HR    r_gribawips16.f$HR
+  cp $COMIN/sref_arw.t${hh}z.pgrb${grid}.n2.f$HR    r_gribawips17.f$HR
+  cp $COMIN/sref_arw.t${hh}z.pgrb${grid}.p2.f$HR    r_gribawips18.f$HR
+  cp $COMIN/sref_arw.t${hh}z.pgrb${grid}.n3.f$HR    r_gribawips19.f$HR
+  cp $COMIN/sref_arw.t${hh}z.pgrb${grid}.p3.f$HR    r_gribawips20.f$HR
+  cp $COMIN/sref_arw.t${hh}z.pgrb${grid}.n4.f$HR    r_gribawips21.f$HR
+  cp $COMIN/sref_arw.t${hh}z.pgrb${grid}.p4.f$HR    r_gribawips22.f$HR
+  cp $COMIN/sref_arw.t${hh}z.pgrb${grid}.n5.f$HR    r_gribawips23.f$HR
+  cp $COMIN/sref_arw.t${hh}z.pgrb${grid}.p5.f$HR    r_gribawips24.f$HR
+  cp $COMIN/sref_arw.t${hh}z.pgrb${grid}.n6.f$HR    r_gribawips25.f$HR
+  cp $COMIN/sref_arw.t${hh}z.pgrb${grid}.p6.f$HR    r_gribawips26.f$HR
+   else
+  cp ${COMIN_BC}/sref_nmb.t${hh}z.pgrb${grid}.ctl.f$HR  r_gribawips1.f$HR
+  cp ${COMIN_BC}/sref_nmb.t${hh}z.pgrb${grid}.n1.f$HR   r_gribawips2.f$HR
+  cp ${COMIN_BC}/sref_nmb.t${hh}z.pgrb${grid}.p1.f$HR   r_gribawips3.f$HR
+  cp ${COMIN_BC}/sref_nmb.t${hh}z.pgrb${grid}.n2.f$HR   r_gribawips4.f$HR
+  cp ${COMIN_BC}/sref_nmb.t${hh}z.pgrb${grid}.p2.f$HR   r_gribawips5.f$HR
+  cp ${COMIN_BC}/sref_nmb.t${hh}z.pgrb${grid}.n3.f$HR   r_gribawips6.f$HR
+  cp ${COMIN_BC}/sref_nmb.t${hh}z.pgrb${grid}.p3.f$HR   r_gribawips7.f$HR
+  cp ${COMIN_BC}/sref_nmb.t${hh}z.pgrb${grid}.n4.f$HR   r_gribawips8.f$HR
+  cp ${COMIN_BC}/sref_nmb.t${hh}z.pgrb${grid}.p4.f$HR   r_gribawips9.f$HR
+  cp ${COMIN_BC}/sref_nmb.t${hh}z.pgrb${grid}.n5.f$HR   r_gribawips10.f$HR
+  cp ${COMIN_BC}/sref_nmb.t${hh}z.pgrb${grid}.p5.f$HR   r_gribawips11.f$HR
+  cp ${COMIN_BC}/sref_nmb.t${hh}z.pgrb${grid}.n6.f$HR   r_gribawips12.f$HR
+  cp ${COMIN_BC}/sref_nmb.t${hh}z.pgrb${grid}.p6.f$HR   r_gribawips13.f$HR
+  cp ${COMIN_BC}/sref_arw.t${hh}z.pgrb${grid}.ctl.f$HR   r_gribawips14.f$HR
+  cp ${COMIN_BC}/sref_arw.t${hh}z.pgrb${grid}.n1.f$HR    r_gribawips15.f$HR
+  cp ${COMIN_BC}/sref_arw.t${hh}z.pgrb${grid}.p1.f$HR    r_gribawips16.f$HR
+  cp ${COMIN_BC}/sref_arw.t${hh}z.pgrb${grid}.n2.f$HR    r_gribawips17.f$HR
+  cp ${COMIN_BC}/sref_arw.t${hh}z.pgrb${grid}.p2.f$HR    r_gribawips18.f$HR
+  cp ${COMIN_BC}/sref_arw.t${hh}z.pgrb${grid}.n3.f$HR    r_gribawips19.f$HR
+  cp ${COMIN_BC}/sref_arw.t${hh}z.pgrb${grid}.p3.f$HR    r_gribawips20.f$HR
+  cp ${COMIN_BC}/sref_arw.t${hh}z.pgrb${grid}.n4.f$HR    r_gribawips21.f$HR
+  cp ${COMIN_BC}/sref_arw.t${hh}z.pgrb${grid}.p4.f$HR    r_gribawips22.f$HR
+  cp ${COMIN_BC}/sref_arw.t${hh}z.pgrb${grid}.n5.f$HR    r_gribawips23.f$HR
+  cp ${COMIN_BC}/sref_arw.t${hh}z.pgrb${grid}.p5.f$HR    r_gribawips24.f$HR
+  cp ${COMIN_BC}/sref_arw.t${hh}z.pgrb${grid}.n6.f$HR    r_gribawips25.f$HR
+  cp ${COMIN_BC}/sref_arw.t${hh}z.pgrb${grid}.p6.f$HR    r_gribawips26.f$HR
+   fi
+  fi
+
+ HR=`expr $HR + $INCHOUR`
+ if [ $HR -lt 10 ];then HR=0$HR;fi
+ done
+
+
+##############################
+fnum=1
+while [ ${fnum} -le ${fmax} ]
+do
+   if [ ${fnum} -le 9 ]; then
+cat r_gribawips${fnum}.f00  r_gribawips${fnum}.f03  \
+    r_gribawips${fnum}.f06  r_gribawips${fnum}.f09  \
+    r_gribawips${fnum}.f12  r_gribawips${fnum}.f15  \
+    r_gribawips${fnum}.f18  r_gribawips${fnum}.f21  \
+    r_gribawips${fnum}.f24  r_gribawips${fnum}.f27  \
+    r_gribawips${fnum}.f30  r_gribawips${fnum}.f33  \
+    r_gribawips${fnum}.f36  r_gribawips${fnum}.f39  \
+    r_gribawips${fnum}.f42  r_gribawips${fnum}.f45  \
+    r_gribawips${fnum}.f48  r_gribawips${fnum}.f51  \
+    r_gribawips${fnum}.f54  r_gribawips${fnum}.f57  \
+    r_gribawips${fnum}.f60  r_gribawips${fnum}.f63  \
+    r_gribawips${fnum}.f66  r_gribawips${fnum}.f69  \
+    r_gribawips${fnum}.f72  r_gribawips${fnum}.f75  \
+    r_gribawips${fnum}.f78  r_gribawips${fnum}.f81  \
+    r_gribawips${fnum}.f84  r_gribawips${fnum}.f87  >> r_gribawips0${fnum}
+${GRBINDEX} r_gribawips0${fnum} r_gribawips0${fnum}.i
+   else
+cat r_gribawips${fnum}.f00  r_gribawips${fnum}.f03  \
+    r_gribawips${fnum}.f06  r_gribawips${fnum}.f09  \
+    r_gribawips${fnum}.f12  r_gribawips${fnum}.f15  \
+    r_gribawips${fnum}.f18  r_gribawips${fnum}.f21  \
+    r_gribawips${fnum}.f24  r_gribawips${fnum}.f27  \
+    r_gribawips${fnum}.f30  r_gribawips${fnum}.f33  \
+    r_gribawips${fnum}.f36  r_gribawips${fnum}.f39  \
+    r_gribawips${fnum}.f42  r_gribawips${fnum}.f45  \
+    r_gribawips${fnum}.f48  r_gribawips${fnum}.f51  \
+    r_gribawips${fnum}.f54  r_gribawips${fnum}.f57  \
+    r_gribawips${fnum}.f60  r_gribawips${fnum}.f63  \
+    r_gribawips${fnum}.f66  r_gribawips${fnum}.f69  \
+    r_gribawips${fnum}.f72  r_gribawips${fnum}.f75  \
+    r_gribawips${fnum}.f78  r_gribawips${fnum}.f81  \
+    r_gribawips${fnum}.f84  r_gribawips${fnum}.f87  >> r_gribawips${fnum}
+${GRBINDEX} r_gribawips${fnum} r_gribawips${fnum}.i
+   fi
+ let fnum=fnum+1
+done
+rm -f *awips*.f*
+##############################
+$EXECsref/sref_ranking <input >err.out
+export err=$?; err_chk
+
+cp data.out $dirarch/sref_rankinginfo_${SYS}.txt
+HR=00
+while [ $HR -le $ENDHOUR ]
+do
+ cp wgt.pgrb212.01.f$HR $dirarch/sref_nmb.t${cyc}z.pgrb212.ctl_wgt.f$HR
+ cp wgt.pgrb212.02.f$HR $dirarch/sref_nmb.t${cyc}z.pgrb212.n1_wgt.f$HR
+ cp wgt.pgrb212.03.f$HR $dirarch/sref_nmb.t${cyc}z.pgrb212.p1_wgt.f$HR
+ cp wgt.pgrb212.04.f$HR $dirarch/sref_nmb.t${cyc}z.pgrb212.n2_wgt.f$HR
+ cp wgt.pgrb212.05.f$HR $dirarch/sref_nmb.t${cyc}z.pgrb212.p2_wgt.f$HR
+ cp wgt.pgrb212.06.f$HR $dirarch/sref_nmb.t${cyc}z.pgrb212.n3_wgt.f$HR
+ cp wgt.pgrb212.07.f$HR $dirarch/sref_nmb.t${cyc}z.pgrb212.p3_wgt.f$HR
+ cp wgt.pgrb212.08.f$HR $dirarch/sref_nmb.t${cyc}z.pgrb212.n4_wgt.f$HR
+ cp wgt.pgrb212.09.f$HR $dirarch/sref_nmb.t${cyc}z.pgrb212.p4_wgt.f$HR
+ cp wgt.pgrb212.10.f$HR $dirarch/sref_nmb.t${cyc}z.pgrb212.n5_wgt.f$HR
+ cp wgt.pgrb212.11.f$HR $dirarch/sref_nmb.t${cyc}z.pgrb212.p5_wgt.f$HR
+ cp wgt.pgrb212.12.f$HR $dirarch/sref_nmb.t${cyc}z.pgrb212.n6_wgt.f$HR
+ cp wgt.pgrb212.13.f$HR $dirarch/sref_nmb.t${cyc}z.pgrb212.p6_wgt.f$HR
+
+ cp wgt.pgrb212.14.f$HR $dirarch/sref_arw.t${cyc}z.pgrb212.ctl_wgt.f$HR
+ cp wgt.pgrb212.15.f$HR $dirarch/sref_arw.t${cyc}z.pgrb212.n1_wgt.f$HR
+ cp wgt.pgrb212.16.f$HR $dirarch/sref_arw.t${cyc}z.pgrb212.p1_wgt.f$HR
+ cp wgt.pgrb212.17.f$HR $dirarch/sref_arw.t${cyc}z.pgrb212.n2_wgt.f$HR
+ cp wgt.pgrb212.18.f$HR $dirarch/sref_arw.t${cyc}z.pgrb212.p2_wgt.f$HR
+ cp wgt.pgrb212.19.f$HR $dirarch/sref_arw.t${cyc}z.pgrb212.n3_wgt.f$HR
+ cp wgt.pgrb212.20.f$HR $dirarch/sref_arw.t${cyc}z.pgrb212.p3_wgt.f$HR
+ cp wgt.pgrb212.21.f$HR $dirarch/sref_arw.t${cyc}z.pgrb212.n4_wgt.f$HR
+ cp wgt.pgrb212.22.f$HR $dirarch/sref_arw.t${cyc}z.pgrb212.p4_wgt.f$HR
+ cp wgt.pgrb212.23.f$HR $dirarch/sref_arw.t${cyc}z.pgrb212.n5_wgt.f$HR
+ cp wgt.pgrb212.24.f$HR $dirarch/sref_arw.t${cyc}z.pgrb212.p5_wgt.f$HR
+ cp wgt.pgrb212.25.f$HR $dirarch/sref_arw.t${cyc}z.pgrb212.n6_wgt.f$HR
+ cp wgt.pgrb212.26.f$HR $dirarch/sref_arw.t${cyc}z.pgrb212.p6_wgt.f$HR
+
+# Convert to grib2 format
+$CNVGRIB -g12 -p40 -nv ${dirarch}/sref_nmb.t${cyc}z.pgrb212.ctl_wgt.f$HR ${dirarch}/sref_nmb.t${cyc}z.pgrb212.ctl_wgt.f$HR.grib2
+$WGRIB2 ${dirarch}/sref_nmb.t${cyc}z.pgrb212.ctl_wgt.f$HR.grib2 -s > ${dirarch}/sref_nmb.t${cyc}z.pgrb212.ctl_wgt.f$HR.grib2.idx
+$CNVGRIB -g12 -p40 -nv ${dirarch}/sref_nmb.t${cyc}z.pgrb212.n1_wgt.f$HR ${dirarch}/sref_nmb.t${cyc}z.pgrb212.n1_wgt.f$HR.grib2
+$WGRIB2 ${dirarch}/sref_nmb.t${cyc}z.pgrb212.n1_wgt.f$HR.grib2 -s > ${dirarch}/sref_nmb.t${cyc}z.pgrb212.n1_wgt.f$HR.grib2.idx
+$CNVGRIB -g12 -p40 -nv ${dirarch}/sref_nmb.t${cyc}z.pgrb212.p1_wgt.f$HR ${dirarch}/sref_nmb.t${cyc}z.pgrb212.p1_wgt.f$HR.grib2
+$WGRIB2 ${dirarch}/sref_nmb.t${cyc}z.pgrb212.p1_wgt.f$HR.grib2 -s > ${dirarch}/sref_nmb.t${cyc}z.pgrb212.p1_wgt.f$HR.grib2.idx
+$CNVGRIB -g12 -p40 -nv ${dirarch}/sref_nmb.t${cyc}z.pgrb212.n2_wgt.f$HR ${dirarch}/sref_nmb.t${cyc}z.pgrb212.n2_wgt.f$HR.grib2
+$WGRIB2 ${dirarch}/sref_nmb.t${cyc}z.pgrb212.n2_wgt.f$HR.grib2 -s > ${dirarch}/sref_nmb.t${cyc}z.pgrb212.n2_wgt.f$HR.grib2.idx
+$CNVGRIB -g12 -p40 -nv ${dirarch}/sref_nmb.t${cyc}z.pgrb212.p2_wgt.f$HR ${dirarch}/sref_nmb.t${cyc}z.pgrb212.p2_wgt.f$HR.grib2
+$WGRIB2 ${dirarch}/sref_nmb.t${cyc}z.pgrb212.p2_wgt.f$HR.grib2 -s > ${dirarch}/sref_nmb.t${cyc}z.pgrb212.p2_wgt.f$HR.grib2.idx
+$CNVGRIB -g12 -p40 -nv ${dirarch}/sref_nmb.t${cyc}z.pgrb212.n3_wgt.f$HR ${dirarch}/sref_nmb.t${cyc}z.pgrb212.n3_wgt.f$HR.grib2
+$WGRIB2 ${dirarch}/sref_nmb.t${cyc}z.pgrb212.n3_wgt.f$HR.grib2 -s > ${dirarch}/sref_nmb.t${cyc}z.pgrb212.n3_wgt.f$HR.grib2.idx
+$CNVGRIB -g12 -p40 -nv ${dirarch}/sref_nmb.t${cyc}z.pgrb212.p3_wgt.f$HR ${dirarch}/sref_nmb.t${cyc}z.pgrb212.p3_wgt.f$HR.grib2
+$WGRIB2 ${dirarch}/sref_nmb.t${cyc}z.pgrb212.p3_wgt.f$HR.grib2 -s > ${dirarch}/sref_nmb.t${cyc}z.pgrb212.p3_wgt.f$HR.grib2.idx
+$CNVGRIB -g12 -p40 -nv ${dirarch}/sref_nmb.t${cyc}z.pgrb212.n4_wgt.f$HR ${dirarch}/sref_nmb.t${cyc}z.pgrb212.n4_wgt.f$HR.grib2
+$WGRIB2 ${dirarch}/sref_nmb.t${cyc}z.pgrb212.n4_wgt.f$HR.grib2 -s > ${dirarch}/sref_nmb.t${cyc}z.pgrb212.n4_wgt.f$HR.grib2.idx
+$CNVGRIB -g12 -p40 -nv ${dirarch}/sref_nmb.t${cyc}z.pgrb212.p4_wgt.f$HR ${dirarch}/sref_nmb.t${cyc}z.pgrb212.p4_wgt.f$HR.grib2
+$WGRIB2 ${dirarch}/sref_nmb.t${cyc}z.pgrb212.p4_wgt.f$HR.grib2 -s > ${dirarch}/sref_nmb.t${cyc}z.pgrb212.p4_wgt.f$HR.grib2.idx
+$CNVGRIB -g12 -p40 -nv ${dirarch}/sref_nmb.t${cyc}z.pgrb212.n5_wgt.f$HR ${dirarch}/sref_nmb.t${cyc}z.pgrb212.n5_wgt.f$HR.grib2
+$WGRIB2 ${dirarch}/sref_nmb.t${cyc}z.pgrb212.n5_wgt.f$HR.grib2 -s > ${dirarch}/sref_nmb.t${cyc}z.pgrb212.n5_wgt.f$HR.grib2.idx
+$CNVGRIB -g12 -p40 -nv ${dirarch}/sref_nmb.t${cyc}z.pgrb212.p5_wgt.f$HR ${dirarch}/sref_nmb.t${cyc}z.pgrb212.p5_wgt.f$HR.grib2
+$WGRIB2 ${dirarch}/sref_nmb.t${cyc}z.pgrb212.p5_wgt.f$HR.grib2 -s > ${dirarch}/sref_nmb.t${cyc}z.pgrb212.p5_wgt.f$HR.grib2.idx
+$CNVGRIB -g12 -p40 -nv ${dirarch}/sref_nmb.t${cyc}z.pgrb212.n6_wgt.f$HR ${dirarch}/sref_nmb.t${cyc}z.pgrb212.n6_wgt.f$HR.grib2
+$WGRIB2 ${dirarch}/sref_nmb.t${cyc}z.pgrb212.n6_wgt.f$HR.grib2 -s > ${dirarch}/sref_nmb.t${cyc}z.pgrb212.n6_wgt.f$HR.grib2.idx
+$CNVGRIB -g12 -p40 -nv ${dirarch}/sref_nmb.t${cyc}z.pgrb212.p6_wgt.f$HR ${dirarch}/sref_nmb.t${cyc}z.pgrb212.p6_wgt.f$HR.grib2
+$WGRIB2 ${dirarch}/sref_nmb.t${cyc}z.pgrb212.p6_wgt.f$HR.grib2 -s > ${dirarch}/sref_nmb.t${cyc}z.pgrb212.p6_wgt.f$HR.grib2.idx
+
+$CNVGRIB -g12 -p40 -nv ${dirarch}/sref_arw.t${cyc}z.pgrb212.ctl_wgt.f$HR ${dirarch}/sref_arw.t${cyc}z.pgrb212.ctl_wgt.f$HR.grib2
+$WGRIB2 ${dirarch}/sref_arw.t${cyc}z.pgrb212.ctl_wgt.f$HR.grib2 -s > ${dirarch}/sref_arw.t${cyc}z.pgrb212.ctl_wgt.f$HR.grib2.idx
+$CNVGRIB -g12 -p40 -nv ${dirarch}/sref_arw.t${cyc}z.pgrb212.n1_wgt.f$HR ${dirarch}/sref_arw.t${cyc}z.pgrb212.n1_wgt.f$HR.grib2
+$WGRIB2 ${dirarch}/sref_arw.t${cyc}z.pgrb212.n1_wgt.f$HR.grib2 -s > ${dirarch}/sref_arw.t${cyc}z.pgrb212.n1_wgt.f$HR.grib2.idx
+$CNVGRIB -g12 -p40 -nv ${dirarch}/sref_arw.t${cyc}z.pgrb212.p1_wgt.f$HR ${dirarch}/sref_arw.t${cyc}z.pgrb212.p1_wgt.f$HR.grib2
+$WGRIB2 ${dirarch}/sref_arw.t${cyc}z.pgrb212.p1_wgt.f$HR.grib2 -s > ${dirarch}/sref_arw.t${cyc}z.pgrb212.p1_wgt.f$HR.grib2.idx
+$CNVGRIB -g12 -p40 -nv ${dirarch}/sref_arw.t${cyc}z.pgrb212.n2_wgt.f$HR ${dirarch}/sref_arw.t${cyc}z.pgrb212.n2_wgt.f$HR.grib2
+$WGRIB2 ${dirarch}/sref_arw.t${cyc}z.pgrb212.n2_wgt.f$HR.grib2 -s > ${dirarch}/sref_arw.t${cyc}z.pgrb212.n2_wgt.f$HR.grib2.idx
+$CNVGRIB -g12 -p40 -nv ${dirarch}/sref_arw.t${cyc}z.pgrb212.p2_wgt.f$HR ${dirarch}/sref_arw.t${cyc}z.pgrb212.p2_wgt.f$HR.grib2
+$WGRIB2 ${dirarch}/sref_arw.t${cyc}z.pgrb212.p2_wgt.f$HR.grib2 -s > ${dirarch}/sref_arw.t${cyc}z.pgrb212.p2_wgt.f$HR.grib2.idx
+$CNVGRIB -g12 -p40 -nv ${dirarch}/sref_arw.t${cyc}z.pgrb212.n3_wgt.f$HR ${dirarch}/sref_arw.t${cyc}z.pgrb212.n3_wgt.f$HR.grib2
+$WGRIB2 ${dirarch}/sref_arw.t${cyc}z.pgrb212.n3_wgt.f$HR.grib2 -s > ${dirarch}/sref_arw.t${cyc}z.pgrb212.n3_wgt.f$HR.grib2.idx
+$CNVGRIB -g12 -p40 -nv ${dirarch}/sref_arw.t${cyc}z.pgrb212.p3_wgt.f$HR ${dirarch}/sref_arw.t${cyc}z.pgrb212.p3_wgt.f$HR.grib2
+$WGRIB2 ${dirarch}/sref_arw.t${cyc}z.pgrb212.p3_wgt.f$HR.grib2 -s > ${dirarch}/sref_arw.t${cyc}z.pgrb212.p3_wgt.f$HR.grib2.idx
+$CNVGRIB -g12 -p40 -nv ${dirarch}/sref_arw.t${cyc}z.pgrb212.n4_wgt.f$HR ${dirarch}/sref_arw.t${cyc}z.pgrb212.n4_wgt.f$HR.grib2
+$WGRIB2 ${dirarch}/sref_arw.t${cyc}z.pgrb212.n4_wgt.f$HR.grib2 -s > ${dirarch}/sref_arw.t${cyc}z.pgrb212.n4_wgt.f$HR.grib2.idx
+$CNVGRIB -g12 -p40 -nv ${dirarch}/sref_arw.t${cyc}z.pgrb212.p4_wgt.f$HR ${dirarch}/sref_arw.t${cyc}z.pgrb212.p4_wgt.f$HR.grib2
+$WGRIB2 ${dirarch}/sref_arw.t${cyc}z.pgrb212.p4_wgt.f$HR.grib2 -s > ${dirarch}/sref_arw.t${cyc}z.pgrb212.p4_wgt.f$HR.grib2.idx
+$CNVGRIB -g12 -p40 -nv ${dirarch}/sref_arw.t${cyc}z.pgrb212.n5_wgt.f$HR ${dirarch}/sref_arw.t${cyc}z.pgrb212.n5_wgt.f$HR.grib2
+$WGRIB2 ${dirarch}/sref_arw.t${cyc}z.pgrb212.n5_wgt.f$HR.grib2 -s > ${dirarch}/sref_arw.t${cyc}z.pgrb212.n5_wgt.f$HR.grib2.idx
+$CNVGRIB -g12 -p40 -nv ${dirarch}/sref_arw.t${cyc}z.pgrb212.p5_wgt.f$HR ${dirarch}/sref_arw.t${cyc}z.pgrb212.p5_wgt.f$HR.grib2
+$WGRIB2 ${dirarch}/sref_arw.t${cyc}z.pgrb212.p5_wgt.f$HR.grib2 -s > ${dirarch}/sref_arw.t${cyc}z.pgrb212.p5_wgt.f$HR.grib2.idx
+$CNVGRIB -g12 -p40 -nv ${dirarch}/sref_arw.t${cyc}z.pgrb212.n6_wgt.f$HR ${dirarch}/sref_arw.t${cyc}z.pgrb212.n6_wgt.f$HR.grib2
+$WGRIB2 ${dirarch}/sref_arw.t${cyc}z.pgrb212.n6_wgt.f$HR.grib2 -s > ${dirarch}/sref_arw.t${cyc}z.pgrb212.n6_wgt.f$HR.grib2.idx
+$CNVGRIB -g12 -p40 -nv ${dirarch}/sref_arw.t${cyc}z.pgrb212.p6_wgt.f$HR ${dirarch}/sref_arw.t${cyc}z.pgrb212.p6_wgt.f$HR.grib2
+$WGRIB2 ${dirarch}/sref_arw.t${cyc}z.pgrb212.p6_wgt.f$HR.grib2 -s > ${dirarch}/sref_arw.t${cyc}z.pgrb212.p6_wgt.f$HR.grib2.idx
+
+HR=`expr $HR + $INCHOUR`
+if [ $HR -lt 10 ];then HR=0$HR;fi
+done
+
+rcc=$?
+if [ ${rcc} -ne 0 ]; then
+  echo "!!! Error *** ${rcc} *** converting files.  Exiting..."
+  exit 8
+fi
+
+# clean working directory before exiting:
+#rm -f $dirwork/*
+exit
+

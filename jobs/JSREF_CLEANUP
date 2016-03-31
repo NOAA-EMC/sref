@@ -1,0 +1,143 @@
+#!/bin/sh
+
+##################################################################
+# Descriptions: This job clean up the working directories 
+# 9/20/2009, Julia Zhu   Scripts are modified to be sharable
+#                        between EMC and NCO
+#         Please note that variable "RUN_ENVIR" is set and used
+#         in the development enviroment only.
+#
+##################################################################
+set -xa
+#
+# Specify whether the run is production or development
+#
+export RUN_ENVIR=${RUN_ENVIR:-nco}
+
+. /usrx/local/Modules/default/init/ksh
+module load grib_util
+ 
+
+#####################################################################################
+# Run config file to get input parameters
+# This config file should define the following variables
+# DATA_IN: Location of working directory, default to ${DATAROOT}
+# DEV_SMS: If the job is to be running using SMS, default to YES
+# SENDDBN: Set to NO for developers, default to YES
+# COM_IN:  Directory for input files, default to ${COMROOT}/$NET/${envir}
+# COM_OUT: Directory for output file, default to ${COMROOT}/$NET/${envir}
+# gespath: Directory for the guess or restart files, default to ${GESROOT}/${envir}
+#####################################################################################
+if [ "$RUN_ENVIR" != nco ]      ### For Developers, "group_name" is passed from the SMS script
+then
+  CONFIG_FILE=${CONFIG_FILE:-/meso/save/${LOGNAME}/sref${NWROOTp1}/parm/sref_para_config}
+  . $CONFIG_FILE
+  export userid=$LOGNAME
+  export DATA_IN=${DATA_IN:-/ptmp/$userid}
+fi
+
+###############################################################
+# This block can be modified for different test environment
+###############################################################
+if [ $RUN_ENVIR = nco -a $envir != prod ]; then
+  export SENDDBN=${SENDDBN:-NO}
+  export jlogfile=${jlogfile:-${COMROOT}/logs/${envir}/jlogfile}
+fi
+
+echo `date` $0 `date -u` begin
+export PS4='$SECONDS + '
+
+# ###################################
+# SET SHELL PROCESSING VARIABLES
+# ###################################
+export PS4='$SECONDS + ' 
+date
+
+###########################################################
+# obtain unique process id (pid) and make temp directories
+###########################################################
+export pid=$$
+export DATA_IN=${DATA_IN:-${DATAROOT}}
+
+export DATA=$DATA_IN/${job}.${pid}
+rm -rf $DATA
+mkdir -p $DATA
+
+cd $DATA
+
+####################################
+# File To Log Msgs
+####################################
+export jlogfile=${jlogfile:-${COMROOT}/logs/jlogfiles/jlogfile.${job}.${pid}}
+
+####################################
+# Determine Job Output Name on System
+####################################
+export outid="LL$job"
+export jobid="${outid}.o${pid}"
+export pgmout="OUTPUT.${pid}"
+
+export FLENGTH=87
+export CYC=${cyc}
+export cycle=t${cyc}z 
+
+###############################
+# Specify NET and RUN name
+##############################
+export NET=sref
+export RUN=sref
+
+##################################################
+# SAVEGES  - Copy Files From TMPDIR to $GESdir
+# SENDSMS  - Flag Events on ecFlow
+# SENDCOM  - Copy Files From TMPDIR to $COMOUT
+# SENDDBN  - Issue DBNet Client Calls
+# RERUN    - Rerun fcst from beginning (default no)
+##################################################
+export SENDCOM=${SENDCOM:-YES}
+export SENDECF=${SENDECF:-YES}
+export SENDDBN=${SENDDBN:-YES}
+
+export HOMEsref=${HOMEsref:-${NWROOT}/${NET}.${sref_ver}}
+export EXECsref=${EXECsref:-$HOMEsref/exec}
+export FIXsref=${FIXsref:-$HOMEsref/fix}
+export PARMsref=${PARMsref:-$HOMEsref/parm}
+export USHsref=${USHsref:-$HOMEsref/ush}
+
+###################################
+# Set up the UTILITIES
+###################################
+# Run setup to initialize working directory and utility scripts
+## setup.sh  # no need, since using module load prod_util 
+
+# Run setpdy and initialize PDY variables
+setpdy.sh
+. PDY
+
+env
+
+########################################################
+# Start remove the directories
+########################################################
+for mod in ARW NMB
+do
+    rm -rf $DATA_IN/sref_${mod}_wps_${cyc}_${envir}
+    rm -rf $DATA_IN/sref_${mod}_real_${cyc}_${envir}
+    rm -rf $DATA_IN/sref_${mod}_fcst_${cyc}_${envir}
+#    rm -rf $DATA_IN/sref_${mod}_post3hrly_${cyc}_${envir}
+#    rm -rf $DATA_IN/sref_${mod}_posthrly_${cyc}_${envir}
+
+    # Remove the BUFR directories:
+#    for mem in ctl n01 n02 n03 p01 p02 p03
+#    do
+#      rm -rf $DATA_IN/sref_${mod}_bufr_${mem}_${cyc}_${envir}
+#    done
+done
+
+cd $DATA_IN
+if [ ${RM_TMPDIR:-YES} = YES ] ; then rm -rf $DATA ; fi
+
+msg="JOB $job HAS COMPLETED NORMALLY."
+postmsg "$jlogfile" "$msg"
+
+date

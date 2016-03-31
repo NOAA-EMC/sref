@@ -1,0 +1,10 @@
+  5       raw variables and mean/spread/prob info
+U10M   33   105  D1  10  
+V10M   34   105  D1  10
+RH     52   105  D1  2
+T2M    11   105  D1  2  
+PRCP   61    1   D1  0 
+  3      special derived variables, each  of which, needs code to process specially
+APCP   61   1   M0     P1  3 > T1 0.25
+FIRW   147  2   M0     P1  0  = T1 1.0 
+CPTP   301 200  M0     P1  0  = T3 1.0 2.0 3.0

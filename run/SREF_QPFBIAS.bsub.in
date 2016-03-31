@@ -1,0 +1,48 @@
+#!/bin/bash
+
+#BSUB -oo _SREFDIR_/run/sref_qpfbias.log
+#BSUB -eo _SREFDIR_/run/sref_qpfbias.log
+#BSUB -J SREF_QPFBIAS
+#BSUB -n 1
+#BSUB -x
+#BSUB -R span[ptile=1]
+#BSUB -W 01:30
+#BSUB -P SREF-T2O
+#BSUB -q "devhigh"
+#BSUB -a poe
+
+set -aeux
+
+trap 'echo "SREF error QPFBIAS" >> /ptmpp1/$LOGNAME/tmpnwprd/jlogfile_sref' INT TERM ERR
+echo "SREF started QPFBIAS" >> /ptmpp1/$LOGNAME/tmpnwprd/jlogfile_sref
+
+. /usrx/local/Modules/3.2.9/init/bash
+module load ibmpe
+module load ics
+
+export OMP_NUM_THREADS=1
+export MP_EUIDEVICE=sn_all
+export MP_EUILIB=us
+export MP_MPILIB=mpich2
+export MP_TASK_AFFINITY=core:1
+
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usrx/local/NetCDF/3.6.3/lib
+
+
+export RUN_ENVIR=para
+export envir=prod
+export job=$$
+
+export CONFIG_FILE=_SREFDIR_/parm/sref_para_config_wcoss
+
+export PDY=_PDY_
+export cyc=_CYC_
+
+_SREFDIR_/jobs/JSREF_QPFBIASESTIMATE
+
+echo "SREF finished QPFBIAS" >> /ptmpp1/$LOGNAME/tmpnwprd/jlogfile_sref
+
+# Submit next job here:
+bsub < _SREFDIR_/run/SREF_BIAS.bsub
+echo "SREF waiting BIAS" >> /ptmpp1/$LOGNAME/tmpnwprd/jlogfile_sref
+

@@ -1,0 +1,58 @@
+#BSUB -J %E%trans_gefs4gefs_06
+#BSUB -o /%COM%/output/transfer/today/transfer_gefs4sref_06.o%J
+#BSUB -e /%COM%/output/transfer/today/transfer_gefs4sref_06.o%J
+#BSUB -L /bin/sh
+#BSUB -q prod2_serv2
+#BSUB -cwd /tmpnwprd
+#BSUB -W 03:00
+#BSUB -R rusage[mem=500]
+#BSUB -R affinity[core:distribute=balance]
+#BSUB -P MIRROR-OPS
+
+%include <head.h>
+%include <envir-p2.h>
+
+
+set -x
+
+export cyc=06
+export job=transfer_gefs4sref
+
+
+
+# versions file for SREF model $sref_ver
+VERSION_FILE=$NWROOT/versions/sref.ver
+if [ -f $VERSION_FILE ]; then
+  . $VERSION_FILE
+else
+  exit
+fi
+
+$NWROOT/sref.${sref_ver}/jobs/JTRANS_GEFS4SREF
+
+if [ $? -ne 0 ]; then
+fi
+
+%include <tail.h>
+%manual
+###############################################################################
+# PURPOSE:  This job transfers the following model data from the primary to the
+#           backup IBM-SP: GEFS
+# TRANSFER: /%COM%/gens/prod/gefs._PDY_/$cyc}/sfcsig/*sf??
+#           /%COM%/gens/prod/gefs._PDY_/${cyc}/sfcsig/*sf10?
+#           /%COM%/gens/prod/gefs._PDY_/${cyc}/sfcsig/*sf11?
+#           /%COM%/gens/prod/gefs._PDY_/${cyc}/sfcsig/*sf12?
+#           /%COM%/gens/prod/gefs._PDY_/${cyc}/sflux/*sfluxgrbf??
+#           /%COM%/gens/prod/gefs._PDY_/${cyc}/sflux/*sfluxgrbf10?
+#           /%COM%/gens/prod/gefs._PDY_/${cyc}/sflux/*sfluxgrbf11?
+#           /%COM%/gens/prod/gefs._PDY_/${cyc}/sflux/*sfluxgrbf12?
+################################################################################
+
+######################################################################
+# Job specific troubleshooting instructions:
+#  see generic troubleshoot manual page
+#
+######################################################################
+
+%end
+
