@@ -29,7 +29,7 @@ if [ $option = ST2 ]; then
  export OBSPPT_DIR=${COMROOTp1}/hourly/prod/nam_pcpn_anal.
 else
 # get 3hrly CCPA data
- export OBSPPT_DIR=${COMROOTp1}/gens/prod
+ export OBSPPT_DIR=${COMROOT}/ccpa/prod
 fi
 
 # Get Stage II data:
@@ -82,22 +82,22 @@ if [ $option = CCPA3 ]; then
  hr=0
  while [ $hr -le 21 ]; do
   if [ $hr -lt 10 ];then hr=0$hr;fi
-# $CPGB -g${grid} -i3 -x ${OBSPPT_DIR}/gefs.$vday/$hr/ccpa/ccpa_conus_hrap_t${hr}z_03h ppt$hr
+# $CPGB -g${grid} -i3 -x ${OBSPPT_DIR}/gefs.$vday/$hr/ccpa.t${hr}z.03h.hrap.conus ppt$hr
 
   if [ $hr -eq 00 ];then
-   $CPGB -g${grid} -i3 -x ${OBSPPT_DIR}/gefs.$vday/00/ccpa/ccpa_conus_hrap_t${hr}z_03h ppt$hr
+   $CPGB -g${grid} -i3 -x ${OBSPPT_DIR}/ccpa.$vday/00/ccpa.t${hr}z.03h.hrap.conus ppt$hr
   fi
   if [ $hr -eq 03 -o $hr -eq 06 ];then
-   $CPGB -g${grid} -i3 -x ${OBSPPT_DIR}/gefs.$vday/06/ccpa/ccpa_conus_hrap_t${hr}z_03h ppt$hr
+   $CPGB -g${grid} -i3 -x ${OBSPPT_DIR}/ccpa.$vday/06/ccpa.t${hr}z.03h.hrap.conus ppt$hr
   fi
   if [ $hr -eq 09 -o $hr -eq 12 ];then
-   $CPGB -g${grid} -i3 -x ${OBSPPT_DIR}/gefs.$vday/12/ccpa/ccpa_conus_hrap_t${hr}z_03h ppt$hr
+   $CPGB -g${grid} -i3 -x ${OBSPPT_DIR}/ccpa.$vday/12/ccpa.t${hr}z.03h.hrap.conus ppt$hr
   fi
   if [ $hr -eq 15 -o $hr -eq 18 ];then
-   $CPGB -g${grid} -i3 -x ${OBSPPT_DIR}/gefs.$vday/18/ccpa/ccpa_conus_hrap_t${hr}z_03h ppt$hr
+   $CPGB -g${grid} -i3 -x ${OBSPPT_DIR}/ccpa.$vday/18/ccpa.t${hr}z.03h.hrap.conus ppt$hr
   fi
   if [ $hr -eq 21 ];then
-   $CPGB -g${grid} -i3 -x ${OBSPPT_DIR}/gefs.$vdayp1/00/ccpa/ccpa_conus_hrap_t${hr}z_03h ppt$hr
+   $CPGB -g${grid} -i3 -x ${OBSPPT_DIR}/ccpa.$vdayp1/00/ccpa.t${hr}z.03h.hrap.conus ppt$hr
   fi
 
   hr=`expr $hr + 3`
