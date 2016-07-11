@@ -15,6 +15,10 @@
 #                   from ens_post.sh to sref_thin_post.sh
 # 03/24/15, Jun Du: Added PRATE and visbility as requested by WPC
 # 05/18/15, SPA SH: Comment out the dbn_alert of grib1 products
+# 07/07/16, Jun Du: Added WEASD (65, water equivelant accumulated snowfall depth from sky only
+#                   doesn't consider process on surface such as previously accumulated amounts 
+#                   and melting, otherwise it needs to use the instantaneuos one, unit: kg/m^2) 
+#                   and SNOD (66, m) two variables requested by WPC
 
 echo "------------------------------------------------"
 echo "Ensemble Postprocessing"
@@ -55,7 +59,7 @@ case $RUN in
 
          if [ "$model" = "rsm" -o "$model" = "nmm" -o "$model" = "em" -o "$model" = "arw" -o "$model" = "nmb" ]
          then
-            WGRIB_LIST=":PWAT:atmos.col|:HGT:1000.mb|:HGT:850.mb|:HGT:700.mb|:HGT:500.mb|:HGT:250.mb|UGRD:10.m.a|:UGRD:850.mb|:UGRD:700.mb|:UGRD:500.mb|:UGRD:250.mb|:VGRD:10.m.a|:VGRD:850.mb|:VGRD:700.mb|:VGRD:500.mb|:VGRD:250.mb|:TMP:2.m.a|:TMP:850.mb|:TMP:700.mb|:RH:850.mb|:RH:700.mb|:APCP|:PRMSL:MSL|:ABSV:500.mb|:ABSV:250.mb|:CAPE:sfc|:CIN:sfc|:LFTX:500.1000.mb|:TMAX:2.m.a|:TMIN:2.m.a|:CSNOW:sfc|:CICEP:sfc|:CFRZR:sfc|:CRAIN:sfc|:VIS|:PRATE"
+            WGRIB_LIST=":PWAT:atmos.col|:HGT:1000.mb|:HGT:850.mb|:HGT:700.mb|:HGT:500.mb|:HGT:250.mb|UGRD:10.m.a|:UGRD:850.mb|:UGRD:700.mb|:UGRD:500.mb|:UGRD:250.mb|:VGRD:10.m.a|:VGRD:850.mb|:VGRD:700.mb|:VGRD:500.mb|:VGRD:250.mb|:TMP:2.m.a|:TMP:850.mb|:TMP:700.mb|:RH:850.mb|:RH:700.mb|:APCP|:PRMSL:MSL|:ABSV:500.mb|:ABSV:250.mb|:CAPE:sfc|:CIN:sfc|:LFTX:500.1000.mb|:TMAX:2.m.a|:TMIN:2.m.a|:CSNOW:sfc|:CICEP:sfc|:CFRZR:sfc|:CRAIN:sfc|:VIS|:PRATE|:WEASD:kpds5=65:kpds6=1:kpds7=0:TR=4|:SNOD"
          fi
 
        if [ $OUTGRD -eq 132 ]; then

@@ -158,10 +158,8 @@ export COMglbIN=$COMglb_IN/${RUN}.${PDY}
 export COMIN=$COM_IN/${RUN}.${PDY}
 export COMOUT=$COM_OUT/${RUN}.${PDY}/${cyc}
 
-#export COMNAM=${COMNAM:-${COMROOT}/nam/prod}
-#export COMRAP=${COMRAP:-${COMROOT}/rap/prod}
 export COMINnam=${COMINnam:-${COMROOTp1}/nam/prod}
-export COMINrap=${COMINrap:-${COMROOTp1}/rap/prod}
+export COMINrap=${COMINrap:-${COMROOT}/rap/para}
 
 mkdir -p -m 775 $COMOUT
  
