@@ -1,0 +1,54 @@
+#BSUB -J %E%sref_gempak_f16_%CYC%
+#BSUB -o /%COM%/output/%ENVIR%/today/sref_gempak_f16_%CYC%.o%J
+#BSUB -e /%COM%/output/%ENVIR%/today/sref_gempak_f16_%CYC%.o%J
+#BSUB -L /bin/sh
+#BSUB -q %QUEUE%_shared
+#BSUB -n 1
+#BSUB -W 00:30
+#BSUB -cwd /tmpnwprd
+#BSUB -P %PROJ%
+#BSUB -R rusage[mem=5000] -R affinity[core]
+
+%include <head.h>
+%include <envir-p2.h>
+
+set -x
+
+export cyc=%CYC%
+export gempak_time="16"
+
+
+
+# versions file for SREF model $sref_ver
+VERSION_FILE=$NWROOT/versions/sref.ver
+if [ -f $VERSION_FILE ]; then
+  . $VERSION_FILE
+else
+  exit
+fi
+
+$NWROOT/sref.${spcsref_ver}/jobs/JSREF_PGRB212_GEMPAK
+
+if [ $? -ne 0 ]; then
+  ecflow_client --msg="***JOB ${ECF_NAME} ERROR RUNNING J-SCRIPT ***"
+  ecflow_client --abort
+  exit
+fi
+
+
+%include <tail.h>
+%manual
+######################################################################
+#
+#  PURPOSE:  To execute the job that runs the SREF GEMPAK processing.
+#
+######################################################################
+
+######################################################################
+# Job specific troubleshooting instructions:
+#  see generic troubleshoot manual page
+#
+######################################################################
+
+# include manual page below
+%end

@@ -1,0 +1,44 @@
+#! /bin/sh
+
+if [ $# -ne 1 ]
+then
+echo "============================================"
+echo " NEED TO ENTER AN OPTION:                   "
+echo "                                            "
+echo " conf zeus (for R&D Machine zeus)           "
+echo " conf wcoss (for tide/gyre)                 "
+echo " conf yellowstone (for NCAR machine)        "
+echo " conf linux (for generic linux)             "
+echo "                                            "
+exit
+fi
+
+set -x
+
+if [ $1 == "zeus" -o $1 == "wcoss" -o $1 == "yellowstone"  -o $1 == "linux" ]
+then
+cp arch/preamble.${1} arch/preamble
+else
+set +x
+echo "bad option " $1
+echo " needs to be zeus/wcoss/yellowstone/linux, otherwise develop a new arch/preamble.${1} file"
+set -x
+fi
+
+set +x
+
+if [ $1 == "wcoss" ]
+then
+echo " "
+module list
+echo " "
+echo " "
+echo "Make sure NetCDF/3.6.3 is listed above"
+echo " "
+echo " "
+echo "**** If not, unload NetCDF/4.2/serial if listed, and load NetCDF/3.6.3 ***** :"
+echo " "
+echo "module unload NetCDF/4.2/serial"
+echo "module load NetCDF/3.6.3"
+echo " "
+fi

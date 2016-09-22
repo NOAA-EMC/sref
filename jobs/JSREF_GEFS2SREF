@@ -1,0 +1,211 @@
+#!/bin/ksh
+############################################
+# Set up environment for gefs2sref jobs
+#
+# change log:
+# 05/29/2012, Jun Du: Initial program 
+# 05/15/2014, Jun Du: Extended to 129hr
+#
+############################################
+set -xa
+
+# ###################################
+# SET SHELL PROCESSING VARIABLES
+# ###################################
+export PS4='$SECONDS + ' 
+date
+
+export OMP_NUM_THREADS=1
+export MP_EUIDEVICE=sn_all
+export MP_EUILIB=us
+export MP_MPILIB=mpich2
+export MP_TASK_AFFINITY=core:1
+
+###############################
+# Specify NET and RUN name
+##############################
+export NET=sref
+export RUN=sref
+
+###########################################
+# Run sref_config to get input parameters
+###########################################
+export RUN_ENVIR=${RUN_ENVIR:-nco}
+if [ "$RUN_ENVIR" != nco ]          ### For Developers
+then
+  CONFIG_FILE=${CONFIG_FILE:-/meso/save/${LOGNAME}/sref${NWROOTp1}/parm/sref_para_config}
+  . $CONFIG_FILE
+  export userid=$LOGNAME
+  export DATA_IN=${DATA_IN:-/ptmpp1/$userid}
+fi
+
+###############################################################
+# This block can be modified for different test environment
+###############################################################
+if [ $RUN_ENVIR = nco -a $envir != prod ]; then
+  export SENDECF=${SENDECF:-NO}
+# export DBNROOT=${NWROOTp1}/spa_util/fakedbn
+# export jlogfile=${jlogfile:-${COMROOT}/logs/${envir}/jlogfile}
+fi
+
+#
+# obtain unique process id (pid) and make temp directories
+#
+export pid=$$
+export DATA_IN=${DATA_IN:-${DATAROOT}}
+
+export DATA=$DATA_IN/${job}.${pid}
+mkdir $DATA
+cd $DATA
+
+####################################
+# File To Log Msgs
+####################################
+export jlogfile=${COMROOT}/logs/jlogfiles/jlogfile.${job}.${pid}
+
+####################################
+# Determine Job Output Name on System
+####################################
+export outid="LL$job"
+export jobid="${outid}.o${pid}"
+export pgmout="OUTPUT.${pid}"
+export pgmerr=errfile
+
+export cycle=t${cyc}z
+
+
+##################################################
+# SAVEGES  - Copy Files From TMPDIR to $GESdir
+# SENDECF  - Flag Events on ecFflow
+# SENDCOM  - Copy Files From TMPDIR to $COMOUT
+# SENDDBN  - Issue DBNet Client Calls
+# RERUN    - Rerun fcst from beginning (default no)
+##################################################
+export SENDCOM=${SENDCOM:-YES}
+export SENDECF=${SENDECF:-YES}
+export SENDDBN=${SENDDBN:-YES}
+export RUN_TCTRACK=${RUN_TCTRACK:-NO}
+
+export HOMEsref=${HOMEsref:-${NWROOT}/${NET}.${sref_ver}}
+export EXECsref=${EXECsref:-$HOMEsref/exec}
+export FIXsref=${FIXsref:-$HOMEsref/fix}
+export PARMsref=${PARMsref:-$HOMEsref/parm}
+export USHsref=${USHsref:-$HOMEsref/ush}
+export GEMPAKsref=${GEMPAKsref:-$HOMEsref/gempak}
+
+###################################
+# Set up the UTILITIES
+###################################
+#export utilscript=${NWROOTp1}/util/ush
+#export utilexec=${NWROOTp1}/util/exec
+
+## setup.sh  # no need, since using module load prod_util 
+
+# Run setpdy and initialize PDY variables
+setpdy.sh
+. ./PDY
+
+###################################
+# Load the GRIB Utilities module
+####################################
+. /usrx/local/Modules/default/init/ksh
+module load grib_util
+
+# Run setup to initialize working directory and utility scripts
+msg="JOB $job HAS BEGUN"
+postmsg "$jlogfile" "$msg"
+
+#typeset -Z2 gefscyc
+if [ $cyc -eq 03 ]; then
+ export gefscyc=00
+fi
+if [ $cyc -eq 09 ]; then
+ export gefscyc=06
+fi
+if [ $cyc -eq 15 ]; then
+ export gefscyc=12
+fi
+if [ $cyc -eq 21 ]; then
+ export gefscyc=18
+fi
+typeset -Z2 gefscyc
+
+########################################################
+# Define COMIN and COMOUT
+########################################################
+export COM_IN=${COM_IN:-${COMROOT}/${NET}/${envir}}
+export COMIN=${COMIN:-$COM_IN/${RUN}.${PDY}/pgrb_gefs/$gefscyc}
+
+export COM_OUT=${COM_OUT:-${COMROOT}/${NET}/${envir}}
+export COMOUT=${COMOUT:-$COM_OUT/${RUN}.${PDY}/ensprod_gefs/$gefscyc}
+
+mkdir -p $COMIN $COMOUT
+ 
+#######################################################
+# Pass information which is needed to run the Script
+#######################################################
+export ENDHOUR=192
+export INCHOUR=3
+
+env
+
+###################################################
+# Execute the Scripts
+###################################################
+#1. Convert gefs to sref
+mkdir -m 775 $DATA/gefs2sref
+cd $DATA/gefs2sref
+rm -rf $DATA/gefs2sref/poescript
+
+#typeset -Z2 HR
+HR=00
+while [ $HR -le $ENDHOUR ]
+do
+ if [ $HR -ge 126 ];then export INCHOUR=06;fi
+ mkdir -m 775 $DATA/gefs2sref/$HR
+ echo "$HOMEsref/scripts/exsref_gefs2sref.sh.ecf $HR > $DATA/gefs2sref/${HR}.out" >>$DATA/gefs2sref/poescript
+ HR=`expr $HR + $INCHOUR`
+ if [ $HR -lt 10 ]; then HR=0$HR; fi
+done
+chmod 775 $DATA/gefs2sref/poescript
+export MP_PGMMODEL=mpmd
+export MP_CMDFILE=$DATA/gefs2sref/poescript
+mpirun.lsf -cmdfile $DATA/gefs2sref/poescript -pgmmodel mpmd -ilevel 3 -labelio yes -stdoutmode ordered
+
+#2. Create ensemble product
+# Reset initial interval for input files
+export INCHOUR=3
+
+mkdir -p $DATA/212_3hrly
+cd $DATA/212_3hrly
+$HOMEsref/scripts/exsref_enspost4GEFS.sh.ecf 3hrly 212 222 > $DATA/212_3hrly.out 
+
+mkdir -p $DATA/243_3hrly
+cd $DATA/243_3hrly
+$HOMEsref/scripts/exsref_enspost4GEFS.sh.ecf 3hrly 243 222 > $DATA/243_3hrly.out 
+
+mkdir -p $DATA/216_3hrly
+cd $DATA/216_3hrly
+$HOMEsref/scripts/exsref_enspost4GEFS.sh.ecf 3hrly 216 222 > $DATA/216_3hrly.out 
+
+cd $DATA
+cat $DATA/212_3hrly.out >>$pgmout
+cat $DATA/243_3hrly.out >>$pgmout
+cat $DATA/216_3hrly.out >>$pgmout
+###################################################
+
+cat $pgmout
+
+msg="JOB $job HAS COMPLETED NORMALLY."
+postmsg "$jlogfile" "$msg"
+
+msg="JOB COMPLETED NORMALLY"
+postmsg "$jlogfile" "$msg"
+
+################################
+# Remove the Working Directory
+################################
+cd $DATA_IN
+if [ ${RM_TMPDIR:-YES} = YES ]; then rm -rf $DATA; fi
+
+date

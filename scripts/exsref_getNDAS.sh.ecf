@@ -1,0 +1,279 @@
+################################################################
+# UNIX Script Documentation Block      
+#                                          
+# Script name:         exsref_getNDAS.sh.sms
+# Script description:  This program is to obtain 3-hourly NCEP 
+#                      regional analysis (NDAS) for the SREF bias 
+#                      correction job
+#                    
+# Author:      Jun Du       Org: NP21         Date: 2007-05 
+#  
+# Change log:
+#  7/16/2007:  Jun Du, initial implementation for the SREF operation
+#  10/6/2009:  Jun Du and Julia Zhu, added a check point to make sure 
+#              that NDAS exists
+#  
+################################################################
+#!/bin/ksh
+set -x
+
+#################################
+# Define dates
+#################################
+#note: run 4 cycles per day (cyc=00,06,12,18z)
+date=${ymd1}${cyc1}
+yy=`echo ${date} | cut -c1-4`
+mm=`echo ${date} | cut -c5-6`
+dd=`echo ${date} | cut -c7-8`
+hh=`echo ${date} | cut -c9-10`
+#--------------
+adate4=$yy$mm$dd
+
+datem24=` $NDATE -24 $date`
+yy3=`echo ${datem24} | cut -c 1-4`
+mm3=`echo ${datem24} | cut -c 5-6`
+dd3=`echo ${datem24} | cut -c 7-8`
+hh3=`echo ${datem24} | cut -c 9-10`
+adate3=$yy3$mm3$dd3
+
+datem48=` $NDATE -48 $date`
+yy2=`echo ${datem48} | cut -c 1-4`
+mm2=`echo ${datem48} | cut -c 5-6`
+dd2=`echo ${datem48} | cut -c 7-8`
+hh2=`echo ${datem48} | cut -c 9-10`
+adate2=$yy2$mm2$dd2
+
+datem72=` $NDATE -72 $date`
+yy1=`echo ${datem72} | cut -c 1-4`
+mm1=`echo ${datem72} | cut -c 5-6`
+dd1=`echo ${datem72} | cut -c 7-8`
+hh1=`echo ${datem72} | cut -c 9-10`
+adate1=$yy1$mm1$dd1
+
+datem96=` $NDATE -96 $date`
+yy0=`echo ${datem96} | cut -c 1-4`
+mm0=`echo ${datem96} | cut -c 5-6`
+dd0=`echo ${datem96} | cut -c 7-8`
+hh0=`echo ${datem96} | cut -c 9-10`
+adate0=$yy0$mm0$dd0
+
+#212 grid
+#grid='255,3,185,129,12190,-133459,8,-95000,40635,40635,0,64,0,25000,25000,0,0'
+#RTMA grid
+#grid='255 3 1073 689 20192 238446 8 265000 5079 5079 0 64 25000 25000 0 0 0'
+
+#########################################
+# get regional analysis
+#########################################
+echo 'beginning copy of NDAS analysis...'
+if [ $hh = 00 ]; then
+ cp $COMINnam/nam.$adate0/nam.t00z.awip3d00.tm00 grib212.ndas.f00
+ cp $COMINnam/nam.$adate0/nam.t06z.awip3d00.tm00 grib212.ndas.f06
+ cp $COMINnam/nam.$adate0/nam.t12z.awip3d00.tm00 grib212.ndas.f12
+ cp $COMINnam/nam.$adate0/nam.t18z.awip3d00.tm00 grib212.ndas.f18
+ cp $COMINnam/nam.$adate1/nam.t00z.awip3d00.tm00 grib212.ndas.f24
+ cp $COMINnam/nam.$adate1/nam.t06z.awip3d00.tm00 grib212.ndas.f30
+ cp $COMINnam/nam.$adate1/nam.t12z.awip3d00.tm00 grib212.ndas.f36
+ cp $COMINnam/nam.$adate1/nam.t18z.awip3d00.tm00 grib212.ndas.f42
+ cp $COMINnam/nam.$adate2/nam.t00z.awip3d00.tm00 grib212.ndas.f48
+ cp $COMINnam/nam.$adate2/nam.t06z.awip3d00.tm00 grib212.ndas.f54
+ cp $COMINnam/nam.$adate2/nam.t12z.awip3d00.tm00 grib212.ndas.f60
+ cp $COMINnam/nam.$adate2/nam.t18z.awip3d00.tm00 grib212.ndas.f66
+ cp $COMINnam/nam.$adate3/nam.t00z.awip3d00.tm00 grib212.ndas.f72
+ cp $COMINnam/nam.$adate3/nam.t06z.awip3d00.tm00 grib212.ndas.f78
+ cp $COMINnam/nam.$adate3/nam.t12z.awip3d00.tm00 grib212.ndas.f84
+
+ cp $COMINnam/ndas.$adate0/ndas.t06z.awphys00.tm03 ndas_raw_03
+ ${COPYGB} -x -g 212 ndas_raw_03    grib212.ndas.f03
+ cp $COMINnam/ndas.$adate0/ndas.t12z.awphys00.tm03 ndas_raw_09
+ ${COPYGB} -x -g 212 ndas_raw_09    grib212.ndas.f09
+ cp $COMINnam/ndas.$adate0/ndas.t18z.awphys00.tm03 ndas_raw_15
+ ${COPYGB} -x -g 212 ndas_raw_15    grib212.ndas.f15
+ cp $COMINnam/ndas.$adate1/ndas.t00z.awphys00.tm03 ndas_raw_21
+ ${COPYGB} -x -g 212 ndas_raw_21    grib212.ndas.f21
+ cp $COMINnam/ndas.$adate1/ndas.t06z.awphys00.tm03 ndas_raw_27
+ ${COPYGB} -x -g 212 ndas_raw_27    grib212.ndas.f27
+ cp $COMINnam/ndas.$adate1/ndas.t12z.awphys00.tm03 ndas_raw_33
+ ${COPYGB} -x -g 212 ndas_raw_33    grib212.ndas.f33
+ cp $COMINnam/ndas.$adate1/ndas.t18z.awphys00.tm03 ndas_raw_39
+ ${COPYGB} -x -g 212 ndas_raw_39    grib212.ndas.f39
+ cp $COMINnam/ndas.$adate2/ndas.t00z.awphys00.tm03 ndas_raw_45
+ ${COPYGB} -x -g 212 ndas_raw_45    grib212.ndas.f45
+ cp $COMINnam/ndas.$adate2/ndas.t06z.awphys00.tm03 ndas_raw_51
+ ${COPYGB} -x -g 212 ndas_raw_51    grib212.ndas.f51
+ cp $COMINnam/ndas.$adate2/ndas.t12z.awphys00.tm03 ndas_raw_57
+ ${COPYGB} -x -g 212 ndas_raw_57    grib212.ndas.f57
+ cp $COMINnam/ndas.$adate2/ndas.t18z.awphys00.tm03 ndas_raw_63
+ ${COPYGB} -x -g 212 ndas_raw_63    grib212.ndas.f63
+ cp $COMINnam/ndas.$adate3/ndas.t00z.awphys00.tm03 ndas_raw_69
+ ${COPYGB} -x -g 212 ndas_raw_69    grib212.ndas.f69
+ cp $COMINnam/ndas.$adate3/ndas.t06z.awphys00.tm03 ndas_raw_75
+ ${COPYGB} -x -g 212 ndas_raw_75    grib212.ndas.f75
+ cp $COMINnam/ndas.$adate3/ndas.t12z.awphys00.tm03 ndas_raw_81
+ ${COPYGB} -x -g 212 ndas_raw_81    grib212.ndas.f81
+fi
+if [ $hh = 06 ]; then
+ cp $COMINnam/nam.$adate0/nam.t06z.awip3d00.tm00 grib212.ndas.f00
+ cp $COMINnam/nam.$adate0/nam.t12z.awip3d00.tm00 grib212.ndas.f06
+ cp $COMINnam/nam.$adate0/nam.t18z.awip3d00.tm00 grib212.ndas.f12
+ cp $COMINnam/nam.$adate1/nam.t00z.awip3d00.tm00 grib212.ndas.f18
+ cp $COMINnam/nam.$adate1/nam.t06z.awip3d00.tm00 grib212.ndas.f24
+ cp $COMINnam/nam.$adate1/nam.t12z.awip3d00.tm00 grib212.ndas.f30
+ cp $COMINnam/nam.$adate1/nam.t18z.awip3d00.tm00 grib212.ndas.f36
+ cp $COMINnam/nam.$adate2/nam.t00z.awip3d00.tm00 grib212.ndas.f42
+ cp $COMINnam/nam.$adate2/nam.t06z.awip3d00.tm00 grib212.ndas.f48
+ cp $COMINnam/nam.$adate2/nam.t12z.awip3d00.tm00 grib212.ndas.f54
+ cp $COMINnam/nam.$adate2/nam.t18z.awip3d00.tm00 grib212.ndas.f60
+ cp $COMINnam/nam.$adate3/nam.t00z.awip3d00.tm00 grib212.ndas.f66
+ cp $COMINnam/nam.$adate3/nam.t06z.awip3d00.tm00 grib212.ndas.f72
+ cp $COMINnam/nam.$adate3/nam.t12z.awip3d00.tm00 grib212.ndas.f78
+ cp $COMINnam/nam.$adate3/nam.t18z.awip3d00.tm00 grib212.ndas.f84
+ cp $COMINnam/ndas.$adate0/ndas.t12z.awphys00.tm03 ndas_raw_03
+ ${COPYGB} -x -g 212 ndas_raw_03    grib212.ndas.f03
+ cp $COMINnam/ndas.$adate0/ndas.t18z.awphys00.tm03 ndas_raw_09
+ ${COPYGB} -x -g 212 ndas_raw_09    grib212.ndas.f09
+ cp $COMINnam/ndas.$adate1/ndas.t00z.awphys00.tm03 ndas_raw_15
+ ${COPYGB} -x -g 212 ndas_raw_15    grib212.ndas.f15
+ cp $COMINnam/ndas.$adate1/ndas.t06z.awphys00.tm03 ndas_raw_21
+ ${COPYGB} -x -g 212 ndas_raw_21    grib212.ndas.f21
+ cp $COMINnam/ndas.$adate1/ndas.t12z.awphys00.tm03 ndas_raw_27
+ ${COPYGB} -x -g 212 ndas_raw_27    grib212.ndas.f27
+ cp $COMINnam/ndas.$adate1/ndas.t18z.awphys00.tm03 ndas_raw_33
+ ${COPYGB} -x -g 212 ndas_raw_33   grib212.ndas.f33 
+ cp $COMINnam/ndas.$adate2/ndas.t00z.awphys00.tm03 ndas_raw_39
+ ${COPYGB} -x -g 212 ndas_raw_39    grib212.ndas.f39
+ cp $COMINnam/ndas.$adate2/ndas.t06z.awphys00.tm03 ndas_raw_45
+ ${COPYGB} -x -g 212 ndas_raw_45    grib212.ndas.f45
+ cp $COMINnam/ndas.$adate2/ndas.t12z.awphys00.tm03 ndas_raw_51
+ ${COPYGB} -x -g 212 ndas_raw_51    grib212.ndas.f51
+ cp $COMINnam/ndas.$adate2/ndas.t18z.awphys00.tm03 ndas_raw_57
+ ${COPYGB} -x -g 212 ndas_raw_57    grib212.ndas.f57
+ cp $COMINnam/ndas.$adate3/ndas.t00z.awphys00.tm03 ndas_raw_63
+ ${COPYGB} -x -g 212 ndas_raw_63    grib212.ndas.f63
+ cp $COMINnam/ndas.$adate3/ndas.t06z.awphys00.tm03 ndas_raw_69
+ ${COPYGB} -x -g 212 ndas_raw_69    grib212.ndas.f69
+ cp $COMINnam/ndas.$adate3/ndas.t12z.awphys00.tm03 ndas_raw_75
+ ${COPYGB} -x -g 212 ndas_raw_75    grib212.ndas.f75
+ cp $COMINnam/ndas.$adate3/ndas.t18z.awphys00.tm03 ndas_raw_81
+ ${COPYGB} -x -g 212 ndas_raw_81    grib212.ndas.f81
+fi
+if [ $hh = 12 ]; then
+ cp $COMINnam/nam.$adate0/nam.t12z.awip3d00.tm00 grib212.ndas.f00
+ cp $COMINnam/nam.$adate0/nam.t18z.awip3d00.tm00 grib212.ndas.f06
+ cp $COMINnam/nam.$adate1/nam.t00z.awip3d00.tm00 grib212.ndas.f12
+ cp $COMINnam/nam.$adate1/nam.t06z.awip3d00.tm00 grib212.ndas.f18
+ cp $COMINnam/nam.$adate1/nam.t12z.awip3d00.tm00 grib212.ndas.f24
+ cp $COMINnam/nam.$adate1/nam.t18z.awip3d00.tm00 grib212.ndas.f30
+ cp $COMINnam/nam.$adate2/nam.t00z.awip3d00.tm00 grib212.ndas.f36
+ cp $COMINnam/nam.$adate2/nam.t06z.awip3d00.tm00 grib212.ndas.f42
+ cp $COMINnam/nam.$adate2/nam.t12z.awip3d00.tm00 grib212.ndas.f48
+ cp $COMINnam/nam.$adate2/nam.t18z.awip3d00.tm00 grib212.ndas.f54
+ cp $COMINnam/nam.$adate3/nam.t00z.awip3d00.tm00 grib212.ndas.f60
+ cp $COMINnam/nam.$adate3/nam.t06z.awip3d00.tm00 grib212.ndas.f66
+ cp $COMINnam/nam.$adate3/nam.t12z.awip3d00.tm00 grib212.ndas.f72
+ cp $COMINnam/nam.$adate3/nam.t18z.awip3d00.tm00 grib212.ndas.f78
+ cp $COMINnam/nam.$adate4/nam.t00z.awip3d00.tm00 grib212.ndas.f84
+ cp $COMINnam/ndas.$adate0/ndas.t18z.awphys00.tm03 ndas_raw_03
+ ${COPYGB} -x -g 212 ndas_raw_03    grib212.ndas.f03
+ cp $COMINnam/ndas.$adate1/ndas.t00z.awphys00.tm03 ndas_raw_09
+ ${COPYGB} -x -g 212 ndas_raw_09    grib212.ndas.f09
+ cp $COMINnam/ndas.$adate1/ndas.t06z.awphys00.tm03 ndas_raw_15
+ ${COPYGB} -x -g 212 ndas_raw_15    grib212.ndas.f15
+ cp $COMINnam/ndas.$adate1/ndas.t12z.awphys00.tm03 ndas_raw_21
+ ${COPYGB} -x -g 212 ndas_raw_21    grib212.ndas.f21
+ cp $COMINnam/ndas.$adate1/ndas.t18z.awphys00.tm03 ndas_raw_27
+ ${COPYGB} -x -g 212 ndas_raw_27    grib212.ndas.f27
+ cp $COMINnam/ndas.$adate2/ndas.t00z.awphys00.tm03 ndas_raw_33
+ ${COPYGB} -x -g 212 ndas_raw_33    grib212.ndas.f33
+ cp $COMINnam/ndas.$adate2/ndas.t06z.awphys00.tm03 ndas_raw_39
+ ${COPYGB} -x -g 212 ndas_raw_39    grib212.ndas.f39
+ cp $COMINnam/ndas.$adate2/ndas.t12z.awphys00.tm03 ndas_raw_45
+ ${COPYGB} -x -g 212 ndas_raw_45    grib212.ndas.f45
+ cp $COMINnam/ndas.$adate2/ndas.t18z.awphys00.tm03 ndas_raw_51
+ ${COPYGB} -x -g 212 ndas_raw_51    grib212.ndas.f51
+ cp $COMINnam/ndas.$adate3/ndas.t00z.awphys00.tm03 ndas_raw_57
+ ${COPYGB} -x -g 212 ndas_raw_57    grib212.ndas.f57
+ cp $COMINnam/ndas.$adate3/ndas.t06z.awphys00.tm03 ndas_raw_63
+ ${COPYGB} -x -g 212 ndas_raw_63    grib212.ndas.f63
+ cp $COMINnam/ndas.$adate3/ndas.t12z.awphys00.tm03 ndas_raw_69
+ ${COPYGB} -x -g 212 ndas_raw_69    grib212.ndas.f69
+ cp $COMINnam/ndas.$adate3/ndas.t18z.awphys00.tm03 ndas_raw_75
+ ${COPYGB} -x -g 212 ndas_raw_75    grib212.ndas.f75
+ cp $COMINnam/ndas.$adate4/ndas.t00z.awphys00.tm03 ndas_raw_81
+ ${COPYGB} -x -g 212 ndas_raw_81    grib212.ndas.f81
+fi
+if [ $hh = 18 ]; then
+ cp $COMINnam/nam.$adate0/nam.t18z.awip3d00.tm00 grib212.ndas.f00
+ cp $COMINnam/nam.$adate1/nam.t00z.awip3d00.tm00 grib212.ndas.f06
+ cp $COMINnam/nam.$adate1/nam.t06z.awip3d00.tm00 grib212.ndas.f12
+ cp $COMINnam/nam.$adate1/nam.t12z.awip3d00.tm00 grib212.ndas.f18
+ cp $COMINnam/nam.$adate1/nam.t18z.awip3d00.tm00 grib212.ndas.f24
+ cp $COMINnam/nam.$adate2/nam.t00z.awip3d00.tm00 grib212.ndas.f30
+ cp $COMINnam/nam.$adate2/nam.t06z.awip3d00.tm00 grib212.ndas.f36
+ cp $COMINnam/nam.$adate2/nam.t12z.awip3d00.tm00 grib212.ndas.f42
+ cp $COMINnam/nam.$adate2/nam.t18z.awip3d00.tm00 grib212.ndas.f48
+ cp $COMINnam/nam.$adate3/nam.t00z.awip3d00.tm00 grib212.ndas.f54
+ cp $COMINnam/nam.$adate3/nam.t06z.awip3d00.tm00 grib212.ndas.f60
+ cp $COMINnam/nam.$adate3/nam.t12z.awip3d00.tm00 grib212.ndas.f66
+ cp $COMINnam/nam.$adate3/nam.t18z.awip3d00.tm00 grib212.ndas.f72
+ cp $COMINnam/nam.$adate4/nam.t00z.awip3d00.tm00 grib212.ndas.f78
+ cp $COMINnam/nam.$adate4/nam.t06z.awip3d00.tm00 grib212.ndas.f84
+ cp $COMINnam/ndas.$adate1/ndas.t00z.awphys00.tm03 ndas_raw_03
+ ${COPYGB} -x -g 212 ndas_raw_03    grib212.ndas.f03
+ cp $COMINnam/ndas.$adate1/ndas.t06z.awphys00.tm03 ndas_raw_09
+ ${COPYGB} -x -g 212 ndas_raw_09    grib212.ndas.f09
+ cp $COMINnam/ndas.$adate1/ndas.t12z.awphys00.tm03 ndas_raw_15
+ ${COPYGB} -x -g 212 ndas_raw_15    grib212.ndas.f15
+ cp $COMINnam/ndas.$adate1/ndas.t18z.awphys00.tm03 ndas_raw_21
+ ${COPYGB} -x -g 212 ndas_raw_21    grib212.ndas.f21
+ cp $COMINnam/ndas.$adate2/ndas.t00z.awphys00.tm03 ndas_raw_27
+ ${COPYGB} -x -g 212 ndas_raw_27    grib212.ndas.f27
+ cp $COMINnam/ndas.$adate2/ndas.t06z.awphys00.tm03 ndas_raw_33
+ ${COPYGB} -x -g 212 ndas_raw_33    grib212.ndas.f33
+ cp $COMINnam/ndas.$adate2/ndas.t12z.awphys00.tm03 ndas_raw_39
+ ${COPYGB} -x -g 212 ndas_raw_39    grib212.ndas.f39
+ cp $COMINnam/ndas.$adate2/ndas.t18z.awphys00.tm03 ndas_raw_45
+ ${COPYGB} -x -g 212 ndas_raw_45    grib212.ndas.f45
+ cp $COMINnam/ndas.$adate3/ndas.t00z.awphys00.tm03 ndas_raw_51
+ ${COPYGB} -x -g 212 ndas_raw_51    grib212.ndas.f51
+ cp $COMINnam/ndas.$adate3/ndas.t06z.awphys00.tm03 ndas_raw_57
+ ${COPYGB} -x -g 212 ndas_raw_57    grib212.ndas.f57
+ cp $COMINnam/ndas.$adate3/ndas.t12z.awphys00.tm03 ndas_raw_63
+ ${COPYGB} -x -g 212 ndas_raw_63    grib212.ndas.f63
+ cp $COMINnam/ndas.$adate3/ndas.t18z.awphys00.tm03 ndas_raw_69
+ ${COPYGB} -x -g 212 ndas_raw_69    grib212.ndas.f69
+ cp $COMINnam/ndas.$adate4/ndas.t00z.awphys00.tm03 ndas_raw_75
+ ${COPYGB} -x -g 212 ndas_raw_75    grib212.ndas.f75
+ cp $COMINnam/ndas.$adate4/ndas.t06z.awphys00.tm03 ndas_raw_81
+ ${COPYGB} -x -g 212 ndas_raw_81    grib212.ndas.f81
+fi
+
+total=`ls grib212.ndas.f*|wc -l`
+if [ $total -lt 29 ]
+then
+ echo "    "
+ echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+ echo "One or more NDAS files are missing, STOP here!"
+ echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+ echo "    "
+ export err=1
+ err_chk; err_exit
+else
+ echo "    "
+ echo " *****************************************************"
+ echo " fetch NDAS successful and continue to CALFCSTERR step"
+ echo " *****************************************************"
+ echo "    "
+fi
+
+tar -cvf anl_data *grib*
+
+##############################################
+# copy data to a directory for next job to use
+##############################################
+#mkdir -p $dirarch
+#mv anl_data ${COMOUT_MISC}/REGanl.f00_84.tar
+#cp grib212.ndas.f03 ${COMOUT_MISC}/.
+#cp grib212.ndas.f* ${COMOUT_MISC}/.
+
+exit

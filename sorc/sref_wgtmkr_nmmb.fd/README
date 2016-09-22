@@ -1,0 +1,181 @@
+#=======================================================================
+#--  Input: $domain - type of domain (e.g., na12, na12aq, na12ex)
+#
+#==  This short script runs the weight maker to produce wgts_$domain_$grid
+#    files for $grid = 218, 221, and 242 from an input model grid ($domain).
+#    These wgts files are needed by the product generator to process a new
+#    model grid.
+#
+#==  WRF: The user must first run the WRF post for the new grid for a single
+#    forecast hour to get the grid specifications in the "griddef.out" file
+#    from the /post directory.  
+#
+#==  NMMB: The user must first run the NMMB post for the new grid for a single
+#    forecast hour to get the grid specifications in the copygb_gridnav.txt
+#    file from the post/$fhr directory.
+#
+#==  Steps to take:
+#
+#==  1a) WRF : Go to the post directory and copy the griddef.out file to this
+#       directory, giving it the name
+#           griddef.$domain
+#       where $domain is the name of the new grid.  The griddef.out file can
+#       be found for a given forecast hour ($fhr) from the launcher output at:
+#       (/meso/noscrub/$user/$cycle/$run/post/$fhr)
+#
+#==  1b) NMMB : Go to the post directory and use the coefficients from the
+#        copygb_gridnav.txt file to modify values for kgdsin(2) - kgdsin(10),
+#        in WGTMKR.f as follows, using the na12aq domain as an example:
+#
+#-- Modify the last set of lines within WGTMKR.f before "DO ii=1,20"
+#   (values below are for the AQ domain -- na12aq):
+#       kgdsin(2)=706       !- Number of x grid points
+#       kgdsin(3)=564       !- Number of y grid points
+#       kgdsin(4)=9222      !- 1000*Latitude of SW corner; see (A) below
+#       kgdsin(5)=211657    !- 1000*(360+Longitude of SW corner); see (A) below
+#       kgdsin(6)=136       !- unchanged ?
+#       kgdsin(7)=50000     !- 1000*(Latitude of center point)
+#       kgdsin(8)=249000    !- 1000*(360+Longitude of center point)
+#       kgdsin(9)=124       !- 1000*DX in longitude; see (B) below
+#       kgdsin(10)=106      !- 1000*DY in latitude; see (B) below
+#
+#   (values below are for the 4-km CONUS domain -- conus4)
+#       kgdsin(2)=1300      !- Number of x grid points
+#       kgdsin(3)=875       !- Number of y grid points
+#       kgdsin(4)=19984     !- 1000*Latitude of SW corner; see (A) below
+#       kgdsin(5)=237514    !- 1000*(360+Longitude of SW corner); see (A) below
+#       kgdsin(6)=136       !- unchanged ?
+#       kgdsin(7)=39000     !- 1000*(Latitude of center point)
+#       kgdsin(8)=262000    !- 1000*(360+Longitude of center point)
+#       kgdsin(9)=37        !- 1000*DX in longitude; see (B) below
+#       kgdsin(10)=36       !- 1000*DY in latitude; see (B) below
+#
+#   (values below are for the 4-km central US domain -- cent4)
+#       kgdsin(2)=1050      !- Number of x grid points
+#       kgdsin(3)=660       !- Number of y grid points
+#       kgdsin(4)=23934     !- 1000*Latitude of SW corner; see (A) below
+#       kgdsin(5)=247296    !- 1000*(360+Longitude of SW corner); see (A) below
+#       kgdsin(6)=136       !- unchanged ?
+#       kgdsin(7)=38000     !- 1000*(Latitude of center point)
+#       kgdsin(8)=268000    !- 1000*(360+Longitude of center point)
+#       kgdsin(9)=37        !- 1000*DX in longitude; see (B) below
+#       kgdsin(10)=36       !- 1000*DY in latitude; see (B) below
+#
+#-- (A) Get the lat/lon for the SW corner by searching for the string "SW corner"
+#       from the geogrid.log file in the NPS directory.
+#
+#-- (B) Get the DX (long) and DY (lat) from the namelist.nps file in the NPS directory.
+#
+#        Recompile the code ("make <return>").  Make sure the name of the executable
+#        (wgtmkr.xc) matches the name of the executable at the end of the run_wgts
+#        script.  
+#
+#-- 2) Type "run $domain <return>".  It produces the various weights files
+#      (wgt_$domain_$grid, $grid=218,221,242) and moves them to the ../parm
+#      directory, with standard output written to wgtmkr_$domain_$grid.out.
+#=======================================================================
+
+Eric code: /meso/save/wx20er/utilsorc/wgts_prdgen_wrf_bgrid_fromlauncher_newlibs. 
+A few things to note:
+
+- In this code the b-grid specs are hardwired in the WGTMKR.f routine. It was 
+easier to do this than make an read in a griddef file. Here are the numbers for 
+the 16 km SREF domain:
+        kgdsin(1)=205
+        kgdsin(2)=716       !- Number of x grid points
+        kgdsin(3)=627       !- Number of y grid points
+        kgdsin(4)=-7527     !- 1000*Latitude of SW corner; see (A) below
+        kgdsin(5)=215881    !- 1000*(360+Longitude of SW corner); see (A) below
+        kgdsin(6)=136       !- unchanged ?
+        kgdsin(7)=54000     !- 1000*(Latitude of center point)
+        kgdsin(8)=254000    !- 1000*(360+Longitude of center point)
+        kgdsin(9)=168       !- 1000*DX in longitude; see (B) below
+        kgdsin(10)=144      !- 1000*DY in latitude; see (B) below
+        kgdsin(12)=44532    !- 1000*Latitude of NE corner
+        kgdsin(13)=14855    !- 1000*Longitude of NE Corner
+
+20km SREF:
+        kgdsin(1)=205
+        kgdsin(2)=572       !- Number of x grid points
+        kgdsin(3)=501       !- Number of y grid points
+        kgdsin(4)=-7424     !- 1000*Latitude of SW corner; see (A) below
+        kgdsin(5)=215883    !- 1000*(360+Longitude of SW corner); see (A) below
+        kgdsin(6)=136       !- unchanged 
+        kgdsin(7)=54000     !- 1000*(Latitude of center point)
+        kgdsin(8)=254000    !- 1000*(360+Longitude of center point)
+        kgdsin(9)=210       !- 1000*DX in longitude; see (B) below
+        kgdsin(10)=180      !- 1000*DY in latitude; see (B) below
+        kgdsin(12)=44591    !- 1000*Latitude of NE corner
+        kgdsin(13)=14737    !- 1000*Longitude of NE Corner
+
+25km SREF:
+        kgdsin(1)=205
+        kgdsin(2)=458       !- Number of x grid points
+        kgdsin(3)=401       !- Number of y grid points
+        kgdsin(4)=-7437     !- 1000*Latitude of SW corner; see (A) below
+        kgdsin(5)=215870    !- 1000*(360+Longitude of SW corner); see (A) below
+        kgdsin(6)=136       !- unchanged 
+        kgdsin(7)=54000     !- 1000*(Latitude of center point)
+        kgdsin(8)=254000    !- 1000*(360+Longitude of center point)
+        kgdsin(9)=262       !- 1000*DX in longitude; see (B) below
+        kgdsin(10)=225      !- 1000*DY in latitude; see (B) below
+        kgdsin(12)=44573    !- 1000*Latitude of NE corner
+        kgdsin(13)=14741    !- 1000*Longitude of NE Corner
+
+The way to get the lat/lon of the corner points is to run the unified post-processor 
+code, it writes out a test file with the lat/lons of the 4 corner points; this is an 
+example for a fire weather nest:
+
+ 28863 -104849  28579  -99454  33350 -104753  33042  -98909
+
+The first two numbers are the SW corner point lat/lon, the last two the NE corner point 
+lat/lon. You now need the NE corner point lat/lon as the changes George Gayno made for 
+w3lib and iplib to process b-grids requires it.
+
+Another way to get the NE corner point lat/lon is to run "wgrib -V" on a model native b-grid GRIB file, 
+using a special version of wgrib from George Gayno in /meso/save/wx20er/nextjif/nwtest_new/util/exec:
+/meso/save/wx20jd/sref/nwprod/sorc/sref_wgtmkr_nmmb.fd/util/wgrib -V native_b-grid-GRIBfile | more
+
+e.g., 25km SREF:
+rec 657:96150704:date 2012031321 WTMP kpds5=80 kpds6=1 kpds7=0 levels=(0,0) grid=255 sfc anl:
+  WTMP=Water temp. [K]
+  timerange 0 P1 0 P2 0 TimeU 1  nx 458 ny 401 GDS grid 205 num_in_ave 0 missing 0
+  center 7 subcenter 0 process 89 Table 2 scan: WE:SN winds(grid) 
+  Semi-staggered Arakawa B-Grid (2D): lat0 -7.437000 lon0 -144.130000 nxny 183658
+    dLat 0.225000 dLon 0.262000 (tlm0d -106.000000 tph0d 54.000000)
+    lat(nx,ny) 44.573000 lon(nx,ny) 14.741000 scan 64 mode 136
+  min/max data 215.304 323.054  num bits 11  BDS_Ref 215.304  DecScale 0 BinScale -4
+
+lat0 and lon0 are SW corner's lat/lon;
+The "lat(nx,ny), lon(nx,ny)" are the NE corner point lat/lons.
+dLat=dy; dLon=dx
+tlm0d -106.000000 tph0d 54.000000: center's lon/lat
+
+- You also need to put the b-grid into the w3fi71_g218_12km.f routine, here is the 16 km SREF grid entry:
+
+      DATA  GRD191/ 0, 255,205,716,627,  -7527, -144119, 136,   54000,
+& -106000,    168, 144, 64, 44532, 14855, 0, 0, 0/
+
+- The script "run_wgts" actually makes the weight files:
+
+grids="212 221 216 243"
+
+for grid in $grids ; do
+   wgt=sref_nmmb_wgt_g${grid}
+   cat > input << !
+191
+$grid
+!
+   ln -sf $wgt fort.51
+   $wgtmkr_exe < input > wgtmkr_${domain}_${grid}.out
+done
+
+Note the number for the b-grid in the input arguments must agree with 
+the grid number you use in the w3fi71 routine. (also need to change 
+map size (IxJ) in w3fi63.f routine??. It seems that it doesn't matter.)
+
+In this directory I have a simple code readit.f that reads a binary griddef file, 
+I got this when I read your 25 km file:
+
+205 458 401 -7437 -144130 136 54000 -106000 262 225 64 0 0 0 0 0 0 0 0 0
+

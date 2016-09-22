@@ -1,0 +1,25 @@
+ 18       raw variables and mean/spread/prob info
+T2M    11   105  M1   2 P1  2  > T1 293.0  
+T2M    11   105  M1   2 P1  2  < T1 273.0  
+Q      51   105  M1   2
+RH     52   105  M1   2  
+U10M   33   105  M1   10  
+V10M   34   105  M1   10
+SLP     2   102  M1   0
+PW     54   200  M1   0
+U      33   100  M7   1000 850 700 600 500 300 250 
+V      34   100  M7   1000 850 700 600 500 300 250 
+HGT     7   100  M7   1000 850 700 600 500 300 250
+RH     52   100  M5   850 700 600 500 300
+T      11   100  M5   850 700 600 500 300
+RAIN   140   1   M0     P1 0 = T1 1.0 
+FRZR   141   1   M0     P1 0 = T1 1.0
+ICEP   142   1   M0     P1 0 = T1 1.0
+SNOW   143   1   M0     P1 0 = T1 1.0
+PRCP   61     1  M1   0
+ 0      no derived products
+ 0      no mxp products
+
+
+NOTE: M/S*1.94 -> KNOT
+      INCH = 25.4 MM = 25.4 KG/M2 
