@@ -155,7 +155,8 @@ export GESNDAS=${GESNDAS:-${GESROOTp1}/prod}
 
 #The following variables are turned off now
 export GESnam=$GESNAM/nam.${PDY}
-export GESndas=$GESNDAS/ndas.${PDY}
+#export GESndas=$GESNDAS/ndas.${PDY}
+export GESndas=$GESNDAS/nam.${PDY}
 #export COMndas=$COMNAM/ndas.${PDY}
 
 mkdir -p -m 775 $GESDIR

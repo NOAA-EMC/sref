@@ -93,12 +93,12 @@ if [ $CORE = nmm -o $CORE = em -o $CORE = arw ];then
 if [ $fhr -eq $LENGTH ];then
  until test -s $FCSTDIR/fcst.$MEMBER.done
  do
-      sleep 600
+      sleep 10
  done
 else
  until test -s $FCSTDIR/wrfout_d01_${afttimeform}
  do
-      sleep 600
+      sleep 10
  done
 fi
 fi
@@ -107,14 +107,14 @@ if [ $CORE = nmb ];then
 if [ $fhr -eq $LENGTH ];then
  until test -s $FCSTDIR/fcst.$MEMBER.done
  do
-      sleep 600
+      sleep 10
  done
 else
  afterincr=`expr $fhr + $INCR`
  if [ $afterincr -lt 10 ];then afterincr=0$afterincr;fi
  until test -s $FCSTDIR/nmmb_hst_01_nio_00${afterincr}h_00m_00.00s
  do
-      sleep 600
+      sleep 10
  done
 fi
 fi
