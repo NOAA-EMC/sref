@@ -1,0 +1,559 @@
+#!/bin/ksh
+########################################################################################
+# UNIX Script Documentation Block                                                      #
+#                                                                                      #
+# Script name:         perturb_ens.ksh                                                 #
+# Script description:  Runs WRF standard initialization (SI) for the WRF-NMM and       #
+#                      WRF-EM model                                                    #
+#                                                                                      #
+# Author:        Eric Rogers       Org: NP22         Date: 2004-07-02                  #
+#                                                                                      #
+# Abstract: The scripts gets all the input files needed for the WRF-NMM and WRF-EM     #
+#           hiresw run and runs the WRF SI which interpolates the operational Eta ic's #
+#           to the nested WRF-NMM domain (old)                                         #
+#                                                                                      #
+# Script history log:                                                                  #
+# 2003-11-01  Matt Pyle   - Original script for parallel                               #
+# 2004-07-02  Eric Rogers - Preliminary modifications for production.                  #
+# 2005-08-03  Jun Du - Modified to fit the SREF system                                 #
+# 2005-08-16  Jun Du - (1) Now WRF perturbed members use corresponding MREF perturbed  #
+#                      members as IC to start with rather than having no perturbation  #
+#                      at all in "cold start" run as previously did; (2) ctl run also  #
+#                      uses ensemble version of real code (perturb) but not the        #
+#                      standard version of real code (real) for simplicity             #
+#                                                                                      #
+# 2005-10-06  Xiaoxue Wang - Modified to operational standard                          #
+# 2006-05-18  Jun Du - changed to read GSI-NMM-based new regional analysis for the     #
+#                      coldstart program                                               #
+# 2008-07-18  Jun Du - upgrade to WRFv2.2                                              #
+# 2010-04-26  Jun Du - generalized the script to run NEMS ensemble (MODEL=NMB)         #
+# 2014-08-20  Jun Du - expanded for SREF.v7.0.0                                        #
+########################################################################################
+
+set -aeux
+
+export XLFRTEOPTS="unit_vars=yes"
+
+START_DATE=$PDY$CYC
+
+cd $WORK_DIR
+
+model=`echo $MODEL | tr "[:upper:]" "[:lower:]"`
+
+END_DATE=`$NDATE $FLENGTH $START_DATE`
+BCK_DATE=`$NDATE -01 $START_DATE`
+BCK_HH=`echo $BCK_DATE | cut -c 9-10`
+
+START_YYYY=`echo $START_DATE | cut -c 1-4`
+START_MM=`echo $START_DATE | cut -c 5-6`
+START_DD=`echo $START_DATE | cut -c 7-8`
+START_HH=`echo $START_DATE | cut -c 9-10`
+
+END_YYYY=`echo $END_DATE | cut -c 1-4`
+END_MM=`echo $END_DATE | cut -c 5-6`
+END_DD=`echo $END_DATE | cut -c 7-8`
+END_HH=`echo $END_DATE | cut -c 9-10`
+
+WPS_START_DATE=${START_YYYY}-${START_MM}-${START_DD}_${START_HH}:00:00
+WPS_END_DATE=${END_YYYY}-${END_MM}-${END_DD}_${END_HH}:00:00
+
+# Run setup to initialize working directory and utility scripts
+## setup.sh  # no need, since using module load prod_util 
+
+if [ $MEMBER = ctl ];then export PAIR=00;fi
+if [ $MEMBER = p01 ];then export PAIR=01;fi
+if [ $MEMBER = n01 ];then export PAIR=01;fi
+if [ $MEMBER = p02 ];then export PAIR=02;fi
+if [ $MEMBER = n02 ];then export PAIR=02;fi
+if [ $MEMBER = p03 ];then export PAIR=03;fi
+if [ $MEMBER = n03 ];then export PAIR=03;fi
+if [ $MEMBER = p04 ];then export PAIR=04;fi
+if [ $MEMBER = n04 ];then export PAIR=04;fi
+if [ $MEMBER = p05 ];then export PAIR=05;fi
+if [ $MEMBER = n05 ];then export PAIR=05;fi
+if [ $MEMBER = p06 ];then export PAIR=06;fi
+if [ $MEMBER = n06 ];then export PAIR=06;fi
+
+# Set random number seeds for SKEB scheme
+if [ "$MODEL" = "ARW" ] ; then
+ if [ $MEMBER = ctl ];then export SEED4SKEB=1;fi
+ if [ $MEMBER = p01 ];then export SEED4SKEB=2;fi
+ if [ $MEMBER = n01 ];then export SEED4SKEB=3;fi
+ if [ $MEMBER = p02 ];then export SEED4SKEB=4;fi
+ if [ $MEMBER = n02 ];then export SEED4SKEB=5;fi
+ if [ $MEMBER = p03 ];then export SEED4SKEB=6;fi
+ if [ $MEMBER = n03 ];then export SEED4SKEB=7;fi
+ if [ $MEMBER = p04 ];then export SEED4SKEB=8;fi
+ if [ $MEMBER = n04 ];then export SEED4SKEB=9;fi
+ if [ $MEMBER = p05 ];then export SEED4SKEB=10;fi
+ if [ $MEMBER = n05 ];then export SEED4SKEB=11;fi
+ if [ $MEMBER = p06 ];then export SEED4SKEB=12;fi
+ if [ $MEMBER = n06 ];then export SEED4SKEB=13;fi
+fi
+
+#
+# real
+#
+
+if [ "$MODEL" = "ARW" ] ; then
+  CORE=em
+elif [ "$MODEL" = "NMM" ] ; then
+  CORE=nmm
+elif [ "$MODEL" = "NMB" ] ; then
+  CORE=nmb
+  cat $PARMsref/sref_namelist.wps.in.${MODEL}_$RES | sed s/WPS_START_DATE/$WPS_START_DATE/ | \
+                                                     sed s/WPS_END_DATE/$WPS_END_DATE/ > namelist.nps
+fi
+
+if [ $MODEL != NMB ]; then
+if [ "$MODEL" = "NMM" ] ; then
+cat $PARMsref/sref_namelist.input.in.${MODEL}.pair${PAIR}_$RES | sed s/START_YYYY/$START_YYYY/ | \
+                                                                 sed s/START_MM/$START_MM/ | \
+                                                                 sed s/START_DD/$START_DD/ | \
+                                                                 sed s/START_HH/$START_HH/ | \
+                                                                 sed s/END_YYYY/$END_YYYY/ | \
+                                                                 sed s/END_MM/$END_MM/ | \
+                                                                 sed s/END_DD/$END_DD/ | \
+                                                                 sed s/END_HH/$END_HH/ | \
+                                                                 sed s/IOFORM/$IOFORM/ > namelist.input
+fi
+if [ "$MODEL" = "ARW" ] ; then
+#cat $PARMsref/sref_namelist.input.in.${MODEL}.pair${PAIR}_$RES | sed s/START_YYYY/$START_YYYY/ | \
+cat $PARMsref/sref_namelist.input.in.${MODEL}.${MEMBER}_$RES | sed s/START_YYYY/$START_YYYY/ | \
+                                                                 sed s/START_MM/$START_MM/ | \
+                                                                 sed s/START_DD/$START_DD/ | \
+                                                                 sed s/START_HH/$START_HH/ | \
+                                                                 sed s/END_YYYY/$END_YYYY/ | \
+                                                                 sed s/END_MM/$END_MM/ | \
+                                                                 sed s/END_DD/$END_DD/ | \
+                                                                 sed s/END_HH/$END_HH/ | \
+                                                                 sed s/IOFORM/$IOFORM/ | \
+                                                                 sed s/SEED4SKEB/$SEED4SKEB/ | \
+                                                                 sed s/BCK_HH/$BCK_HH/ > namelist.input
+
+fi
+cp $PARMsref/sref_ETAMPNEW_DATA ETAMPNEW_DATA
+cp $PARMsref/sref_ETAMPNEW_DATA.expanded_rain ETAMPNEW_DATA.expanded_rain
+cp $PARMsref/sref_GENPARM.TBL GENPARM.TBL
+cp $PARMsref/sref_LANDUSE.TBL LANDUSE.TBL
+cp $PARMsref/sref_SOILPARM.TBL SOILPARM.TBL
+cp $PARMsref/sref_VEGPARM.TBL VEGPARM.TBL
+cp $PARMsref/sref_gribmap.txt gribmap.txt
+cp $PARMsref/sref_co2_trans co2_trans
+cp $PARMsref/sref_tr49t67 tr49t67
+cp $PARMsref/sref_tr49t85 tr49t85
+cp $PARMsref/sref_tr67t85 tr67t85
+if [ $IOFORM == 1 ] ; then
+ suffix=int
+else
+ suffix=nc
+fi
+else
+ suffix=dio
+fi
+
+if [ $MODEL = NMM -a $PAIR = 03 ]; then
+cp $PARMsref/sref_RRTM_DATA RRTM_DATA
+fi
+
+# Different IC at f00 and hi-res GFS afterward as LBC
+for f in $WPSDIR/wps.ctl/met_${CORE}.d01.????-??-??_??:??:??.$suffix; do
+  cp $f `basename $f`
+done
+  cp $WPSDIR/wps.ctl/met_${CORE}.d01.${WPS_START_DATE}.${suffix}_LBC .
+
+if [ $MEMBER != ctl ]; then
+
+   #
+   # Run LBC perturbation on non ctl members
+   #
+
+# low-res gefs ctl
+   for f in $WPSDIR/wps.c00/met_${CORE}.d01.????-??-??_??:??:??.$suffix; do
+    cp $f c00.`basename $f`
+   done
+# replace with gefs c00 at f00 to add gefs perturbations
+    mv c00.met_${CORE}.d01.${WPS_START_DATE}.${suffix} c00.met_${CORE}.d01.${WPS_START_DATE}.${suffix}_orig 
+    cp $WPSDIR/wps.c00/met_${CORE}.d01.${WPS_START_DATE}.${suffix}_LBC c00.met_${CORE}.d01.${WPS_START_DATE}.${suffix}
+
+# low-res gefs perturbed members
+   for f in $WPSDIR/wps.$MEMBER/met_${CORE}.d01.????-??-??_??:??:??.$suffix; do
+    cp $f $MEMBER.`basename $f`
+   done
+# replace with gefs perturb member at f00 to add gefs perturbations
+    mv $MEMBER.met_${CORE}.d01.${WPS_START_DATE}.${suffix} $MEMBER.met_${CORE}.d01.${WPS_START_DATE}.${suffix}_orig 
+    cp $WPSDIR/wps.$MEMBER/met_${CORE}.d01.${WPS_START_DATE}.${suffix}_LBC $MEMBER.met_${CORE}.d01.${WPS_START_DATE}.${suffix}
+
+date
+   FHR=00
+   while [ $FHR -le $FLENGTH ]
+   do
+
+      DATE=`$NDATE +$FHR $START_DATE`
+      YYYY=`echo $DATE | cut -c 1-4`
+      MM=`echo $DATE | cut -c 5-6`
+      DD=`echo $DATE | cut -c 7-8`
+      HH=`echo $DATE | cut -c 9-10`
+      DATE_TIME=${YYYY}-${MM}-${DD}_${HH}:00:00
+
+      cp             met_${CORE}.d01.$DATE_TIME.$suffix met_${CORE}.d01.$DATE_TIME.$suffix.no_perturb
+      ln -sf         met_${CORE}.d01.$DATE_TIME.$suffix fort.31
+      ln -sf $MEMBER.met_${CORE}.d01.$DATE_TIME.$suffix fort.32
+      ln -sf     c00.met_${CORE}.d01.$DATE_TIME.$suffix fort.33
+
+      if [ $MODEL != NMB ]; then
+         export pgm=sref_lbc_perturb_wrf
+         prep_step
+         startmsg
+         if [ $MACHINE == zeus ]; then
+         #mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_lbc_perturb_wrf
+         $EXECsref/sref_lbc_perturb_wrf
+         elif [ $MACHINE == wcoss ]; then
+         # mpirun.lsf $EXECsref/sref_lbc_perturb_wrf
+         $EXECsref/sref_lbc_perturb_wrf
+         fi
+         export err=$?; err_chk
+      else
+         export pgm=sref_lbc_perturb_nmb
+         prep_step
+         startmsg
+         if [ $MACHINE == zeus ]; then
+         #mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_lbc_perturb_nmb
+         $EXECsref/sref_lbc_perturb_nmb
+         elif [ $MACHINE == wcoss ]; then
+         # mpirun.lsf $EXECsref/sref_lbc_perturb_nmb
+         $EXECsref/sref_lbc_perturb_nmb
+         fi
+         export err=$?; err_chk
+      fi
+
+      FHR=`expr $FHR + $INCR`
+      if [ $FHR -lt 10 ]; then
+         FHR=0$FHR
+      fi
+
+   done
+
+fi
+
+rm -f rsl.*
+ls -l met_${CORE}.d01.*.$suffix 
+date
+
+# Execute wrf-real job to create ICs
+#if [ $MODEL == NMM ] && [ $PAIR == 02 ] ; then
+if [ $MODEL == NMM ] && [ $PAIR == 99 ] ; then
+  export pgm=sref_real_${model}_hwrf
+  prep_step
+  startmsg
+  if [ $MACHINE == zeus ]; then
+  mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_real_${model}_hwrf >> $pgmout 2>errfile
+  elif [ $MACHINE == wcoss ]; then
+  mpirun.lsf $EXECsref/sref_real_${model}_hwrf >> $pgmout 2>errfile
+  fi
+  export err=$?; err_chk
+else
+  export pgm=sref_real_${model}
+  prep_step
+  startmsg
+  if [ $MACHINE == zeus ]; then
+  mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_real_${model} >> $pgmout 2>errfile
+  elif [ $MACHINE == wcoss ]; then
+  mpirun.lsf $EXECsref/sref_real_${model} >> $pgmout 2>errfile
+  fi
+  export err=$?; err_chk
+fi
+
+#grep "SUCCESS COMPLETE REAL" rsl.error.0000
+err=$?
+if [ $err -ne 0 ]; then
+   echo "sref_real_${model} failed" >> $WORK_DIR/real.$MEMBER.failed
+   exit 1
+fi
+
+# Checking if it's a cold or warm start to decide which IC perturbation to use
+if [ $MEMBER != ctl ]; then
+#  PASTYMD=`$NDATE -06 $START_DATE | cut -c1-8`
+   PASTYMD=`$NDATE -12 $START_DATE | cut -c1-8`
+   DATE_TIME=${START_YYYY}-${START_MM}-${START_DD}_${START_HH}:00:00
+
+   case "$MEMBER" in
+       "p01" ) M[1]=p01
+               M[2]=n01
+               ;;
+       "n01" ) M[1]=n01
+               M[2]=p01
+               ;;
+       "p02" ) M[1]=p02
+               M[2]=n02
+               ;;
+       "n02" ) M[1]=n02
+               M[2]=p02
+               ;;
+       "p03" ) M[1]=p03
+               M[2]=n03
+               ;;
+       "n03" ) M[1]=n03
+               M[2]=p03
+               ;;
+       "p04" ) M[1]=p04
+               M[2]=n04
+               ;;
+       "n04" ) M[1]=n04
+               M[2]=p04
+               ;;
+       "p05" ) M[1]=p05
+               M[2]=n05
+               ;;
+       "n05" ) M[1]=n05
+               M[2]=p05
+               ;;
+       "p06" ) M[1]=p06
+               M[2]=n06
+               ;;
+       "n06" ) M[1]=n06
+               M[2]=p06
+               ;;
+        * ) echo "Unknown member $MEMBER"
+            exit 1
+            ;;
+   esac
+
+   totalmembership=${#M[*]}
+
+   missing=0
+   m=1
+   MISSNAME=ANY
+   while [ $m -le $totalmembership ]
+   do
+# If to use reg bred
+      #TEST for file existence
+      #ls -l $GES_IN/${NET}.$PASTYMD/$MODEL.${M[$m]}.wrfout_d01_${DATE_TIME}_$RES
+      if [ -s $GES_IN/${NET}.$PASTYMD/$MODEL.${M[$m]}.wrfout_d01_${DATE_TIME}_$RES ]; then
+# If not to use reg bred
+#     if [ -s $GES_IN/${NET}.$PASTYMD/$MISSNAME.${M[$m]}.wrfout_d01_${DATE_TIME}_$RES ]; then
+         unit=`expr $m + 20`
+         ln -sf $GES_IN/${NET}.$PASTYMD/$MODEL.${M[$m]}.wrfout_d01_${DATE_TIME}_$RES fort.$unit
+      else
+         echo "$m wrfout file from previous cycle not to be used"
+         missing=1
+      fi
+   m=`expr $m + 1`
+   done
+
+   if [ $missing -eq 0 ]; then
+     if [ $MODEL != NMB ]; then
+      cp wrfinput_d01 wrfinput_d01.no_perturb
+      ln -sf wrfinput_d01 fort.20
+     else
+      cp input_domain_01_nemsio input_domain_01_nemsio.no_perturb
+      ln -sf input_domain_01_nemsio fort.20
+     fi
+      if [ $MACHINE == zeus ]; then
+      #mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_breeding_${model}
+      $EXECsref/sref_breeding_${model}
+      elif [ $MACHINE == wcoss ]; then
+      # mpirun.lsf $EXECsref/sref_breeding_${model}
+      $EXECsref/sref_breeding_${model}
+      else
+      $EXECsref/sref_breeding_${model}
+      fi
+      echo "Control analysis is used as base IC superimposed by regional bred perts!!!"
+   else
+      echo "some or all of the previous wrfout files are not used"
+      echo "will not use regional breeding but GEFS ET perturbations"
+   fi
+fi
+
+#####################################################
+## if want to force to use ndas land surface initial states,
+## use the following coldstart program.
+## Note: This option is now turned off to have more diversity 
+##       in land surface initial states (LSI): ndas's LSI for NMB;
+##       RR's LSI for ARW; and GFS's LSI for NMM.
+#####################################################
+#lsm=gfs
+#lsm=ndas
+if [ $lsm = ndas ]; then
+ if [ $MODEL != NMB ]; then
+ cp wrfbdy_d01   wrfbdy_d01_b4ndasreplacement
+ cp wrfinput_d01 wrfinput_d01_b4ndasreplacement
+ else
+ cp input_domain_01_nemsio input_domain_01_nemsio_b4coldstart
+ fi
+
+ if [ $CYC -eq 00 -o $CYC -eq 06 -o $CYC -eq 12 -o $CYC -eq 18 ]; then
+     icnt=1
+     while [ $icnt -lt 1500 ]
+     do
+      if [ -s ${GESnam}/nam.t${CYC}z.nmm_b_restart_nemsio_anl.tm00 ] ; then
+       str=`ls -s ${GESnam}/nam.t${CYC}z.nmm_b_restart_nemsio_anl.tm00`  #get file size in block (1024 bytes)
+       set -A fsize $str
+       if [ ${fsize[0]} -gt 8000 ] ; then
+        dump=0
+        break
+       fi
+      else
+       icnt=$((icnt + 1))
+       sleep 5
+      fi
+      if [ $icnt -ge 1200 ]
+       then
+       echo ${GESnam}/nam.t${CYC}z.nmm_b_restart_nemsio_anl.tm00 "not exist"
+       msg="ABORTING after 20 minutes of waiting for ${GESnam}/nam.t${CYC}z.nmm_b_restart_nemsio_anl.tm00"
+       err_exit $msg
+      fi
+     done
+  ln -sf ${GESnam}/nam.t${CYC}z.nmm_b_restart_nemsio_anl.tm00    edas12rst_ndas
+ fi
+
+ if [ $CYC -eq 03 ]; then
+     icnt=1
+     while [ $icnt -lt 1500 ]
+     do
+      if [ -s ${GESndas}/nam.t06z.nmm_b_restart_nemsio_anl.tm03 ] ; then
+       str=`ls -s ${GESndas}/nam.t06z.nmm_b_restart_nemsio_anl.tm03`  #get file size in block (1024 bytes)
+       set -A fsize $str
+       if [ ${fsize[0]} -gt 8000 ] ; then
+        dump=0
+        break
+       fi
+      else
+       icnt=$((icnt + 1))
+       sleep 5
+      fi
+      if [ $icnt -ge 1200 ]
+       then
+       echo ${GESndas}/nam.t06z.nmm_b_restart_nemsio_anl.tm03 "not exist"
+       msg="ABORTING after 20 minutes of waiting for ${GESndas}/nam.t06z.nmm_b_restart_nemsio_anl.tm03"
+       err_exit $msg
+      fi
+     done
+  ln -sf ${GESndas}/nam.t06z.nmm_b_restart_nemsio_anl.tm03      edas12rst_ndas
+ fi
+
+ if [ $CYC -eq 09 ]; then
+     icnt=1
+     while [ $icnt -lt 1500 ]
+     do
+      if [ -s ${GESndas}/nam.t12z.nmm_b_restart_nemsio_anl.tm03 ] ; then
+       str=`ls -s ${GESndas}/nam.t12z.nmm_b_restart_nemsio_anl.tm03`  #get file size in block (1024 bytes)
+       set -A fsize $str
+       if [ ${fsize[0]} -gt 8000 ] ; then
+        dump=0
+        break
+       fi
+      else
+       icnt=$((icnt + 1))
+       sleep 5
+      fi
+      if [ $icnt -ge 1200 ]
+       then
+       echo ${GESndas}/nam.t12z.nmm_b_restart_nemsio_anl.tm03 "not exist"
+       msg="ABORTING after 20 minutes of waiting for ${GESndas}/nam.t12z.nmm_b_restart_nemsio_anl.tm03"
+       err_exit $msg
+      fi
+     done
+  ln -sf ${GESndas}/nam.t12z.nmm_b_restart_nemsio_anl.tm03      edas12rst_ndas
+ fi
+
+ if [ $CYC -eq 15 ]; then
+     icnt=1
+     while [ $icnt -lt 1500 ]
+     do
+      if [ -s ${GESndas}/nam.t18z.nmm_b_restart_nemsio_anl.tm03 ] ; then
+       str=`ls -s ${GESndas}/nam.t18z.nmm_b_restart_nemsio_anl.tm03`  #get file size in block (1024 bytes)
+       set -A fsize $str
+       if [ ${fsize[0]} -gt 8000 ] ; then
+        dump=0
+        break
+       fi
+      else
+       icnt=$((icnt + 1))
+       sleep 5
+      fi
+      if [ $icnt -ge 1200 ]
+       then
+       echo ${GESndas}/nam.t18z.nmm_b_restart_nemsio_anl.tm03 "not exist"
+       msg="ABORTING after 20 minutes of waiting for ${GESndas}/nam.t18z.nmm_b_restart_nemsio_anl.tm03"
+       err_exit $msg
+      fi
+     done
+  ln -sf ${GESndas}/nam.t18z.nmm_b_restart_nemsio_anl.tm03      edas12rst_ndas
+ fi
+
+ if [ $CYC -eq 21 ]; then
+     icnt=1
+     while [ $icnt -lt 1500 ]
+     do
+      if [ -s ${GESNDAS}/nam.${PDYp1}/nam.t00z.nmm_b_restart_nemsio_anl.tm03 ] ; then
+       str=`ls -s ${GESNDAS}/nam.${PDYp1}/nam.t00z.nmm_b_restart_nemsio_anl.tm03`  #get file size in block (1024 bytes)
+       set -A fsize $str
+       if [ ${fsize[0]} -gt 8000 ] ; then
+        dump=0
+        break
+       fi
+      else
+       icnt=$((icnt + 1))
+       sleep 5
+      fi
+      if [ $icnt -ge 1200 ]
+       then
+       echo ${GESNDAS}/nam.${PDYp1}/nam.t00z.nmm_b_restart_nemsio_anl.tm03 "not exist"
+       msg="ABORTING after 20 minutes of waiting for ${GESNDAS}/nam.${PDYp1}/nam.t00z.nmm_b_restart_nemsio_anl.tm03"
+       err_exit $msg
+      fi
+     done
+  ln -sf ${GESNDAS}/nam.${PDYp1}/nam.t00z.nmm_b_restart_nemsio_anl.tm03    edas12rst_ndas
+ fi
+
+ rm -f fort.*
+
+# If use usgs vegitation data in all models NMMB, ARW and NMM
+#cp $FIXsref/sref_wrf${CORE}_usgs_vegtype.grb .
+#if [ "$MODEL" = "NMM" -o "$MODEL" = "NMB" ] ; then
+# cp $FIXsref/sref_wrf${CORE}_roughness.grb .
+#fi
+# If use igbp vegitation data in NMMB but usgs data in ARW
+ if [ "$MODEL" = "ARW" ] ; then
+  cp $FIXsref/sref_wrf${CORE}_usgs_vegtype.grb .
+ fi
+
+ ln -s -f $PARMsref/sref_wrf${CORE}_config.nml fort.81
+ if [ $MACHINE == zeus ]; then
+ mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_coldstart_wrf > coldstart_wrf.out
+ elif [ $MACHINE == wcoss ]; then
+ mpirun.lsf $EXECsref/sref_coldstart_wrf > coldstart_wrf.out
+ else
+ $EXECsref/sref_coldstart_wrf > coldstart_wrf.out
+ fi
+ export err=$?; err_chk
+fi
+
+# copy ic & bc file to the run directory
+# --------------------------------------
+if [ $MODEL != NMB ]; then
+cp wrfbdy_d01     ${GESDIR}/$MODEL.t${CYC}z.${MEMBER}.wrfbdy_d01
+cp wrfinput_d01   ${GESDIR}/$MODEL.t${CYC}z.${MEMBER}.wrfinput_d01
+cp namelist.input ${GESDIR}/$MODEL.t${CYC}z.${MEMBER}.pair${PAIR}.namelist.input
+else
+
+FHR=00
+while [ $FHR -lt $FLENGTH ]
+do
+ cp boco.00$FHR       ${GESDIR}/$MODEL.t${CYC}z.${MEMBER}.boco.00$FHR
+ FHR=`expr $FHR + $INCR`
+ if [ $FHR -lt 10 ]; then
+ FHR=0$FHR
+ fi
+done
+cp input_domain_01_nemsio  ${GESDIR}/$MODEL.t${CYC}z.${MEMBER}_d01_nemsio
+if [ -s GWD_bin_01 ]; then
+ cp GWD_bin_01              ${GESDIR}/GWD_bin_01_$MODEL.t${CYC}z.${MEMBER}
+fi
+cp namelist.nps            ${GESDIR}/$MODEL.t${CYC}z.${MEMBER}.namelist.nps
+fi
+
+
+echo "done" > $WORK_DIR/real.$MEMBER.done
+echo "done" > $WORK_DIR/../real.$MEMBER.done

@@ -1,0 +1,183 @@
+#!/bin/ksh
+###############################################################
+# Setup environment for the SREF Bias correction job - part I:
+# past error estimation
+#
+# change log:
+# 07/17/2007 Jun Du, initial implementation
+# 9/20/2009, Julia Zhu   Scripts are modified to be sharable
+#                        between EMC and NCO
+#         Please note that variable "RUN_ENVIR" is set and used
+#         in the development enviroment only.
+# 11/05/2010, Jun Du, Added precipitation bias correction job
+###############################################################
+set -xa
+export PS4='$SECONDS + '
+
+export OMP_NUM_THREADS=1
+export MP_EUIDEVICE=sn_all
+export MP_EUILIB=us
+export MP_MPILIB=mpich2
+export MP_TASK_AFFINITY=core:1
+
+#
+# Specify whether the run is production or development
+#
+export RUN_ENVIR=${RUN_ENVIR:-nco}
+
+#####################################################################################
+# Run config file to get input parameters
+# This config file should define the following variables
+# DATA_IN: Location of working directory, default to ${DATAROOT}
+# DEV_SMS: If the job is to be running using ecFlow, default to YES
+# SENDDBN: Set to NO for developers, default to YES
+# COM_IN:  Directory for input files, default to ${COMROOT}/$NET/${envir}
+# COM_OUT: Directory for output file, default to ${COMROOT}/$NET/${envir}
+# gespath: Directory for the guess or restart files, default to ${GESROOT}/${envir}
+#####################################################################################
+if [ "$RUN_ENVIR" != nco ]      ### For Developers, "group_name" is passed from the ecFlow script
+then
+  CONFIG_FILE=${CONFIG_FILE:-/meso/save/${LOGNAME}/sref${NWROOTp1}/parm/sref_para_config}
+  . $CONFIG_FILE
+  export userid=$LOGNAME
+  export DATA_IN=${DATA_IN:-/ptmp/$userid}
+fi
+
+###############################################################
+# This block can be modified for different test environment
+###############################################################
+if [ $RUN_ENVIR = nco -a $envir != prod ]; then
+  export SENDDBN=${SENDDBN:-YES}
+#  export DBNROOT=${NWROOTp1}/spa_util/fakedbn
+#  export jlogfile=${jlogfile:-${COMROOT}/logs/${envir}/jlogfile}
+fi
+
+echo `date` $0 `date -u` begin
+
+########################################################### 
+# obtain unique process id (pid) and make temp directories
+###########################################################
+export pid=$$
+export DATA_IN=${DATA_IN:-${DATAROOT}}
+
+export DATA=$DATA_IN/${job}.${pid}
+rm -rf $DATA
+mkdir -p $DATA
+
+cd $DATA
+
+####################################
+# File To Log Msgs
+####################################
+export jlogfile=${jlogfile:-${COMROOT}/logs/jlogfiles/jlogfile.${job}.${pid}}
+
+####################################
+# Determine Job Output Name on System
+####################################
+export outid="LL$job"
+export jobid="${outid}.o${pid}"
+export pgmout="OUTPUT.${pid}"
+
+export cycle=t${cyc}z 
+
+###############################
+# Specify NET and RUN name
+##############################
+export NET=sref
+export RUN=sref
+
+##################################################
+# SAVEGES  - Copy Files From TMPDIR to $GESdir
+# SENDECF  - Flag Events on ecFlow
+# SENDCOM  - Copy Files From TMPDIR to $COMOUT
+# SENDDBN  - Issue DBNet Client Calls
+# RERUN    - Rerun fcst from beginning (default no)
+##################################################
+export SENDCOM=${SENDCOM:-YES}
+export SENDECF=${SENDECF:-YES}
+export SENDDBN=${SENDDBN:-YES}
+export VERBOSE=${VERBOSE:-YES}
+
+export HOMEsref=${HOMEsref:-${NWROOT}/${NET}.${sref_ver}}
+export EXECsref=${EXECsref:-$HOMEsref/exec}
+export FIXsref=${FIXsref:-$HOMEsref/fix}
+export PARMsref=${PARMsref:-$HOMEsref/parm}
+export USHsref=${USHsref:-$HOMEsref/ush}
+
+export HOMEglobal=${HOMEglobal:-${NWROOTp1}}
+export EXECglobal=$HOMEglobal/exec
+export FIXglobal=$HOMEglobal/fix
+export PARMglobal=$HOMEglobal/parm
+export USHglobal=$HOMEglobal/ush
+
+###################################
+# Set up the UTILITIES
+###################################
+
+# Run setup to initialize working directory and utility scripts
+## setup.sh  # no need, since using module load prod_util 
+
+# Run setpdy and initialize PDY variables
+setpdy.sh
+. ./PDY
+
+#############################################
+# COMIN and COMOUT
+#############################################
+export COM_IN=${COM_IN:-${COMROOT}/${NET}/${envir}}
+export COM_OUT=${COM_OUT:-${COMROOT}/${NET}/${envir}}
+
+export COMIN=$COM_IN/${RUN}.${PDY}/${cyc}/pgrb
+export COMOUT=$COM_OUT/${RUN}.${PDYm4}/${cyc}/misc
+
+export COMOUT_MISC=${COMOUT_MISC:-$COM_OUT/${RUN}.${PDY}/${cyc}/misc}
+
+#export COMNAM=${COMNAM:-${COMROOT}/nam/prod}
+export COMINnam=${COMINnam:-${COMROOTp1}/nam/prod}
+
+mkdir -p -m 775 $COMOUT $COMOUT_MISC
+ 
+env
+
+#######################################################
+# Pass information which is needed to run the Script
+#######################################################
+export ENDHOUR=87
+export INCHOUR=3
+
+NDATE=$NDATE
+export ymd1=${ymd1:-`$NDATE +3 $PDY$cyc | cut -c1-8`}
+export cyc1=${cyc1:-`$NDATE +3 $PDY$cyc | cut -c9-10`}
+
+###################################################
+# Execute the Script
+###################################################
+# get analysis
+$HOMEsref/scripts/exsref_getNDAS.sh.ecf
+
+# run bias-correction job of basic variables
+$HOMEsref/scripts/exsref_calfcsterr.sh.ecf
+
+# run bias-correction job of individual members' precipitation
+export region=CONUS
+$HOMEsref/scripts/exsref_calqpffcsterr.sh.ecf C21
+
+# run bias-correction job of ensemble mean's precipitation (it needs the job
+# exsref_enspost4special.sh.ecf to produce *mean*fvs* files for mean precip)
+#sleep 300          # Don't need it anymore due to trigger flag setup
+export region=CONUS
+$HOMEsref/scripts/exsref_calqpffcsterr.sh.ecf SMN
+
+########################################################
+cat $pgmout
+
+msg="JOB COMPLETED NORMALLY"
+postmsg "$jlogfile" "$msg"
+
+################################
+# Remove the Working Directory
+################################
+cd $DATA_IN
+if [ ${RM_TMPDIR:-YES} = YES ] ; then rm -rf $DATA ; fi
+
+date

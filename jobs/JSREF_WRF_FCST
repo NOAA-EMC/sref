@@ -1,0 +1,174 @@
+#!/bin/sh
+########################################
+# Set up environment for WRF ENSEMBLE FCST
+# change log:
+# 08/14/2007, Jun Du: Initial Implementation
+# 05/20/2008, Jun Du: run it separately by disconnecting to $model and $member
+#                     for generality
+# 9/20/2009, Julia Zhu   Scripts are modified to be sharable
+#                        between EMC and NCO
+# 9/27/2011, Jun Du: FY2012 upgrades 
+#
+########################################
+set -aeux
+export PS4='$SECONDS + '
+
+export OMP_NUM_THREADS=1
+export MP_SHARED_MEMORY=yes
+export MP_EAGER_LIMIT=65535
+export MP_MPILIB=mpich2
+export MP_USE_BULK_XFER=yes
+export MPICH_ALLTOALL_THROTTLE=0
+export OMP_STACKSIZE=256000
+
+#
+# Specify whether the run is production or development
+#
+export RUN_ENVIR=${RUN_ENVIR:-nco}
+
+#####################################################################################
+# Run config file to get input parameters
+# This config file should define the following variables
+# DATA_IN: Location of working directory, default to ${DATAROOT}
+# DEV_SMS: If the job is to be running using ecFflow, default to YES
+# SENDDBN: Set to NO for developers, default to YES
+# COM_IN:  Directory for input files, default to ${COMROOT}/$NET/${envir}
+# COM_OUT: Directory for output file, default to ${COMROOT}/$NET/${envir}
+# gespath: Directory for the guess or restart files, default to ${GESROOT}/${envir}
+#####################################################################################
+if [ "$RUN_ENVIR" != nco ]      ### For Developers, "group_name" is passed from the ecFflow script
+then
+  CONFIG_FILE=${CONFIG_FILE:-/meso/save/${LOGNAME}/sref${NWROOTp1}/parm/sref_para_config}
+  . $CONFIG_FILE
+  export userid=$LOGNAME
+  export DATA_IN=${DATA_IN:-/ptmpp1/$userid}
+fi
+
+###############################################################
+# This block can be modified for different test environment
+###############################################################
+if [ $RUN_ENVIR = nco -a $envir != prod ]; then
+  export SENDDBN=${SENDDBN:-NO}
+# export DBNROOT=${NWROOTp1}/spa_util/fakedbn
+# export jlogfile=${jlogfile:-${COMROOT}/logs/${envir}/jlogfile}
+fi
+
+echo `date` $0 `date -u` begin
+
+export CYC=${CYC:-${cyc}}
+export MEMBER=${MEMBER:-ctl}
+export MODEL=${MODEL:-ARW}
+export RES=${RES:-16km}
+
+########################################################### 
+# obtain unique process id (pid) and make temp directories
+# Note: ctl member needs to be run only once and can be used 
+# for both NMM and ARW cores!
+###########################################################
+export pid=$$
+export DATA_IN=${DATA_IN:-${DATAROOT}}
+
+export DATA=$DATA_IN/sref_${MODEL}_fcst_${CYC}_${envir}
+export WORK_DIR=$DATA/fcst.$MEMBER
+
+# Remove old directory if it exists
+rm -rf $WORK_DIR
+mkdir -p $WORK_DIR
+
+while [ ! -d $WORK_DIR ]
+do
+   mkdir -p $WORK_DIR
+done
+
+cd $WORK_DIR
+
+####################################
+# File To Log Msgs
+####################################
+export jlogfile=${jlogfile:-${COMROOT}/logs/jlogfiles/jlogfile.${job}.${pid}}
+
+####################################
+# Determine Job Output Name on System
+####################################
+export outid="LL$job"
+export jobid="${outid}.o${pid}"
+export pgmout="OUTPUT.${pid}"
+
+export cycle=t${cyc}z 
+
+###############################
+# Specify NET and RUN name
+##############################
+export NET=sref
+export RUN=sref
+
+##################################################
+# SAVEGES  - Copy Files From TMPDIR to $GESdir
+# SENDECF  - Flag Events on ecFflow
+# SENDCOM  - Copy Files From TMPDIR to $COMOUT
+# SENDDBN  - Issue DBNet Client Calls
+# RERUN    - Rerun fcst from beginning (default no)
+##################################################
+export SENDCOM=${SENDCOM:-YES}
+export SENDECF=${SENDECF:-YES}
+export SENDDBN=${SENDDBN:-YES}
+
+export HOMEsref=${HOMEsref:-${NWROOT}/${NET}.${sref_ver}}
+export EXECsref=${EXECsref:-$HOMEsref/exec}
+export FIXsref=${FIXsref:-$HOMEsref/fix}
+export PARMsref=${PARMsref:-$HOMEsref/parm}
+export USHsref=${USHsref:-$HOMEsref/ush}
+
+###################################
+# Set up the UTILITIES
+###################################
+machine=`hostname |cut -c1`
+if [ $machine = t -o $machine = g ]; then
+  export MACHINE=wcoss
+fi
+
+if [ $MACHINE == zeus ]; then
+  export utilscript=/scratch2/portfolios/NCEPDEV/meso/save/$USER${NWROOTp1}/util/ush
+  export utilexec=/scratch2/portfolios/NCEPDEV/meso/save/$USER${NWROOTp1}/util/exec
+else
+  export utilscript=${NWROOTp1}/util/ush
+  export utilexec=${NWROOTp1}/util/exec
+fi
+
+# Run setup to initialize working directory and utility scripts
+## setup.sh  # no need, since using module load prod_util 
+
+# Run setpdy and initialize PDY variables
+setpdy.sh
+. ./PDY
+
+#############################################
+#XXW# COMIN and COMOUT
+# GESDIR
+#############################################
+export gespath=${gespath:-${GESROOT}/${envir}}
+export GESDIR=$gespath/${NET}.${PDY}
+
+mkdir -p -m 775 $GESDIR 
+ 
+env
+
+export FLENGTH=${FLENGTH:-87}
+export INCR=${INCR:-3}
+export IOFORM=2
+########################################################
+# Execute the script.
+$HOMEsref/scripts/exsref_wrffcst.sh.ecf
+########################################################
+cat $pgmout
+
+msg="JOB COMPLETED NORMALLY"
+postmsg "$jlogfile" "$msg"
+
+################################
+# Remove the Working Directory
+################################
+cd $DATA_IN
+if [ ${RM_TMPDIR:-NO} = YES ] ; then rm -rf $DATA ; fi
+
+date

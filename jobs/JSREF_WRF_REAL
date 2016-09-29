@@ -1,0 +1,198 @@
+#!/bin/sh
+########################################
+# WRF-SREF Preliminary data setup step
+# change log:
+# 07/18/2008, Jun Du - upgrade to WRFv2.2
+# MODEL(MEMBER ...)=NMM(p01,n01,p02,n02)+ARW(p01,n01,p02,n02)
+# 9/20/2009, Julia Zhu   Scripts are modified to be sharable
+#                        between EMC and NCO
+# 4/15/2010, Jun Du  Generalized the script to run NEMS-NMMB
+#                    ensemble (MODEL=NMB)
+########################################
+set -aeux
+export PS4='$SECONDS + '
+
+export OMP_NUM_THREADS=1
+export MP_MPILIB=mpich2
+
+. /usrx/local/Modules/default/init/ksh
+module load grib_util
+
+#
+# Specify whether the run is production or development
+#
+export RUN_ENVIR=${RUN_ENVIR:-nco}
+
+#####################################################################################
+# Run config file to get input parameters
+# This config file should define the following variables
+# DATA_IN: Location of working directory, default to ${DATAROOT}
+# DEV_SMS: If the job is to be running using ecFflow, default to YES
+# SENDDBN: Set to NO for developers, default to YES
+# COM_IN:  Directory for input files, default to ${COMROOT}/$NET/${envir}
+# COM_OUT: Directory for output file, default to ${COMROOT}/$NET/${envir}
+# gespath: Directory for the guess or restart files, default to ${GESROOT}/${envir}
+#####################################################################################
+if [ "$RUN_ENVIR" != nco ]      ### For Developers, "group_name" is passed from the ecFflow script
+then
+  CONFIG_FILE=${CONFIG_FILE:-/meso/save/${LOGNAME}/sref${NWROOTp1}/parm/sref_para_config}
+  . $CONFIG_FILE
+  export userid=$LOGNAME
+  export DATA_IN=${DATA_IN:-/ptmpp1/$userid}
+fi
+
+###############################################################
+# This block can be modified for different test environment
+###############################################################
+if [ $RUN_ENVIR = nco -a $envir != prod ]; then
+  export SENDDBN=${SENDDBN:-NO}
+# export DBNROOT=${NWROOTp1}/spa_util/fakedbn
+# export jlogfile=${jlogfile:-${COMROOT}/logs/${envir}/jlogfile}
+  export RM_TMPDIR=${RM_TMPDIR:-NO}
+fi
+
+echo `date` $0 `date -u` begin
+
+export CYC=${CYC:-${cyc}}
+export MEMBER=${MEMBER:-ctl}
+export MODEL=${MODEL:-ARW}
+export RES=${RES:-16km}
+
+########################################################### 
+# obtain unique process id (pid) and make temp directories
+# Note: ctl member needs to be run only once and can be used 
+# for both NMM and ARW cores!
+###########################################################
+export pid=$$
+export DATA_IN=${DATA_IN:-${DATAROOT}}
+
+export DATA=$DATA_IN/sref_${MODEL}_real_${CYC}_${envir}
+export WORK_DIR=$DATA/real.$MEMBER
+
+# Remove old directory if it exists
+rm -rf $WORK_DIR
+mkdir -p $WORK_DIR
+
+while [ ! -d $WORK_DIR ]
+do
+   mkdir -p $WORK_DIR
+done
+
+cd $WORK_DIR
+
+####################################
+# File To Log Msgs
+####################################
+export jlogfile=${jlogfile:-${COMROOT}/logs/jlogfiles/jlogfile.${job}.${pid}}
+
+####################################
+# Determine Job Output Name on System
+####################################
+export outid="LL$job"
+export jobid="${outid}.o${pid}"
+export pgmout="OUTPUT.${pid}"
+
+export cycle=t${cyc}z 
+
+###############################
+# Specify NET and RUN name
+##############################
+export NET=sref
+export RUN=sref
+
+##################################################
+# SAVEGES  - Copy Files From TMPDIR to $GESdir
+# SENDECF  - Flag Events on ecFflow
+# SENDCOM  - Copy Files From TMPDIR to $COMOUT
+# SENDDBN  - Issue DBNet Client Calls
+# RERUN    - Rerun fcst from beginning (default no)
+##################################################
+export SENDCOM=${SENDCOM:-YES}
+export SENDECF=${SENDECF:-YES}
+export SENDDBN=${SENDDBN:-YES}
+
+export HOMEsref=${HOMEsref:-${NWROOT}/${NET}.${sref_ver}}
+export EXECsref=${EXECsref:-$HOMEsref/exec}
+export FIXsref=${FIXsref:-$HOMEsref/fix}
+export PARMsref=${PARMsref:-$HOMEsref/parm}
+export USHsref=${USHsref:-$HOMEsref/ush}
+
+###################################
+# Set up the UTILITIES
+###################################
+machine=`hostname |cut -c1`
+if [ $machine = t -o $machine = g ]; then
+  export MACHINE=wcoss
+fi
+
+if [ $MACHINE == zeus ]; then
+  export utilscript=/scratch2/portfolios/NCEPDEV/meso/save/$USER${NWROOTp1}/util/ush
+  export utilexec=/scratch2/portfolios/NCEPDEV/meso/save/$USER${NWROOTp1}/util/exec
+fi
+
+# Run setup to initialize working directory and utility scripts
+## setup.sh  # no need, since using module load prod_util 
+
+# Run setpdy and initialize PDY variables
+setpdy.sh
+. ./PDY
+
+#############################################
+# COMIN and COMOUT
+#############################################
+export gespath=${gespath:-${GESROOT}/${envir}}
+
+export GESDIR=$gespath/${NET}.${PDY}
+
+#export COMNAM=${COMNAM:-${COMROOT}/nam/prod}
+export COMINnam=${COMINnam:-${COMROOTp1}/nam/prod}
+
+##export GES_IN=/nwges_p6/prod #XXW 
+export GES_IN=${GES_IN:-$gespath}
+
+export GESNAM=${GESNAM:-${GESROOTp1}/prod}
+export GESNDAS=${GESNDAS:-${GESROOTp1}/prod}
+
+#The following variables are turned off now
+export GESnam=$GESNAM/nam.${PDY}
+#export GESndas=$GESNDAS/ndas.${PDY}
+export GESndas=$GESNDAS/nam.${PDY}
+#export COMndas=$COMNAM/ndas.${PDY}
+
+mkdir -p -m 775 $GESDIR
+ 
+env
+
+export FLENGTH=${FLENGTH:-87}
+export INCR=${INCR:-3}
+if [ "$MODEL" = NMB ];then
+  export lsm=ndas
+fi
+# The coldstart program cannot be applied to RUC LSM
+if [ "$MODEL" = ARW ];then
+#if [ "$MEMBER" = p01 -o "$MEMBER" = n02 -o "$MEMBER" = n04 -o "$MEMBER" = p05 -o "$MEMBER" = p06 ];then
+# export lsm=own
+#else
+  export lsm=ndas
+#fi
+fi
+
+export IOFORM=2
+########################################################
+# Execute the script.
+export WPSDIR=$DATA_IN/sref_${MODEL}_wps_${CYC}_${envir}
+$HOMEsref/scripts/exsref_wrfreal.sh.ecf 
+
+########################################################
+cat $pgmout
+
+msg="JOB COMPLETED NORMALLY"
+postmsg "$jlogfile" "$msg"
+
+################################
+# Remove the Working Directory
+################################
+cd $DATA_IN
+if [ ${RM_TMPDIR:-NO} = YES ] ; then rm -rf $DATA ; fi
+
+date

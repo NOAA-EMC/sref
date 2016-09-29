@@ -1,0 +1,56 @@
+#!/bin/bash
+
+#BSUB -oo _SREFDIR_/run/sref_real__MODEL___MEMBER_.log
+#BSUB -eo _SREFDIR_/run/sref_real__MODEL___MEMBER_.log
+#BSUB -J SREF_REAL__MODEL___MEMBER_
+#BSUB -n 32
+#BSUB -x
+#BSUB -R span[ptile=8]
+#BSUB -W 01:50
+#BSUB -q "devhigh"
+#BSUB -P SREF-T2O
+#BSUB -a poe
+
+set -aeux
+
+trap 'echo "SREF error _MODEL_ _MEMBER_ REAL" >> /ptmpp1/$LOGNAME/tmpnwprd/jlogfile_sref' INT TERM ERR
+echo "SREF started _MODEL_ _MEMBER_ REAL" >> /ptmpp1/$LOGNAME/tmpnwprd/jlogfile_sref
+
+. /usrx/local/Modules/3.2.9/init/bash
+module load ibmpe
+module load ics
+
+export OMP_NUM_THREADS=1
+export MP_EUIDEVICE=sn_all
+export MP_EUILIB=us
+export MP_MPILIB=mpich2
+export MP_TASK_AFFINITY=core:1
+
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usrx/local/netcdf-3.6.3/lib
+
+
+export RUN_ENVIR=para
+export envir=prod
+export job=$$
+
+export CONFIG_FILE=_SREFDIR_/parm/sref_para_config_wcoss
+
+export PDY=_PDY_
+export cyc=_CYC_
+export FLENGTH=_FLENGTH_
+export INCR=_INCR_
+export MODEL=_MODEL_
+export MEMBER=_MEMBER_
+export IOFORM=_IOFORM_
+export RES=_RES_
+export MACHINE=_MACHINE_
+export N_TASK=$LSB_DJOB_NUMPROC
+
+
+_SREFDIR_/jobs/JSREF_WRF_REAL
+
+echo "SREF finished _MODEL_ _MEMBER_ REAL" >> /ptmpp1/$LOGNAME/tmpnwprd/jlogfile_sref
+
+bsub < _SREFDIR_/run/SREF_FCST__MODEL___MEMBER_.bsub
+echo "SREF waiting _MODEL_ _MEMBER_ FCST" >> /ptmpp1/$LOGNAME/tmpnwprd/jlogfile_sref
+

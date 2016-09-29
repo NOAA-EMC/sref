@@ -1,0 +1,55 @@
+#BSUB -J %E%sref_gempak_postmgr_%CYC%
+#BSUB -o /%COM%/output/%ENVIR%/today/sref_gempak_postmgr_%CYC%.o%J
+#BSUB -e /%COM%/output/%ENVIR%/today/sref_gempak_postmgr_%CYC%.o%J
+#BSUB -L /bin/sh
+#BSUB -q %QUEUE%_shared
+#BSUB -W 01:30
+#BSUB -cwd /tmpnwprd
+#BSUB -P %PROJ%
+#BSUB -R rusage[mem=5000] -R affinity[core]
+
+%include <head.h>
+%include <envir-p2.h>
+
+
+set -x
+
+export cyc=%CYC%
+export gempak_jobs="00 03 06 09 00 03 18 21 24 27 30 33 36 39 42 45 48 51 54 57 60 63 66 69 72 75 78 81 84 87"
+
+
+
+# versions file for SREF model $sref_ver
+VERSION_FILE=$NWROOT/versions/sref.ver
+if [ -f $VERSION_FILE ]; then
+  . $VERSION_FILE
+else
+  exit
+fi
+
+$NWROOT/sref.${sref_ver}/jobs/JSREF_GEMPAK_PMGR
+
+if [ $? -ne 0 ]; then
+  ecflow_client --msg="***JOB ${ECF_NAME} ERROR RUNNING J-SCRIPT ***"
+  ecflow_client --abort
+  exit
+fi
+
+
+%include <tail.h>
+%manual
+######################################################################
+#
+#  PURPOSE:  To execute the job that monitors the SREF forecast pgrb200
+#          and releases the gempak jobs upon the pgrb200 completion.
+#
+######################################################################
+
+######################################################################
+# Job specific troubleshooting instructions:
+#  see generic troubleshoot manual page
+#
+######################################################################
+
+# include manual page below
+%end

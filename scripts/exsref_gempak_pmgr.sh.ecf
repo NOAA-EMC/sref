@@ -1,0 +1,65 @@
+#! /bin/ksh
+#
+# Script name:         exsref_gempak_pmgr.sh.sms
+#
+#  This script monitors the progress of the sref post jobs
+#  and releases the spc gempak processing jobs.
+#
+
+set -x
+
+hour=00
+typeset -Z2 hour
+TEND=87
+TCP=88
+
+total_count=21
+while [ $hour -lt $TCP ];
+do
+#
+# Wait for all sref members pgrb212*$hour to finish 
+#
+   icnt=1
+   while [ $icnt -lt 100 ]
+   do
+     count=`ls ${COMIN}/sref_*.${cycle}.pgrb212.*.f${hour} | wc -l`
+     if [ $count -ge $total_count ]
+     then
+       ecflow_client --event f${hour}_done
+       # Remove current hour from list
+       gempak_jobs=`echo $gempak_jobs | sed s/${hour}//g`
+       result_check=`echo $gempak_jobs | wc -w`
+       if [ $result_check -eq 0 ]
+       then
+          echo Exiting $0
+       fi
+       icnt=200  # out of inner while-loop
+     else
+       sleep 10
+       icnt=$((icnt + 1))
+       if [ $icnt -ge 180 ]
+       then
+         #msg="ABORTING after 30 minutes of waiting for sref gempak hours $gempakjobs."
+         #err_exit $msg
+         msg="Waiting over 30 minutes for all members to finish, will run with only $count members"
+         total_count=$count
+       fi
+     fi
+
+   done
+  
+   if [ $hour -lt 39 ]
+   then
+     let "hour=hour+1"
+   else
+     let "hour=hour+3"
+   fi
+   if [ $hour -lt 10 ]; then
+      typeset -Z2 hour
+   fi
+
+done
+
+echo Exiting $0
+
+exit
