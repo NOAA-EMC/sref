@@ -1,0 +1,707 @@
+###############################################################
+# This is the job script of ensemble clustering for SREF, which
+# works for both the NCEP and OU methods
+#
+# initial program, Jun Du, 2011
+#
+# change log:
+# 11/14/2011, Jun Du: initial implementation for SREF
+# 09/09/2013, BinBin Zhou and Jun Du: rebuild the cluster table
+#             to have time continuity over a pre-selected forecast
+#             time period for each clusters
+# 03/16/2015, modified to the 2-model and 26-member SREF.v7.0.0
+#
+#
+###############################################################
+#!/bin/ksh
+set -x
+
+ulimit -s unlimited
+
+XLFRTEOPTS="namelist=old"
+export XLFRTEOPTS
+
+XLSMPOPTS="parthds=2"
+export XLSMPOPTS
+
+date=$PDY$cyc
+field=$1
+method=$2
+org=$3
+freq=3hrly
+
+fmem=26
+
+let fmax1=fmem+1 
+let fmax=fmax1
+
+# ensemble fcst initiation date:
+yy=`echo ${date} | cut -c1-4`
+mm=`echo ${date} | cut -c5-6`
+dd=`echo ${date} | cut -c7-8`
+hh=`echo ${date} | cut -c9-10`
+
+# dates for anl data
+date1=` $NDATE +0 $date`
+ay1=`echo ${date1} | cut -c1-4`
+am1=`echo ${date1} | cut -c5-6`
+ad1=`echo ${date1} | cut -c7-8`
+ah1=`echo ${date1} | cut -c9-10`
+
+date2=` $NDATE +3 $date`
+ay2=`echo ${date2} | cut -c1-4`
+am2=`echo ${date2} | cut -c5-6`
+ad2=`echo ${date2} | cut -c7-8`
+ah2=`echo ${date2} | cut -c9-10`
+
+date3=` $NDATE +6 $date`
+ay3=`echo ${date3} | cut -c1-4`
+am3=`echo ${date3} | cut -c5-6`
+ad3=`echo ${date3} | cut -c7-8`
+ah3=`echo ${date3} | cut -c9-10`
+
+date4=` $NDATE +9 $date`
+ay4=`echo ${date4} | cut -c1-4`
+am4=`echo ${date4} | cut -c5-6`
+ad4=`echo ${date4} | cut -c7-8`
+ah4=`echo ${date4} | cut -c9-10`
+
+date5=` $NDATE +12 $date`
+ay5=`echo ${date5} | cut -c1-4`
+am5=`echo ${date5} | cut -c5-6`
+ad5=`echo ${date5} | cut -c7-8`
+ah5=`echo ${date5} | cut -c9-10`
+
+date6=` $NDATE +15 $date`
+ay6=`echo ${date6} | cut -c1-4`
+am6=`echo ${date6} | cut -c5-6`
+ad6=`echo ${date6} | cut -c7-8`
+ah6=`echo ${date6} | cut -c9-10`
+
+date7=` $NDATE +18 $date`
+ay7=`echo ${date7} | cut -c1-4`
+am7=`echo ${date7} | cut -c5-6`
+ad7=`echo ${date7} | cut -c7-8`
+ah7=`echo ${date7} | cut -c9-10`
+
+date8=` $NDATE +21 $date`
+ay8=`echo ${date8} | cut -c1-4`
+am8=`echo ${date8} | cut -c5-6`
+ad8=`echo ${date8} | cut -c7-8`
+ah8=`echo ${date8} | cut -c9-10`
+
+date9=` $NDATE +24 $date`
+ay9=`echo ${date9} | cut -c1-4`
+am9=`echo ${date9} | cut -c5-6`
+ad9=`echo ${date9} | cut -c7-8`
+ah9=`echo ${date9} | cut -c9-10`
+
+date10=` $NDATE +27 $date`
+ay10=`echo ${date10} | cut -c1-4`
+am10=`echo ${date10} | cut -c5-6`
+ad10=`echo ${date10} | cut -c7-8`
+ah10=`echo ${date10} | cut -c9-10`
+
+date11=` $NDATE +30 $date`
+ay11=`echo ${date11} | cut -c1-4`
+am11=`echo ${date11} | cut -c5-6`
+ad11=`echo ${date11} | cut -c7-8`
+ah11=`echo ${date11} | cut -c9-10`
+
+date12=` $NDATE +33 $date`
+ay12=`echo ${date12} | cut -c1-4`
+am12=`echo ${date12} | cut -c5-6`
+ad12=`echo ${date12} | cut -c7-8`
+ah12=`echo ${date12} | cut -c9-10`
+
+date13=` $NDATE +36 $date`
+ay13=`echo ${date13} | cut -c1-4`
+am13=`echo ${date13} | cut -c5-6`
+ad13=`echo ${date13} | cut -c7-8`
+ah13=`echo ${date13} | cut -c9-10`
+
+date14=` $NDATE +39 $date`
+ay14=`echo ${date14} | cut -c1-4`
+am14=`echo ${date14} | cut -c5-6`
+ad14=`echo ${date14} | cut -c7-8`
+ah14=`echo ${date14} | cut -c9-10`
+
+date15=` $NDATE +42 $date`
+ay15=`echo ${date15} | cut -c1-4`
+am15=`echo ${date15} | cut -c5-6`
+ad15=`echo ${date15} | cut -c7-8`
+ah15=`echo ${date15} | cut -c9-10`
+
+date16=` $NDATE +45 $date`
+ay16=`echo ${date16} | cut -c1-4`
+am16=`echo ${date16} | cut -c5-6`
+ad16=`echo ${date16} | cut -c7-8`
+ah16=`echo ${date16} | cut -c9-10`
+
+date17=` $NDATE +48 $date`
+ay17=`echo ${date17} | cut -c1-4`
+am17=`echo ${date17} | cut -c5-6`
+ad17=`echo ${date17} | cut -c7-8`
+ah17=`echo ${date17} | cut -c9-10`
+
+date18=` $NDATE +51 $date`
+ay18=`echo ${date18} | cut -c1-4`
+am18=`echo ${date18} | cut -c5-6`
+ad18=`echo ${date18} | cut -c7-8`
+ah18=`echo ${date18} | cut -c9-10`
+
+date19=` $NDATE +54 $date`
+ay19=`echo ${date19} | cut -c1-4`
+am19=`echo ${date19} | cut -c5-6`
+ad19=`echo ${date19} | cut -c7-8`
+ah19=`echo ${date19} | cut -c9-10`
+
+date20=` $NDATE +57 $date`
+ay20=`echo ${date20} | cut -c1-4`
+am20=`echo ${date20} | cut -c5-6`
+ad20=`echo ${date20} | cut -c7-8`
+ah20=`echo ${date20} | cut -c9-10`
+
+date21=` $NDATE +60 $date`
+ay21=`echo ${date21} | cut -c1-4`
+am21=`echo ${date21} | cut -c5-6`
+ad21=`echo ${date21} | cut -c7-8`
+ah21=`echo ${date21} | cut -c9-10`
+
+date22=` $NDATE +63 $date`
+ay22=`echo ${date22} | cut -c1-4`
+am22=`echo ${date22} | cut -c5-6`
+ad22=`echo ${date22} | cut -c7-8`
+ah22=`echo ${date22} | cut -c9-10`
+
+date23=` $NDATE +66 $date`
+ay23=`echo ${date23} | cut -c1-4`
+am23=`echo ${date23} | cut -c5-6`
+ad23=`echo ${date23} | cut -c7-8`
+ah23=`echo ${date23} | cut -c9-10`
+
+date24=` $NDATE +69 $date`
+ay24=`echo ${date24} | cut -c1-4`
+am24=`echo ${date24} | cut -c5-6`
+ad24=`echo ${date24} | cut -c7-8`
+ah24=`echo ${date24} | cut -c9-10`
+
+date25=` $NDATE +72 $date`
+ay25=`echo ${date25} | cut -c1-4`
+am25=`echo ${date25} | cut -c5-6`
+ad25=`echo ${date25} | cut -c7-8`
+ah25=`echo ${date25} | cut -c9-10`
+
+date26=` $NDATE +75 $date`
+ay26=`echo ${date26} | cut -c1-4`
+am26=`echo ${date26} | cut -c5-6`
+ad26=`echo ${date26} | cut -c7-8`
+ah26=`echo ${date26} | cut -c9-10`
+
+date27=` $NDATE +78 $date`
+ay27=`echo ${date27} | cut -c1-4`
+am27=`echo ${date27} | cut -c5-6`
+ad27=`echo ${date27} | cut -c7-8`
+ah27=`echo ${date27} | cut -c9-10`
+
+date28=` $NDATE +81 $date`
+ay28=`echo ${date28} | cut -c1-4`
+am28=`echo ${date28} | cut -c5-6`
+ad28=`echo ${date28} | cut -c7-8`
+ah28=`echo ${date28} | cut -c9-10`
+
+date29=` $NDATE +84 $date`
+ay29=`echo ${date29} | cut -c1-4`
+am29=`echo ${date29} | cut -c5-6`
+ad29=`echo ${date29} | cut -c7-8`
+ah29=`echo ${date29} | cut -c9-10`
+
+date30=` $NDATE +87 $date`
+ay30=`echo ${date30} | cut -c1-4`
+am30=`echo ${date30} | cut -c5-6`
+ad30=`echo ${date30} | cut -c7-8`
+ah30=`echo ${date30} | cut -c9-10`
+
+climo=$FIXsref/climo
+#climo=${climo:-${NWROOTp1}/fix/climo}
+dirarch=${COM_IN}/sref.$yy$mm$dd/$hh/cluster_$org
+mkdir -p $dirarch
+
+# Note: in the 3hrly climo data, only 00/06/12/18z are analysis-based, other
+# times are forecast-based (that's why having the "3hr-fcst hour" stamp in its pds info)
+#################################
+#mkdir -p $DATA/cluster_$org
+#cd $DATA/cluster_$org !! exit
+#rm -f $DATA/cluster_$org/*
+
+echo " $ay1 $ay2 $ay3 $ay4 $ay5 $ay6 $ay7 $ay8 $ay9 $ay10 $ay11 $ay12 $ay13 $ay14 $ay15 $ay16 $ay17 $ay18 $ay19 $ay20 $ay21 $ay22 $ay23 $ay24 $ay25 $ay26 $ay27 $ay28 $ay29 $ay30
+       $am1 $am2 $am3 $am4 $am5 $am6 $am7 $am8 $am9 $am10 $am11 $am12 $am13 $am14 $am15 $am16 $am17 $am18 $am19 $am20 $am21 $am22 $am23 $am24 $am25 $am26 $am27 $am28 $am29 $am30
+       $ad1 $ad2 $ad3 $ad4 $ad5 $ad6 $ad7 $ad8 $ad9 $ad10 $ad11 $ad12 $ad13 $ad14 $ad15 $ad16 $ad17 $ad18 $ad19 $ad20 $ad21 $ad22 $ad23 $ad24 $ad25 $ad26 $ad27 $ad28 $ad29 $ad30
+       $ah1 $ah2 $ah3 $ah4 $ah5 $ah6 $ah7 $ah8 $ah9 $ah10 $ah11 $ah12 $ah13 $ah14 $ah15 $ah16 $ah17 $ah18 $ah19 $ah20 $ah21 $ah22 $ah23 $ah24 $ah25 $ah26 $ah27 $ah28 $ah29 $ah30
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       00,03,06,09,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87
+       03,00,03,00,03,00,03,00,03,00,03,00,03,00,03,00,03,00,03,00,03,00,03,00,03,00,03,00,03,00 
+       nmb_c1,nmb_n1,nmb_p1,nmb_n2,nmb_p2,nmb_n3,nmb_p3,nmb_n4,nmb_p4,nmb_n5,nmb_p5,nmb_n6,nmb_p6,arw_cl,arw_n1,arw_p1,arw_n2,arw_p2,arw_n3,arw_p3,arw_n4,arw_p4,arw_n5,arw_p5,arw_n6,arw_p6" > headinfo
+
+ln -f -s headinfo fort.7
+
+cat <<paramEOF >input
+ &namin
+   yy1=${yy},mm1=${mm},dd1=${dd},hh1=${hh},iar=${field},meth=${method}
+ &end
+paramEOF
+
+HR=00
+while [ $HR -le $ENDHOUR ]
+do
+  cp $COMIN/sref_nmb.t${hh}z.pgrb212.ctl.f$HR r_gribawips1.f$HR
+  cp $COMIN/sref_nmb.t${hh}z.pgrb212.n1.f$HR  r_gribawips2.f$HR
+  cp $COMIN/sref_nmb.t${hh}z.pgrb212.p1.f$HR  r_gribawips3.f$HR
+  cp $COMIN/sref_nmb.t${hh}z.pgrb212.n2.f$HR  r_gribawips4.f$HR
+  cp $COMIN/sref_nmb.t${hh}z.pgrb212.p2.f$HR  r_gribawips5.f$HR
+  cp $COMIN/sref_nmb.t${hh}z.pgrb212.n3.f$HR  r_gribawips6.f$HR
+  cp $COMIN/sref_nmb.t${hh}z.pgrb212.p3.f$HR  r_gribawips7.f$HR
+  cp $COMIN/sref_nmb.t${hh}z.pgrb212.n4.f$HR  r_gribawips8.f$HR
+  cp $COMIN/sref_nmb.t${hh}z.pgrb212.p4.f$HR  r_gribawips9.f$HR
+  cp $COMIN/sref_nmb.t${hh}z.pgrb212.n5.f$HR  r_gribawips10.f$HR
+  cp $COMIN/sref_nmb.t${hh}z.pgrb212.p5.f$HR  r_gribawips11.f$HR
+  cp $COMIN/sref_nmb.t${hh}z.pgrb212.n6.f$HR  r_gribawips12.f$HR
+  cp $COMIN/sref_nmb.t${hh}z.pgrb212.p6.f$HR  r_gribawips13.f$HR
+  cp $COMIN/sref_arw.t${hh}z.pgrb212.ctl.f$HR  r_gribawips14.f$HR
+  cp $COMIN/sref_arw.t${hh}z.pgrb212.n1.f$HR   r_gribawips15.f$HR
+  cp $COMIN/sref_arw.t${hh}z.pgrb212.p1.f$HR   r_gribawips16.f$HR
+  cp $COMIN/sref_arw.t${hh}z.pgrb212.n2.f$HR   r_gribawips17.f$HR
+  cp $COMIN/sref_arw.t${hh}z.pgrb212.p2.f$HR   r_gribawips18.f$HR
+  cp $COMIN/sref_arw.t${hh}z.pgrb212.n3.f$HR   r_gribawips19.f$HR
+  cp $COMIN/sref_arw.t${hh}z.pgrb212.p3.f$HR   r_gribawips20.f$HR
+  cp $COMIN/sref_arw.t${hh}z.pgrb212.n4.f$HR   r_gribawips21.f$HR
+  cp $COMIN/sref_arw.t${hh}z.pgrb212.p4.f$HR   r_gribawips22.f$HR
+  cp $COMIN/sref_arw.t${hh}z.pgrb212.n5.f$HR   r_gribawips23.f$HR
+  cp $COMIN/sref_arw.t${hh}z.pgrb212.p5.f$HR   r_gribawips24.f$HR
+  cp $COMIN/sref_arw.t${hh}z.pgrb212.n6.f$HR   r_gribawips25.f$HR
+  cp $COMIN/sref_arw.t${hh}z.pgrb212.p6.f$HR   r_gribawips26.f$HR
+ HR=`expr $HR + $INCHOUR`
+ if [ $HR -lt 10 ];then HR=0$HR;fi
+done
+
+# get climo
+echo 'beginning getting climo data...'
+if [ $field -eq 1 ]; then
+ var=z500
+else
+ var=prmsl
+fi
+if [ $method -eq 1 ]; then
+ type=mean
+else
+ type=stdv
+fi
+chgrd=${COPYGB:-${NWROOTp1}/util/exec/copygb}
+
+HR=00
+while [ $HR -le $ENDHOUR ]
+do
+ if [ $HR -eq 00 ];then $chgrd -x -g 212 $climo/$var/$var$am1$ad1$ah1.$type r_gribawips$fmax1.f$HR;fi
+ if [ $HR -eq 03 ];then $chgrd -x -g 212 $climo/$var/$var$am2$ad2$ah2.$type r_gribawips$fmax1.f$HR;fi
+ if [ $HR -eq 06 ];then $chgrd -x -g 212 $climo/$var/$var$am3$ad3$ah3.$type r_gribawips$fmax1.f$HR;fi
+ if [ $HR -eq 09 ];then $chgrd -x -g 212 $climo/$var/$var$am4$ad4$ah4.$type r_gribawips$fmax1.f$HR;fi
+ if [ $HR -eq 12 ];then $chgrd -x -g 212 $climo/$var/$var$am5$ad5$ah5.$type r_gribawips$fmax1.f$HR;fi
+ if [ $HR -eq 15 ];then $chgrd -x -g 212 $climo/$var/$var$am6$ad6$ah6.$type r_gribawips$fmax1.f$HR;fi
+ if [ $HR -eq 18 ];then $chgrd -x -g 212 $climo/$var/$var$am7$ad7$ah7.$type r_gribawips$fmax1.f$HR;fi
+ if [ $HR -eq 21 ];then $chgrd -x -g 212 $climo/$var/$var$am8$ad8$ah8.$type r_gribawips$fmax1.f$HR;fi
+ if [ $HR -eq 24 ];then $chgrd -x -g 212 $climo/$var/$var$am9$ad9$ah9.$type r_gribawips$fmax1.f$HR;fi
+ if [ $HR -eq 27 ];then $chgrd -x -g 212 $climo/$var/$var$am10$ad10$ah10.$type r_gribawips$fmax1.f$HR;fi
+ if [ $HR -eq 30 ];then $chgrd -x -g 212 $climo/$var/$var$am11$ad11$ah11.$type r_gribawips$fmax1.f$HR;fi
+ if [ $HR -eq 33 ];then $chgrd -x -g 212 $climo/$var/$var$am12$ad12$ah12.$type r_gribawips$fmax1.f$HR;fi
+ if [ $HR -eq 36 ];then $chgrd -x -g 212 $climo/$var/$var$am13$ad13$ah13.$type r_gribawips$fmax1.f$HR;fi
+ if [ $HR -eq 39 ];then $chgrd -x -g 212 $climo/$var/$var$am14$ad14$ah14.$type r_gribawips$fmax1.f$HR;fi
+ if [ $HR -eq 42 ];then $chgrd -x -g 212 $climo/$var/$var$am15$ad15$ah15.$type r_gribawips$fmax1.f$HR;fi
+ if [ $HR -eq 45 ];then $chgrd -x -g 212 $climo/$var/$var$am16$ad16$ah16.$type r_gribawips$fmax1.f$HR;fi
+ if [ $HR -eq 48 ];then $chgrd -x -g 212 $climo/$var/$var$am17$ad17$ah17.$type r_gribawips$fmax1.f$HR;fi
+ if [ $HR -eq 51 ];then $chgrd -x -g 212 $climo/$var/$var$am18$ad18$ah18.$type r_gribawips$fmax1.f$HR;fi
+ if [ $HR -eq 54 ];then $chgrd -x -g 212 $climo/$var/$var$am19$ad19$ah19.$type r_gribawips$fmax1.f$HR;fi
+ if [ $HR -eq 57 ];then $chgrd -x -g 212 $climo/$var/$var$am20$ad20$ah20.$type r_gribawips$fmax1.f$HR;fi
+ if [ $HR -eq 60 ];then $chgrd -x -g 212 $climo/$var/$var$am21$ad21$ah21.$type r_gribawips$fmax1.f$HR;fi
+ if [ $HR -eq 63 ];then $chgrd -x -g 212 $climo/$var/$var$am22$ad22$ah22.$type r_gribawips$fmax1.f$HR;fi
+ if [ $HR -eq 66 ];then $chgrd -x -g 212 $climo/$var/$var$am23$ad23$ah23.$type r_gribawips$fmax1.f$HR;fi
+ if [ $HR -eq 69 ];then $chgrd -x -g 212 $climo/$var/$var$am24$ad24$ah24.$type r_gribawips$fmax1.f$HR;fi
+ if [ $HR -eq 72 ];then $chgrd -x -g 212 $climo/$var/$var$am25$ad25$ah25.$type r_gribawips$fmax1.f$HR;fi
+ if [ $HR -eq 75 ];then $chgrd -x -g 212 $climo/$var/$var$am26$ad26$ah26.$type r_gribawips$fmax1.f$HR;fi
+ if [ $HR -eq 78 ];then $chgrd -x -g 212 $climo/$var/$var$am27$ad27$ah27.$type r_gribawips$fmax1.f$HR;fi
+ if [ $HR -eq 81 ];then $chgrd -x -g 212 $climo/$var/$var$am28$ad28$ah28.$type r_gribawips$fmax1.f$HR;fi
+ if [ $HR -eq 84 ];then $chgrd -x -g 212 $climo/$var/$var$am29$ad29$ah29.$type r_gribawips$fmax1.f$HR;fi
+ if [ $HR -eq 87 ];then $chgrd -x -g 212 $climo/$var/$var$am30$ad30$ah30.$type r_gribawips$fmax1.f$HR;fi
+
+ HR=`expr $HR + $INCHOUR`
+ if [ $HR -lt 10 ];then HR=0$HR;fi
+done
+echo 'end of getting regional climo'
+
+##############################
+fnum=1
+while [ ${fnum} -le ${fmax} ]
+do
+   if [ ${fnum} -le 9 ]; then
+cat r_gribawips${fnum}.f00 r_gribawips${fnum}.f03 \
+    r_gribawips${fnum}.f06 r_gribawips${fnum}.f09 \
+    r_gribawips${fnum}.f12 r_gribawips${fnum}.f15 \
+    r_gribawips${fnum}.f18 r_gribawips${fnum}.f21 \
+    r_gribawips${fnum}.f24 r_gribawips${fnum}.f27 \
+    r_gribawips${fnum}.f30 r_gribawips${fnum}.f33 \
+    r_gribawips${fnum}.f36 r_gribawips${fnum}.f39 \
+    r_gribawips${fnum}.f42 r_gribawips${fnum}.f45 \
+    r_gribawips${fnum}.f48 r_gribawips${fnum}.f51 \
+    r_gribawips${fnum}.f54 r_gribawips${fnum}.f57 \
+    r_gribawips${fnum}.f60 r_gribawips${fnum}.f63 \
+    r_gribawips${fnum}.f66 r_gribawips${fnum}.f69 \
+    r_gribawips${fnum}.f72 r_gribawips${fnum}.f75 \
+    r_gribawips${fnum}.f78 r_gribawips${fnum}.f81 \
+    r_gribawips${fnum}.f84 r_gribawips${fnum}.f87 >> r_gribawips0${fnum}
+${GRBINDEX} r_gribawips0${fnum} r_gribawips0${fnum}.i
+#${NWROOTp1}/util/exec/grbindex r_gribawips0${fnum} r_gribawips0${fnum}.i
+   else
+cat r_gribawips${fnum}.f00 r_gribawips${fnum}.f03 \
+    r_gribawips${fnum}.f06 r_gribawips${fnum}.f09 \
+    r_gribawips${fnum}.f12 r_gribawips${fnum}.f15 \
+    r_gribawips${fnum}.f18 r_gribawips${fnum}.f21 \
+    r_gribawips${fnum}.f24 r_gribawips${fnum}.f27 \
+    r_gribawips${fnum}.f30 r_gribawips${fnum}.f33 \
+    r_gribawips${fnum}.f36 r_gribawips${fnum}.f39 \
+    r_gribawips${fnum}.f42 r_gribawips${fnum}.f45 \
+    r_gribawips${fnum}.f48 r_gribawips${fnum}.f51 \
+    r_gribawips${fnum}.f54 r_gribawips${fnum}.f57 \
+    r_gribawips${fnum}.f60 r_gribawips${fnum}.f63 \
+    r_gribawips${fnum}.f66 r_gribawips${fnum}.f69 \
+    r_gribawips${fnum}.f72 r_gribawips${fnum}.f75 \
+    r_gribawips${fnum}.f78 r_gribawips${fnum}.f81 \
+    r_gribawips${fnum}.f84 r_gribawips${fnum}.f87 >> r_gribawips${fnum}
+${GRBINDEX} r_gribawips${fnum} r_gribawips${fnum}.i
+#${NWROOTp1}/util/exec/grbindex r_gribawips${fnum} r_gribawips${fnum}.i
+   fi
+ let fnum=fnum+1
+done
+
+rm -f *awips*.f*
+##############################
+$EXECsref/sref_cluster_$org <input >job.out
+export err=$?; err_chk
+
+mv sref_cluster_info        sref_cluster_info_raw
+cp sref_cluster_info_raw    $dirarch/.
+cp sref_clustering_process  $dirarch/.
+mv *clus*.f*  $dirarch/.
+
+#############################
+# Rebuild the clustering membership to have time continuity over a pre-selected
+# forecast time period for each cluster, requested by NCEP Weather Prediction Center.
+# Three time periods are selected 00-39hr, 42-63hr, 66-87hr based on a discussion 
+# with WPC.
+
+if [ $freq = "3hrly" ] ; then
+#      0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29
+fhrs="00 03 06 09 12 15 18 21 24 27 30 33 36 39 42 45 48 51 54 57 60 63 66 69 72 75 78 81 84 87"
+set -A fhours $fhrs
+fi
+
+exec 2<&0 < sref_cluster_info_raw
+
+nfhr=0
+max_non_0_cluster_fhr=${fhrs[0]}
+max_non_0_cluster=0
+max_nfhr=0
+
+for fhr in $fhrs ; do
+  if [ $fhr = 42 ] || [ $fhr = 66 ] ; then
+   max_non_0_cluster_fhr=$fhr
+   max_non_0_cluster=0
+  fi
+
+ finished='no'
+ while [ $finished = 'no' ] ; do
+
+ read LINE
+ set -A x $LINE
+
+   if [ "${x[0]}" = $fhr ] ; then #search the line with forecast hour as first  
+
+     read LINE              #skip "**********"
+
+     echo "Forcast hr: " $fhr  >> sref_clustering_rebuild
+
+     cluster=1
+     count_non_0_cluster=0
+     total_mbrs[$nfhr]=0
+
+     while [ $cluster -le 6 ] ; do
+
+      read LINE
+      set -A y $LINE
+
+      if [ ${y[4]} -gt 0 ] ; then   #search the clauster with non-zero ensemble members 
+
+        total_mbrs[$nfhr]=`expr ${total_mbrs[$nfhr]} + ${y[4]}`
+
+        count_non_0_cluster=$((count_non_0_cluster+1))
+        n=0
+        while [ $n -lt ${y[4]} ] ; do
+         read LINE
+         set -A z $LINE
+         nf=${z[2]}
+         n=`expr $n + 1 `
+        done
+
+        echo "cluster $cluster  has $n members" >> sref_clustering_rebuild
+      else
+        echo "cluster $cluster  has 0 members" >> sref_clustering_rebuild
+      fi
+
+      cluster=`expr $cluster + 1 `
+
+     done   # done all clusters in this fhr  
+
+     echo "There are $count_non_0_cluster non-zero member clusters for fhr $fhr total_mbrs=${total_mbrs[$nfhr]}" >> sref_clustering_rebuild
+     if [ $count_non_0_cluster -ge $max_non_0_cluster ] ; then
+        max_non_0_cluster=$count_non_0_cluster
+        max_non_0_cluster_fhr=$fhr
+        max_nfhr=$nfhr
+     fi
+
+    finished='yes'
+
+   fi       # if "${x[0]}" = $fhr  
+
+  done      #  while finished 
+
+  echo    "Forecast hour " $fhr "done ..." >> sref_clustering_rebuild
+
+  if [ $fhr = 39 ] ; then
+   echo "0 ~ 39hr: max_non_0_cluster=$max_non_0_cluster at fhr $max_non_0_cluster_fhr " >> sref_clustering_rebuild
+   found0_39hr=$max_non_0_cluster_fhr
+   max_nfhr0_39=$max_nfhr
+  fi
+
+  if [ $fhr = 63 ] ; then
+   echo "42 ~ 63hr: max_non_0_cluster=$max_non_0_cluster at fhr $max_non_0_cluster_fhr " >> sref_clustering_rebuild
+   found42_63hr=$max_non_0_cluster_fhr
+   max_nfhr42_63=$max_nfhr
+  fi
+
+  if [ $fhr = 87 ] ; then
+   echo "66 ~ 87hr: max_non_0_cluster=$max_non_0_cluster at fhr $max_non_0_cluster_fhr " >> sref_clustering_rebuild
+   found66_87hr=$max_non_0_cluster_fhr
+   max_nfhr66_87=$max_nfhr
+  fi
+
+  nfhr=`expr $nfhr + 1 `
+done # done one fhr
+
+echo "Found max clusters are at $found0_39hr ( $max_nfhr0_39 )  $found42_63hr( $max_nfhr42_63 )  $found66_87hr ( $max_nfhr66_87 ) " >> sref_clustering_rebuild
+
+echo "Now rebuild sref_cluster_info file" >> sref_clustering_rebuild
+CLUSTERS=6
+HEADER=3
+
+exec 2<&0 < sref_cluster_info_raw
+read LINE1
+read LINE2
+
+echo $LINE1>sref_cluster_info
+echo $LINE2>>sref_cluster_info
+
+nfhr=0
+for fhr in $fhrs ; do
+
+  total_lines=$((total_mbrs[$nfhr]+3+6))
+
+  if [ $fhr -eq $found0_39hr ] ; then
+
+    m=1
+    while [ $m -le $total_lines ] ; do
+     read LINE
+     line[$m]=$LINE
+     #echo ${line[$m]} 
+     m=$((m+1))
+    done
+
+    n=0
+    while [ $n -le 13 ] ; do
+     echo " *******************************" >> sref_cluster_info
+     echo " ${fhours[$n]} Forecast Hour"       >> sref_cluster_info
+     echo " *******************************" >> sref_cluster_info
+     m=4
+     while [ $m -le $total_lines ] ; do
+       echo " ${line[$m]}" >> sref_cluster_info
+       m=$((m+1))
+     done
+     n=$((n+1))
+    done
+
+  elif [ $fhr -eq $found42_63hr ] ; then
+
+    m=1
+    while [ $m -le $total_lines ] ; do
+     read LINE
+     line[$m]=$LINE
+     #echo ${line[$m]}
+     m=$((m+1))
+    done
+
+    n=14
+    while [ $n -le 21 ] ; do
+     echo " *******************************" >> sref_cluster_info
+     echo " ${fhours[$n]} Forecast Hour"       >> sref_cluster_info
+     echo " *******************************" >> sref_cluster_info
+     m=4
+     while [ $m -le $total_lines ] ; do
+       echo " ${line[$m]}" >> sref_cluster_info
+       m=$((m+1))
+     done
+     n=$((n+1))
+    done
+
+  elif [ $fhr -eq $found66_87hr ] ; then
+
+    m=1
+    while [ $m -le $total_lines ] ; do
+     read LINE
+     line[$m]=$LINE
+     #echo ${line[$m]}
+     m=$((m+1))
+    done
+
+    n=22
+    while [ $n -le 29 ] ; do
+     echo " *******************************" >> sref_cluster_info
+     echo " ${fhours[$n]} Forecast Hour"       >> sref_cluster_info
+     echo " *******************************" >> sref_cluster_info
+     m=4
+     while [ $m -le $total_lines ] ; do
+       echo " ${line[$m]}" >> sref_cluster_info
+       m=$((m+1))
+     done
+     n=$((n+1))
+    done
+
+  else
+    m=1
+    while [ $m -le $total_lines ] ; do
+     read LINE
+     m=$((m+1))
+    done
+  fi
+
+ nfhr=$((nfhr+1))
+
+done
+
+set -x 
+cp sref_cluster_info        $dirarch/.
+cp sref_clustering_rebuild  $dirarch/.
+echo 'cluster info written is done'
+###############################################
+
+if [ $SENDDBN = YES ]; then
+# $DBNROOT/bin/dbn_alert MODEL SREF_CLUSTER_PARA $job $dirarch/sref_cluster_info
+  $DBNROOT/bin/dbn_alert MODEL ${DBN_ALERT_TYPE} $job $dirarch/sref_cluster_info
+fi
+
+# Find weights of each clusters
+cat <<paramEOF >input1
+ &namin
+   yy1=${yy},mm1=${mm},dd1=${dd},hh1=${hh},iar=${field}
+ &end
+paramEOF
+
+#export FORT50=sref_cluster_info
+
+ls -l sref_cluster_info
+$EXECsref/sref_clusterweight <input1 >job1.out
+export err=$?; err_chk
+cp wgt.*.pgrb212.clus*.f*  $dirarch/.
+
+# Convert to grib2 format
+CNVGRIB=${CNVGRIB}
+HR=00
+while [ $HR -le $ENDHOUR ]
+do
+#if [ ${SENDDBN_GB2} = YES ]
+#then
+
+if [ -s ${dirarch}/ref.t${hh}z.pgrb212.clus1mean.f$HR ];then
+$CNVGRIB -g12 -p40 -nv ${dirarch}/ref.t${hh}z.pgrb212.clus1mean.f$HR ${dirarch}/ref.t${hh}z.pgrb212.clus1mean.f$HR.grib2
+$WGRIB2 ${dirarch}/ref.t${hh}z.pgrb212.clus1mean.f$HR.grib2 -s > ${dirarch}/ref.t${hh}z.pgrb212.clus1mean.f$HR.grib2.idx
+fi
+if [ -s ${dirarch}/ref.t${hh}z.pgrb212.clus2mean.f$HR ];then
+$CNVGRIB -g12 -p40 -nv ${dirarch}/ref.t${hh}z.pgrb212.clus2mean.f$HR ${dirarch}/ref.t${hh}z.pgrb212.clus2mean.f$HR.grib2
+$WGRIB2 ${dirarch}/ref.t${hh}z.pgrb212.clus2mean.f$HR.grib2 -s > ${dirarch}/ref.t${hh}z.pgrb212.clus2mean.f$HR.grib2.idx
+fi
+if [ -s ${dirarch}/ref.t${hh}z.pgrb212.clus3mean.f$HR ];then
+$CNVGRIB -g12 -p40 -nv ${dirarch}/ref.t${hh}z.pgrb212.clus3mean.f$HR ${dirarch}/ref.t${hh}z.pgrb212.clus3mean.f$HR.grib2
+$WGRIB2 ${dirarch}/ref.t${hh}z.pgrb212.clus3mean.f$HR.grib2 -s > ${dirarch}/ref.t${hh}z.pgrb212.clus3mean.f$HR.grib2.idx
+fi
+if [ -s ${dirarch}/ref.t${hh}z.pgrb212.clus4mean.f$HR ];then
+$CNVGRIB -g12 -p40 -nv ${dirarch}/ref.t${hh}z.pgrb212.clus4mean.f$HR ${dirarch}/ref.t${hh}z.pgrb212.clus4mean.f$HR.grib2
+$WGRIB2 ${dirarch}/ref.t${hh}z.pgrb212.clus4mean.f$HR.grib2 -s > ${dirarch}/ref.t${hh}z.pgrb212.clus4mean.f$HR.grib2.idx
+fi
+if [ -s ${dirarch}/ref.t${hh}z.pgrb212.clus5mean.f$HR ];then
+$CNVGRIB -g12 -p40 -nv ${dirarch}/ref.t${hh}z.pgrb212.clus5mean.f$HR ${dirarch}/ref.t${hh}z.pgrb212.clus5mean.f$HR.grib2
+$WGRIB2 ${dirarch}/ref.t${hh}z.pgrb212.clus5mean.f$HR.grib2 -s > ${dirarch}/ref.t${hh}z.pgrb212.clus5mean.f$HR.grib2.idx
+fi
+if [ -s ${dirarch}/ref.t${hh}z.pgrb212.clus6mean.f$HR ];then
+$CNVGRIB -g12 -p40 -nv ${dirarch}/ref.t${hh}z.pgrb212.clus6mean.f$HR ${dirarch}/ref.t${hh}z.pgrb212.clus6mean.f$HR.grib2
+$WGRIB2 ${dirarch}/ref.t${hh}z.pgrb212.clus6mean.f$HR.grib2 -s > ${dirarch}/ref.t${hh}z.pgrb212.clus6mean.f$HR.grib2.idx
+fi
+
+$CNVGRIB -g12 -p40 -nv ${dirarch}/wgt.t${hh}z.pgrb212.clus1.f$HR ${dirarch}/wgt.t${hh}z.pgrb212.clus1.f$HR.grib2
+$WGRIB2 ${dirarch}/wgt.t${hh}z.pgrb212.clus1.f$HR.grib2 -s > ${dirarch}/wgt.t${hh}z.pgrb212.clus1.f$HR.grib2.idx
+$CNVGRIB -g12 -p40 -nv ${dirarch}/wgt.t${hh}z.pgrb212.clus2.f$HR ${dirarch}/wgt.t${hh}z.pgrb212.clus2.f$HR.grib2
+$WGRIB2 ${dirarch}/wgt.t${hh}z.pgrb212.clus2.f$HR.grib2 -s > ${dirarch}/wgt.t${hh}z.pgrb212.clus2.f$HR.grib2.idx
+$CNVGRIB -g12 -p40 -nv ${dirarch}/wgt.t${hh}z.pgrb212.clus3.f$HR ${dirarch}/wgt.t${hh}z.pgrb212.clus3.f$HR.grib2
+$WGRIB2 ${dirarch}/wgt.t${hh}z.pgrb212.clus3.f$HR.grib2 -s > ${dirarch}/wgt.t${hh}z.pgrb212.clus3.f$HR.grib2.idx
+$CNVGRIB -g12 -p40 -nv ${dirarch}/wgt.t${hh}z.pgrb212.clus4.f$HR ${dirarch}/wgt.t${hh}z.pgrb212.clus4.f$HR.grib2
+$WGRIB2 ${dirarch}/wgt.t${hh}z.pgrb212.clus4.f$HR.grib2 -s > ${dirarch}/wgt.t${hh}z.pgrb212.clus4.f$HR.grib2.idx
+$CNVGRIB -g12 -p40 -nv ${dirarch}/wgt.t${hh}z.pgrb212.clus5.f$HR ${dirarch}/wgt.t${hh}z.pgrb212.clus5.f$HR.grib2
+$WGRIB2 ${dirarch}/wgt.t${hh}z.pgrb212.clus5.f$HR.grib2 -s > ${dirarch}/wgt.t${hh}z.pgrb212.clus5.f$HR.grib2.idx
+$CNVGRIB -g12 -p40 -nv ${dirarch}/wgt.t${hh}z.pgrb212.clus6.f$HR ${dirarch}/wgt.t${hh}z.pgrb212.clus6.f$HR.grib2
+$WGRIB2 ${dirarch}/wgt.t${hh}z.pgrb212.clus6.f$HR.grib2 -s > ${dirarch}/wgt.t${hh}z.pgrb212.clus6.f$HR.grib2.idx
+
+#fi
+
+ HR=`expr $HR + $INCHOUR`
+ if [ $HR -lt 10 ];then HR=0$HR;fi
+done
+
+rcc=$?
+if [ ${rcc} -ne 0 ]; then
+  echo "!!! Error *** ${rcc} *** converting files.  Exiting..."
+  exit 8
+fi
+
+# clean working directory before exiting:
+#rm -f $DATA/cluster_$org/*
+exit
+

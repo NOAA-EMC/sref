@@ -1,0 +1,64 @@
+#BSUB -J %E%sref_wrf%MOD%_post_hrly_%MEM%_%CYC%
+#BSUB -o /%COM%/output/%ENVIR%/today/sref_wrf%MOD%_post_hrly_%MEM%_%CYC%.o%J
+#BSUB -e /%COM%/output/%ENVIR%/today/sref_wrf%MOD%_post_hrly_%MEM%_%CYC%.o%J
+#BSUB -L /bin/sh
+#BSUB -q %QUEUE%
+#BSUB -cwd /tmpnwprd
+#BSUB -R span[ptile=16] -R affinity[core:distribute=balance]
+#BSUB -n 16
+#BSUB -W 01:30
+#BSUB -P %PROJ%
+#BSUB -a poe
+#BSUB -network "type=sn_all:mode=US"
+#BSUB -x
+
+%include <head.h>
+%include <envir-p2.h>
+
+
+set -x
+
+module load grib_util
+
+
+export cyc=%CYC%
+export runflag="hrly"
+export MODEL="%MODEL%"
+export DOMIN_SMALL="na32"
+export MEMBER="%MEM0%"
+
+
+
+# versions file for SREF model $sref_ver
+VERSION_FILE=$NWROOT/versions/sref.ver
+if [ -f $VERSION_FILE ]; then
+  . $VERSION_FILE
+else
+  exit
+fi
+
+$NWROOT/sref.${sref_ver}/jobs/JSREF_WRF_POST
+
+if [ $? -ne 0 ]; then
+  ecflow_client --msg="***JOB ${ECF_NAME} ERROR RUNNING J-SCRIPT ***"
+  ecflow_client --abort
+  exit
+fi
+
+
+%include <tail.h>
+%manual
+######################################################################
+#
+#  PURPOSE:
+#
+######################################################################
+
+######################################################################
+# Job specific troubleshooting instructions:
+#  see generic troubleshoot manual page
+#
+######################################################################
+
+# include manual page below
+%end

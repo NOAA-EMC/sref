@@ -1,0 +1,204 @@
+#!/bin/ksh
+################################################################################
+# UNIX Script Documentation Block                                                         #
+#                                                                                         #
+# Script name:         exsref_wrfpost.sh.sms                                              #
+# Script description:  Runs WRF-NMM or WRF-EM post-processor.                             #
+#                                                                                         #
+# Author:        Eric Rogers       Org: NP22         Date: 2004-07-02                     #
+#                                                                                         #
+# Script history log:                                                                     #
+# 2003-11-01  Matt Pyle   - Original script for parallel                                  #
+# 2004-07-02  Eric Rogers - Preliminary modifications for production.                     #
+# 2005-08-10  Jun Du - Modified to fit the SREF system
+#
+# 2005-10-06  Xiaoxue Wang - Modified to operational standard
+# 2008-07-18  Jun Du - Upgraded to WRFv2.2
+# 2008-08-13  Jun Du - changed the model post-processing frequency from 3hrly to 
+#                      1hrly for the 1st 39hr
+# 2010-05-07  Jun Du - Generalized the script to run NEMS ensemble (MODEL=NMB)
+################################################################################
+set -aeux
+
+export XLFRTEOPTS="unit_vars=yes"
+
+cd $WORK_DIR
+
+# Run setup to initialize working directory and utility scripts
+## setup.sh  # no need, since using module load prod_util 
+
+#
+# post
+#
+
+cp $PARMsref/sref_wrf_cntrl.parm              wrf_cntrl.parm
+cp $PARMsref/sref_ETAMPNEW_DATA.expanded_rain  eta_micro_lookup.dat
+#cp $PARMsref/sref_ETAMPNEW_DATA      eta_micro_lookup.dat
+
+### type depends on model.  binarympiio for nmm, binary for arw
+if [ $MODEL = NMB ] ; then
+OUTTYP=binarynemsio
+model=NMMB
+fi
+if [ $MODEL = NMM ] ; then
+if [ $IOFORM == 1 ] ; then
+OUTTYP=binarympiio
+else
+OUTTYP=netcdf
+fi
+model=NMM
+fi
+if [ $MODEL = ARW ] ; then
+if [ $IOFORM == 1 ] ; then
+OUTTYP=binarympiio
+else
+OUTTYP=netcdf
+fi
+model=NCAR
+fi
+
+FHR=$SFHR
+#FHR=00
+testFHR=`expr $FHR + 03`
+if [ $testFHR -lt 10 ]; then
+   testFHR=0$testFHR
+fi
+while [ $FHR -le $FLENGTH ]
+do
+
+   DATE=`$NDATE +$FHR ${PDY}${CYC}`
+   YYYY=`echo $DATE | cut -c 1-4`
+   MM=`echo $DATE | cut -c 5-6`
+   DD=`echo $DATE | cut -c 7-8`
+   HH=`echo $DATE | cut -c 9-10`
+   DATE_TIME=${YYYY}-${MM}-${DD}_${HH}:00:00
+
+   testDATE=`$NDATE +$testFHR ${PDY}${CYC}`
+   testYYYY=`echo $testDATE | cut -c 1-4`
+   testMM=`echo $testDATE | cut -c 5-6`
+   testDD=`echo $testDATE | cut -c 7-8`
+   testHH=`echo $testDATE | cut -c 9-10`
+   testDATE_TIME=${testYYYY}-${testMM}-${testDD}_${testHH}:00:00
+
+# check to see if forecast file is available
+if [ $MODEL != NMB ];then
+if [ $FHR -eq $FLENGTH -a ${runflag} != "hrly" ];then
+#if [ $FHR -eq $FLENGTH ];then
+# if [ ${runflag} = "hrly" ]
+# then
+#   donefile=fcstdone${FHR}
+# else
+    donefile=fcst.$MEMBER.done
+# fi
+  until test -s $FCSTDIR/$donefile
+  do
+      sleep 10
+  done
+else
+  until test -s $FCSTDIR/wrfout_d01_${testDATE_TIME}
+  do
+      sleep 10
+  done
+ str=`ls -s $FCSTDIR/wrfout_d01_${testDATE_TIME}`  #get file size in block (1024 bytes)
+ set -A fsize $str
+ if [ ${fsize[0]} -gt 900000 ] ; then # fcst file is finished?
+  echo $FCSTDIR/wrfout_d01_${testDATE_TIME} ' exists and has large enough size'
+ else
+  sleep 10
+  str=`ls -s $FCSTDIR/wrfout_d01_${testDATE_TIME}`
+  set -A fsize $str
+ fi
+fi
+
+else
+
+if [ $FHR -eq $FLENGTH -a ${runflag} != "hrly" ];then
+  until test -s $FCSTDIR/fcst.$MEMBER.done
+  do
+      sleep 10
+  done
+else
+  until test -s $FCSTDIR/nmmb_hst_01_nio_00${testFHR}h_00m_00.00s
+  do
+      sleep 10
+  done
+ str=`ls -s $FCSTDIR/nmmb_hst_01_nio_00${testFHR}h_00m_00.00s`  #get file size in block (1024 bytes)
+ set -A fsize $str
+ if [ ${fsize[0]} -gt 90000 ] ; then # fcst file is finished?
+  echo $FCSTDIR/nmmb_hst_01_nio_00${testFHR}h_00m_00.00s ' exists and has large enough size'
+ else
+  sleep 10
+  str=`ls -s $FCSTDIR/nmmb_hst_01_nio_00${testFHR}h_00m_00.00s`
+  set -A fsize $str
+ fi
+fi
+
+fi
+
+if [ $MODEL != NMB ];then
+cat > itag <<EOF
+$FCSTDIR/wrfout_d01_${YYYY}-${MM}-${DD}_${HH}:00:00
+$OUTTYP
+${YYYY}-${MM}-${DD}_${HH}:00:00
+$model
+EOF
+else
+cat > itag <<EOF
+$FCSTDIR/nmmb_hst_01_nio_00${FHR}h_00m_00.00s
+$OUTTYP
+${YYYY}-${MM}-${DD}_${HH}:00:00
+NMM
+EOF
+fi
+
+   rm -f fort.*
+   ln -sf wrf_cntrl.parm fort.14
+   ln -sf griddef.out fort.110
+
+   export pgm=sref_post
+   prep_step
+   startmsg
+   if [ $MACHINE == zeus ]; then
+   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_post < itag >> $pgmout 2>errfile
+   elif [ $MACHINE == wcoss ]; then
+   mpirun.lsf $EXECsref/sref_post < itag >> $pgmout 2>errfile
+   fi
+   export err=$?;err_chk
+
+   if [ $err -ne 0 ]; then
+      echo "sref_post failed" >> $WORK_DIR/post.$MEMBER.failed
+      exit 1
+   fi
+
+   $USHsref/sref_wrfprdgen.sh $FHR $CYC $MODEL $MEMBER $PDY $OUTGRD
+
+   ## Generate a "done" files in the FCSTDIR
+   echo "done" > $FCSTDIR/wrfpost${OUTGRD}.done${FHR}.tm00
+   postmsg "$jlogfile" "WRF $MEMBER POST done for ${OUTGRD} at F${FHR}"
+
+### add for restart
+   if [ $MODEL = NMM ];then CORE=nmm;fi
+#  if [ $MODEL = ARW ];then CORE=em;fi
+   if [ $MODEL = ARW ];then CORE=arw;fi
+   if [ $MODEL = NMB ];then CORE=nmb;fi
+
+   echo "$PDY$CYC$FHR" > $COMOUT/${RUN}_${CORE}${OUTGRD}.t${CYC}z.${MEMBER}.${runflag}.control
+
+   FHR=`expr $FHR + $INCR`
+   testFHR=`expr $testFHR + $INCR`
+   if [ ${runflag} = "hrly" -a `expr $FHR % 3` -eq 0 ]
+   then
+     FHR=`expr $FHR + $INCR`
+     testFHR=`expr $testFHR + $INCR`
+   fi
+
+   if [ $FHR -lt 10 ]; then
+      FHR=0$FHR
+   fi
+   if [ $testFHR -lt 10 ]; then
+      testFHR=0$testFHR
+   fi
+done
+
+echo "done" > $WORK_DIR/post.$MEMBER.done
+echo "done" > $WORK_DIR/../post.$MEMBER.done

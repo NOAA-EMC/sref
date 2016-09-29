@@ -1,0 +1,215 @@
+#!/bin/ksh
+###############################################################
+# Setup environment for the SREF Bias correction job - part II:
+# bias estimation
+#
+# change log:
+# 07/17/2007 Jun Du, initial implementation
+# 08/04/2008 Jun Du, reduce 4 eta members and increase 2 nmm and 2 em members
+#                    with proper model and member names
+# 9/20/2009, Julia Zhu   Scripts are modified to be sharable
+#                        between EMC and NCO
+#         Please note that variable "RUN_ENVIR" is set and used
+#         in the development enviroment only.
+# 11/05/2010, Jun Du, Added precipitation bias correction job
+# 11/02/2011, Jun Du, Modified to the 2012 new NMMB-based SREF (v6.0.0)
+#                     by reducing grouping from 4 (Eta, RSM, NMM and ARW)
+#                     to 3 (NMMB, NMM and ARW)
+# 03/11/2015, Jun Du, Modified to the 2-model and 26-member SREF.v7.0.0
+###############################################################
+set -xa
+
+export OMP_NUM_THREADS=1
+export MP_EUIDEVICE=sn_all
+export MP_EUILIB=us
+export MP_MPILIB=mpich2
+export MP_TASK_AFFINITY=core:1
+
+#
+# Specify whether the run is production or development
+#
+export RUN_ENVIR=${RUN_ENVIR:-nco}
+
+#####################################################################################
+# Run config file to get input parameters
+# This config file should define the following variables
+# DATA_IN: Location of working directory, default to ${DATAROOT}
+# DEV_SMS: If the job is to be running using ecFlow, default to YES
+# SENDDBN: Set to NO for developers, default to YES
+# COM_IN:  Directory for input files, default to ${COMROOT}/$NET/${envir}
+# COM_OUT: Directory for output file, default to ${COMROOT}/$NET/${envir}
+# gespath: Directory for the guess or restart files, default to ${GESROOT}/${envir}
+#####################################################################################
+if [ "$RUN_ENVIR" != nco ]      ### For Developers, "group_name" is passed from the ecFlow script
+then
+  CONFIG_FILE=${CONFIG_FILE:-/meso/save/${LOGNAME}/sref${NWROOTp1}/parm/sref_para_config}
+  . $CONFIG_FILE
+  export userid=$LOGNAME
+  export DATA_IN=${DATA_IN:-/ptmpp1/$userid}
+fi
+
+###############################################################
+# This block can be modified for different test environment
+###############################################################
+if [ $RUN_ENVIR = nco -a $envir != prod ]; then
+  export SENDDBN=${SENDDBN:-YES}
+# export DBNROOT=${NWROOTp1}/spa_util/fakedbn
+# export jlogfile=${jlogfile:-${COMROOT}/logs/${envir}/jlogfile}
+fi
+
+echo `date` $0 `date -u` begin
+export PS4='$SECONDS + '
+
+########################################################### 
+# obtain unique process id (pid) and make temp directories
+###########################################################
+export pid=$$
+export DATA_IN=${DATA_IN:-${DATAROOT}}
+
+export DATA=$DATA_IN/${job}.${pid}
+rm -rf $DATA
+mkdir -p $DATA
+
+cd $DATA
+
+####################################
+# File To Log Msgs
+####################################
+export jlogfile=${jlogfile:-${COMROOT}/logs/jlogfiles/jlogfile.${job}.${pid}}
+
+####################################
+# Determine Job Output Name on System
+####################################
+export outid="LL$job"
+export jobid="${outid}.o${pid}"
+export pgmout="OUTPUT.${pid}"
+
+export cycle=t${cyc}z 
+
+###############################
+# Specify NET and RUN name
+##############################
+export NET=sref
+export RUN=sref
+
+##################################################
+# SAVEGES  - Copy Files From TMPDIR to $GESdir
+# SENDECF  - Flag Events on ecFlow
+# SENDCOM  - Copy Files From TMPDIR to $COMOUT
+# SENDDBN  - Issue DBNet Client Calls
+# RERUN    - Rerun fcst from beginning (default no)
+##################################################
+export SENDCOM=${SENDCOM:-YES}
+export SENDECF=${SENDECF:-YES}
+export SENDDBN=${SENDDBN:-YES}
+export VERBOSE=${VERBOSE:-YES}
+
+export HOMEsref=${HOMEsref:-${NWROOT}/${NET}.${sref_ver}}
+export EXECsref=${EXECsref:-$HOMEsref/exec}
+export FIXsref=${FIXsref:-$HOMEsref/fix}
+export PARMsref=${PARMsref:-$HOMEsref/parm}
+export USHsref=${USHsref:-$HOMEsref/ush}
+
+export HOMEglobal=${HOMEglobal:-${NWROOTp1}}
+export EXECglobal=$HOMEglobal/exec
+export FIXglobal=$HOMEglobal/fix
+export PARMglobal=$HOMEglobal/parm
+export USHglobal=$HOMEglobal/ush
+
+###################################
+# Load the GRIB Utilities module
+####################################
+. /usrx/local/Modules/default/init/ksh
+module load grib_util
+
+###################################
+# Set up the UTILITIES
+###################################
+
+# Run setup to initialize working directory and utility scripts
+## setup.sh  # no need, since using module load prod_util 
+
+# Run setpdy and initialize PDY variables
+setpdy.sh
+. ./PDY
+
+#############################################
+# COMIN and COMOUT
+#############################################
+export COM_IN=${COM_IN:-${COMROOT}/${NET}/${envir}}
+export COM_OUT=${COM_OUT:-${COMROOT}/${NET}/${envir}}
+
+export COMIN=$COM_IN/${RUN}.${PDY}/${cyc}/pgrb
+export COMIN_ENSPRD=${COM_IN}/${RUN}.${PDY}/${cyc}/ensprod
+
+export COMOUT=$COM_OUT/${RUN}.${PDY}/${cyc}/pgrb_biasc
+export COMIN_BC=$COMOUT
+export COMOUT_BC=$COM_OUT/${RUN}.${PDY}/${cyc}/ensprod_biasc
+export COMOUT_NDGD=$COM_OUT/${RUN}.${PDY}/${cyc}/ensprod_ndgd
+
+export COMOUT_MISC=${COMOUT_MISC:-$COM_OUT/${RUN}.${PDY}/${cyc}/misc}
+export COM_NDGD=$COM_IN/${RUN}.${PDY}/${cyc}/pgrb_ndgd
+
+#XXW export COMNAM=${COMNAM:-${COMROOT}/nam/prod}
+
+mkdir -p -m 775 $COMOUT $COMOUT_BC $COMOUT_NDGD $COM_NDGD
+ 
+env
+
+#######################################################
+# Pass information which is needed to run the Script
+#######################################################
+export ENDHOUR=87
+export INCHOUR=03
+
+export VERBOSE=YES
+
+###################################################
+# Execute the Script
+###################################################
+###################################################
+# 1. Execute the bias correction Script of basic variables (submit after wrfpost is done)
+mkdir -m 775 $DATA/basic_biasc
+cd $DATA/basic_biasc
+$HOMEsref/scripts/exsref_biasestimate.sh.ecf
+
+# 2. Execute ensemble product job for bias corrected data for basic fields
+mkdir -m 775 $DATA/ensprod_biasc
+cd $DATA/ensprod_biasc
+$HOMEsref/scripts/exsref_enspost_afterBC.sh.ecf 212 111
+
+# 3. Execute ensemble ranking job (note: this job has to be run after Job 1 finishes!)
+mkdir -m 775 $DATA/ranking_biasc
+cd $DATA/ranking_biasc
+$HOMEsref/scripts/exsref_memberranking.sh.ecf BC
+
+#
+# generate one file per member for NAWIPS
+#
+mkdir -m 775 $DATA/nawips
+cd $DATA/nawips
+## setup.sh  # no need, since using module load prod_util 
+
+modelname="nmb arw"
+for model in $modelname
+do
+  list="ctl n1 p1 n2 p2 n3 p3 n4 p4 n5 p5 n6 p6"
+  for pair in $list
+  do
+    export memberlist=$pair
+    $USHsref/sref_ens_post.sh $model $pair
+  done
+done
+
+cat $DATA/pgrb_biasc/$pgmout
+
+msg="JOB COMPLETED NORMALLY"
+postmsg "$jlogfile" "$msg"
+
+################################
+# Remove the Working Directory
+################################
+cd $DATA_IN
+if [ ${RM_TMPDIR:-YES} = YES ] ; then rm -rf $DATA ; fi
+
+date

@@ -1,0 +1,77 @@
+#=======================================================================
+#--  Input: $domain - type of domain (e.g., na12, na12aq, na12ex)
+#
+#==  This short script runs the weight maker to produce wgts_$domain_$grid
+#    files for $grid = 218, 221, and 242 from an input model grid ($domain).
+#    These wgts files are needed by the product generator to process a new
+#    model grid.
+#
+#==  WRF: The user must first run the WRF post for the new grid for a single
+#    forecast hour to get the grid specifications in the "griddef.out" file
+#    from the /post directory.  
+#
+#==  NMMB: The user must first run the NMMB post for the new grid for a single
+#    forecast hour to get the grid specifications in the copygb_gridnav.txt
+#    file from the post/$fhr directory.
+#
+#==  Steps to take:
+#
+#==  1a) WRF : Go to the post directory and copy the griddef.out file to this
+#       directory, giving it the name
+#           griddef.$domain
+#       where $domain is the name of the new grid.  The griddef.out file can
+#       be found for a given forecast hour ($fhr) from the launcher output at:
+#       (/meso/noscrub/$user/$cycle/$run/post/$fhr)
+#
+#==  1b) NMMB : Go to the post directory and use the coefficients from the
+#        copygb_gridnav.txt file to modify values for kgdsin(2) - kgdsin(10),
+#        in WGTMKR.f as follows, using the na12aq domain as an example:
+#
+#-- Modify the last set of lines within WGTMKR.f before "DO ii=1,20"
+#   (values below are for the AQ domain -- na12aq):
+#       kgdsin(2)=706       !- Number of x grid points
+#       kgdsin(3)=564       !- Number of y grid points
+#       kgdsin(4)=9222      !- 1000*Latitude of SW corner; see (A) below
+#       kgdsin(5)=211657    !- 1000*(360+Longitude of SW corner); see (A) below
+#       kgdsin(6)=136       !- unchanged ?
+#       kgdsin(7)=50000     !- 1000*(Latitude of center point)
+#       kgdsin(8)=249000    !- 1000*(360+Longitude of center point)
+#       kgdsin(9)=124       !- 1000*DX in longitude; see (B) below
+#       kgdsin(10)=106      !- 1000*DY in latitude; see (B) below
+#
+#   (values below are for the 4-km CONUS domain -- conus4)
+#       kgdsin(2)=1300      !- Number of x grid points
+#       kgdsin(3)=875       !- Number of y grid points
+#       kgdsin(4)=19984     !- 1000*Latitude of SW corner; see (A) below
+#       kgdsin(5)=237514    !- 1000*(360+Longitude of SW corner); see (A) below
+#       kgdsin(6)=136       !- unchanged ?
+#       kgdsin(7)=39000     !- 1000*(Latitude of center point)
+#       kgdsin(8)=262000    !- 1000*(360+Longitude of center point)
+#       kgdsin(9)=37        !- 1000*DX in longitude; see (B) below
+#       kgdsin(10)=36       !- 1000*DY in latitude; see (B) below
+#
+#   (values below are for the 4-km central US domain -- cent4)
+#       kgdsin(2)=1050      !- Number of x grid points
+#       kgdsin(3)=660       !- Number of y grid points
+#       kgdsin(4)=23934     !- 1000*Latitude of SW corner; see (A) below
+#       kgdsin(5)=247296    !- 1000*(360+Longitude of SW corner); see (A) below
+#       kgdsin(6)=136       !- unchanged ?
+#       kgdsin(7)=38000     !- 1000*(Latitude of center point)
+#       kgdsin(8)=268000    !- 1000*(360+Longitude of center point)
+#       kgdsin(9)=37        !- 1000*DX in longitude; see (B) below
+#       kgdsin(10)=36       !- 1000*DY in latitude; see (B) below
+#
+#-- (A) Get the lat/lon for the SW corner by searching for the string "SW corner"
+#       from the geogrid.log file in the NPS directory.
+#
+#-- (B) Get the DX (long) and DY (lat) from the namelist.nps file in the NPS directory.
+#
+#        Recompile the code ("make <return>").  Make sure the name of the executable
+#        (wgtmkr.xc) matches the name of the executable at the end of the run_wgts
+#        script.  
+#
+#-- 2) Type "run $domain <return>".  It produces the various weights files
+#      (wgt_$domain_$grid, $grid=218,221,242) and moves them to the ../parm
+#      directory, with standard output written to wgtmkr_$domain_$grid.out.
+#=======================================================================
+

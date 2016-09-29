@@ -1,0 +1,60 @@
+#BSUB -J %E%sref_wrf_gefsprep_p01_%CYC%
+#BSUB -o /%COM%/output/%ENVIR%/today/sref_wrf_gefsprep_p01_%CYC%.o%J
+#BSUB -e /%COM%/output/%ENVIR%/today/sref_wrf_gefsprep_p01_%CYC%.o%J
+#BSUB -cwd /tmpnwprd
+#BSUB -L /bin/sh
+#BSUB -q %QUEUE%
+#BSUB -R "span[ptile=11]"
+#BSUB -n 54
+#BSUB -W 01:00
+#BSUB -P %PROJ%
+##BSUB -R rusage [mem=2500]
+#BSUB -a poe
+#BSUB -x
+
+%include <head.h>
+%include <envir-p2.h>
+
+
+set -x
+
+
+export cyc=%CYC%
+export MEMBER=p01
+
+#  PURPOSE:      To execute the SREF Post Processing
+
+
+
+# versions file for SREF model $sref_ver
+VERSION_FILE=$NWROOT/versions/sref.ver
+if [ -f $VERSION_FILE ]; then
+  . $VERSION_FILE
+else
+  exit
+fi
+
+$NWROOT/sref.${sref_ver}/jobs/JSREF_WRF_GFSPREP
+
+if [ $? -ne 0 ]; then
+  ecflow_client --msg="***JOB ${ECF_NAME} ERROR RUNNING J-SCRIPT ***"
+  ecflow_client --abort
+  exit
+fi
+
+
+%include <tail.h>
+%manual
+######################################################################
+#
+#
+######################################################################
+
+######################################################################
+# Job specific troubleshooting instructions:
+#  see generic troubleshoot manual page
+#
+######################################################################
+
+# include manual page below
+%end

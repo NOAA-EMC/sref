@@ -1,0 +1,13 @@
+SHELL=/bin/sh
+SRCS 	= ranking.f
+OBJS	= ranking.o
+
+FC 	= ncepxlf
+LDFLAGS =
+LIBS 	= -L/nwprod/lib -lw3_4 -lbacio_4 -lessl_r -l mass
+CMD 	= sref_ranking
+
+all:	$(CMD)
+
+$(CMD):	 ${OBJS}
+	$(FC) $(LDFLAGS) -o $(@) $(OBJS) -qcheck $(LIBS)

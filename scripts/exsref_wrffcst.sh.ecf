@@ -1,0 +1,222 @@
+#!/bin/bash
+###############################################################################
+# UNIX Script Documentation Block                                                         #
+#                                                                                         #
+# Script name:         model_nmm.ksh                                                      #
+# Script description:  Runs WRF-NMM or WRF-EM forecast model.                             #
+#                                                                                         #
+# Author:        Eric Rogers       Org: NP22         Date: 2004-07-02                     #
+#                                                                                         #
+# Script history log:                                                                     #
+# 2003-11-01  Matt Pyle   - Original script for parallel                                  #
+# 2004-07-02  Eric Rogers - Preliminary modifications for production.                     #
+# 2005-08-03  Jun Du - Modified it to fit to the SREF system
+#
+# 2005-10-06  Xiaoxue Wang - Modified to operational standard
+# 2006-03-30  Jun Du - save 6-hour instead of 12-hour forecasts for 4xday SREF's
+#                      breeding
+# 2008-07-18  Jun Du - upgrade to WRFv2.2
+# 2010-05-06  Jun Du - generalized the script to run NEMS ensemble (MODEL=NMB)
+# 2014-10-10  Jun Du - expanded for SREF.v7.0.0
+################################################################################
+set -aeux
+
+# Jim A's
+export XLFRTEOPTS="unit_vars=yes"
+#export MP_EAGER_LIMIT=8192 
+#export MP_SHARED_MEMORY=yes 
+#export MP_LABELIO=yes 
+#export MP_STDOUTMODE=ordered 
+#export MEMORY_AFFINITY=MCM 
+#export MP_COREFILE_FORMAT=core.txt 
+#export XLSMPOPTS="stack=512000000" 
+#export MP_SYNC_QP=yes 
+#export LAPI_DEBUG_SLOT_ATT_THRESH=5000000 
+
+model=`echo $MODEL | tr "[:upper:]" "[:lower:]"`
+
+START_DATE=$PDY$CYC
+START_YYYY=`echo $START_DATE | cut -c 1-4`
+START_MM=`echo $START_DATE | cut -c 5-6`
+START_DD=`echo $START_DATE | cut -c 7-8`
+START_HH=`echo $START_DATE | cut -c 9-10`
+
+YEAR=${START_YYYY}
+YEARM1=`expr $YEAR - 1`
+
+cd $WORK_DIR
+
+if [ $MEMBER = ctl ];then export PAIR=00;fi
+if [ $MEMBER = p01 ];then export PAIR=01;fi
+if [ $MEMBER = n01 ];then export PAIR=01;fi
+if [ $MEMBER = p02 ];then export PAIR=02;fi
+if [ $MEMBER = n02 ];then export PAIR=02;fi
+if [ $MEMBER = p03 ];then export PAIR=03;fi
+if [ $MEMBER = n03 ];then export PAIR=03;fi
+if [ $MEMBER = p04 ];then export PAIR=04;fi
+if [ $MEMBER = n04 ];then export PAIR=04;fi
+if [ $MEMBER = p05 ];then export PAIR=05;fi
+if [ $MEMBER = n05 ];then export PAIR=05;fi
+if [ $MEMBER = p06 ];then export PAIR=06;fi
+if [ $MEMBER = n06 ];then export PAIR=06;fi
+
+# Run setup to initialize working directory and utility scripts
+## setup.sh  # no need, since using module load prod_util 
+
+#
+# fcst
+#
+
+cp $PARMsref/sref_co2_trans co2_trans
+cp $PARMsref/sref_tr49t67 tr49t67
+cp $PARMsref/sref_tr49t85 tr49t85
+cp $PARMsref/sref_tr67t85 tr67t85
+cp $PARMsref/sref_RRTM_DATA RRTM_DATA
+cp $PARMsref/sref_RRTMG_LW_DATA RRTMG_LW_DATA
+cp $PARMsref/sref_RRTMG_SW_DATA RRTMG_SW_DATA
+cp $PARMsref/sref_ETAMPNEW_DATA ETAMPNEW_DATA
+cp $PARMsref/sref_ETAMPNEW_DATA.expanded_rain ETAMPNEW_DATA.expanded_rain
+
+if [ $MODEL != NMB ]; then
+cp $PARMsref/sref_GENPARM.TBL GENPARM.TBL
+cp $PARMsref/sref_LANDUSE.TBL LANDUSE.TBL
+cp $PARMsref/sref_SOILPARM.TBL SOILPARM.TBL
+cp $PARMsref/sref_VEGPARM.TBL VEGPARM.TBL
+cp $PARMsref/sref_gribmap.txt gribmap.txt
+
+cp $GESDIR/${MODEL}.t${CYC}z.${MEMBER}.pair${PAIR}.namelist.input namelist.input
+cp $GESDIR/${MODEL}.t${CYC}z.${MEMBER}.wrfinput_d01 wrfinput_d01
+cp $GESDIR/${MODEL}.t${CYC}z.${MEMBER}.wrfbdy_d01 wrfbdy_d01
+
+else
+
+cp $PARMsref/sref_GENPARM.TBL4nems GENPARM.TBL
+cp $PARMsref/sref_LANDUSE.TBL4nems LANDUSE.TBL
+cp $PARMsref/sref_SOILPARM.TBL4nems SOILPARM.TBL
+cp $PARMsref/sref_VEGPARM.TBL4nems VEGPARM.TBL
+cp $PARMsref/sref_climaeropac_global.txt aerosol.dat
+cp $FIXsref/sref_co2historicaldata_${YEAR}.txt co2historicaldata_${YEAR}.txt
+cp $FIXsref/sref_co2historicaldata_${YEARM1}.txt co2historicaldata_${YEARM1}.txt
+ln -sf $FIXsref/sref_global_o3prdlos.f77 fort.28
+ln -sf $FIXsref/sref_global_o3clim.txt fort.48
+cp $PARMsref/sref_solver_state.txt solver_state.txt
+#if [ $MEMBER == ctl -o $MEMBER == p01 -o $MEMBER == n02 -o $MEMBER == n03 -o $MEMBER == p04 -o $MEMBER == n06 ]; then
+# cp $PARMsref/sref_solver_state.txt_fer_hires solver_state.txt
+#fi
+#if [ $MEMBER == p02 -o $MEMBER == n04 -o $MEMBER == p05 ]; then
+# cp $PARMsref/sref_solver_state.txt_Thompson solver_state.txt
+#fi
+#if [ $MEMBER == n01 -o $MEMBER == p03 -o $MEMBER == n05 -o $MEMBER == p06 ]; then
+# cp $PARMsref/sref_solver_state.txt_WSM6 solver_state.txt
+#fi
+cp $PARMsref/sref_nests.txt nests.txt
+cp $PARMsref/sref_atmos.configure atmos.configure
+cp $PARMsref/sref_ocean.configure ocean.configure
+cp $PARMsref/sref_atm_namelist atm_namelist
+cat $PARMsref/sref_configure_file.in.${MODEL}.${MEMBER}_$RES | sed s/START_YYYY/$START_YYYY/ | \
+                                              sed s/START_MM/$START_MM/ | \
+                                              sed s/START_DD/$START_DD/ | \
+                                              sed s/START_HH/$START_HH/ | \
+                                              sed s/FLENGTH/$FLENGTH/  > model_configure
+cp model_configure configure_file_01
+cp model_configure $GESDIR/${MODEL}.t${CYC}z.${MEMBER}_model_configure
+
+cp $GESDIR/$MODEL.t${CYC}z.${MEMBER}_d01_nemsio input_domain_01_nemsio
+if [ -s $GESDIR/GWD_bin_01_$MODEL.t${CYC}z.${MEMBER} ]; then
+ cp $GESDIR/GWD_bin_01_$MODEL.t${CYC}z.${MEMBER} GWD_bin_01
+fi
+FHR=00
+while [ $FHR -lt $FLENGTH ]
+do
+cp $GESDIR/$MODEL.t${CYC}z.${MEMBER}.boco.00$FHR boco.00$FHR
+ FHR=`expr $FHR + $INCR`
+ if [ $FHR -lt 10 ]; then
+ FHR=0$FHR
+ fi
+done
+
+fi
+
+rm -f rsl.*
+
+#if [ $MODEL == NMM ] && [ $PAIR == 02 ] ; then
+if [ $MODEL == NMM ] && [ $PAIR == 99 ] ; then
+   export pgm=sref_wrf_${model}_hwrf
+   prep_step
+   startmsg
+   if [ $MACHINE == zeus ]; then
+   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_wrf_${model}_hwrf >> $pgmout 2>errfile
+   elif [ $MACHINE == wcoss ]; then
+   mpirun.lsf $EXECsref/sref_wrf_${model}_hwrf >> $pgmout 2>errfile
+   fi
+   export err=$?; err_chk
+else
+   export pgm=sref_wrf_${model}
+   prep_step
+   startmsg
+
+   if [ $MODEL == NMB ] ; then
+    if [ $MEMBER == n02 -o $MEMBER == p02 -o $MEMBER == n03 -o $MEMBER == p03 -o $MEMBER == n05 -o $MEMBER == p05 ]; then
+     if [ $MACHINE == zeus ]; then
+     mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_wrf_${model}_driersoil >> $pgmout 2>errfile
+     elif [ $MACHINE == wcoss ]; then
+     mpirun.lsf $EXECsref/sref_wrf_${model}_driersoil >> $pgmout 2>errfile
+     fi
+    else
+     if [ $MACHINE == zeus ]; then
+     mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_wrf_${model}_normalsoil >> $pgmout 2>errfile
+     elif [ $MACHINE == wcoss ]; then
+     mpirun.lsf $EXECsref/sref_wrf_${model}_normalsoil >> $pgmout 2>errfile
+     fi
+    fi
+   fi
+   if [ $MODEL == ARW ] ; then
+#   if [ $MEMBER == n01 -o $MEMBER == n03 -o $MEMBER == p04 -o $MEMBER == n06 ]; then
+    if [ $MEMBER == n01 -o $MEMBER == n02 -o $MEMBER == n03 -o $MEMBER == p04 -o $MEMBER == p05 -o $MEMBER == n06 ]; then
+     if [ $MACHINE == zeus ]; then
+     mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_wrf_${model}_driersoil >> $pgmout 2>errfile
+     elif [ $MACHINE == wcoss ]; then
+     mpirun.lsf $EXECsref/sref_wrf_${model}_driersoil >> $pgmout 2>errfile
+     fi
+    else
+     if [ $MACHINE == zeus ]; then
+     mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_wrf_${model}_normalsoil >> $pgmout 2>errfile
+     elif [ $MACHINE == wcoss ]; then
+     mpirun.lsf $EXECsref/sref_wrf_${model}_normalsoil >> $pgmout 2>errfile
+     fi
+    fi
+   fi
+
+   export err=$?; err_chk
+fi
+
+#grep "wrf: SUCCESS COMPLETE WRF" rsl.error.0000
+err=$?
+if [ $err -ne 0 ]; then
+   echo "sref_wrf${model}_fcst failed" >> $WORK_DIR/fcst.$MEMBER.failed
+   exit 1
+fi
+
+# save 12h or 6h wrf fcst for next cycle's breeding calculation
+#TOMMORROW=`$NDATE +06 ${PDY}${CYC}`
+TOMMORROW=`$NDATE +12 ${PDY}${CYC}`
+Y=`echo ${TOMMORROW} | cut -c 1-4`
+M=`echo ${TOMMORROW} | cut -c 5-6`
+D=`echo ${TOMMORROW} | cut -c 7-8`
+C=`echo ${TOMMORROW} | cut -c 9-10`
+
+WRFF=wrfout_d01_${Y}-${M}-${D}_${C}:00:00
+if [ $MODEL = NMM ];then
+cp ${WRFF} ${GESDIR}/${MODEL}.${MEMBER}.${WRFF}_$RES
+fi
+if [ $MODEL = ARW ];then
+# Note: here MODEL=ARW. If want to apply reg bred, use name "MODEL"; otherwise, use "em"
+cp ${WRFF} ${GESDIR}/${MODEL}.${MEMBER}.${WRFF}_$RES
+#cp ${WRFF} ${GESDIR}/em.${MEMBER}.${WRFF}_$RES
+fi
+if [ $MODEL = NMB ];then
+cp nmmb_hst_01_nio_0012h_00m_00.00s ${GESDIR}/${MODEL}.${MEMBER}.${WRFF}_$RES
+fi
+
+echo "done" > $WORK_DIR/fcst.$MEMBER.done
+echo "done" > $WORK_DIR/../fcst.$MEMBER.done

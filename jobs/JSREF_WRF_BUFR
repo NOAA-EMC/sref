@@ -1,0 +1,178 @@
+#!/bin/sh
+############################################
+# Set up environment for WRF BUFR JOB
+# Change log:
+#
+# 08/01/2007, Jun Du: Initial Implementation
+# 07/18/2008, Jun Du: upgraded to new mpiio wrfbufr version for
+#                     both WRF cores in order to match WRFv2.2
+#
+# MODEL(MEMBER ...)=NMM(ctl,p01,n01,p02,n02,p03,n03)
+#                  +ARW(ctl,p01,n01,p02,n02,p03,n03)
+#                  +NMB(ctl,p01,n01,p02,n02,p03,n03)
+# 9/20/2009, Julia Zhu   Scripts are modified to be sharable
+#                        between EMC and NCO
+# 4/15/2010, Jun Du  Generalized the script to run NEMS-NMMB
+#                    ensemble (MODEL=NMB)
+########################################
+set -xa
+export PS4='$SECONDS + '
+
+export OMP_NUM_THREADS=1
+export MP_MPILIB=mpich2
+
+. /usrx/local/Modules/default/init/ksh
+module load grib_util
+
+#
+# Specify whether the run is production or development
+#
+export RUN_ENVIR=${RUN_ENVIR:-nco}
+
+#####################################################################################
+# Run config file to get input parameters
+# This config file should define the following variables
+# DATA_IN: Location of working directory, default to ${DATAROOT}
+# DEV_SMS: If the job is to be running using ecFflow, default to YES
+# SENDDBN: Set to NO for developers, default to YES
+# COM_IN:  Directory for input files, default to ${COMROOT}/$NET/${envir}
+# COM_OUT: Directory for output file, default to ${COMROOT}/$NET/${envir}
+# gespath: Directory for the guess or restart files, default to ${GESROOT}/${envir}
+#####################################################################################
+if [ "$RUN_ENVIR" != nco ]      ### For Developers, "group_name" is passed from the ecFflow script
+then
+  CONFIG_FILE=${CONFIG_FILE:-/meso/save/${LOGNAME}/sref${NWROOTp1}/parm/sref_para_config}
+  . $CONFIG_FILE
+  export userid=$LOGNAME
+  export DATA_IN=${DATA_IN:-/ptmp/$userid}
+fi
+
+###############################################################
+# This block can be modified for different test environment
+###############################################################
+if [ $RUN_ENVIR = nco -a $envir != prod ]; then
+  export SENDDBN=${SENDDBN:-NO}
+# export DBNROOT=${NWROOTp1}/spa_util/fakedbn
+# export jlogfile=${jlogfile:-${COMROOT}/logs/${envir}/jlogfile}
+  export RM_TMPDIR=${RM_TMPDIR:-NO}
+fi
+
+echo `date` $0 `date -u` begin
+
+export CYC=${CYC:-${cyc}}
+export MEMBER=${MEMBER:-ctl}
+export MODEL=${MODEL:-ARW}
+export RES=${RES:-16km}
+export runflag=${runflag:-3hrly}
+
+########################################################### 
+# obtain unique process id (pid) and make temp directories
+# Note: ctl member needs to be run only once and can be used 
+# for both NMM and ARW cores!
+###########################################################
+export pid=$$
+export DATA_IN=${DATA_IN:-${DATAROOT}}
+
+export DATA=$DATA_IN/${job}.${pid}
+rm -rf $DATA
+mkdir -p $DATA
+
+cd $DATA
+
+####################################
+# File To Log Msgs
+####################################
+export jlogfile=${jlogfile:-${COMROOT}/logs/jlogfiles/jlogfile.${job}.${pid}}
+
+####################################
+# Determine Job Output Name on System
+####################################
+export outid="LL$job"
+export jobid="${outid}.o${pid}"
+export pgmout="OUTPUT.${pid}"
+
+export cycle=t${cyc}z 
+
+###############################
+# Specify NET and RUN name
+##############################
+export NET=sref
+export RUN=sref
+
+##################################################
+# SAVEGES  - Copy Files From TMPDIR to $GESdir
+# SENDECF  - Flag Events on ecFflow
+# SENDCOM  - Copy Files From TMPDIR to $COMOUT
+# SENDDBN  - Issue DBNet Client Calls
+# RERUN    - Rerun fcst from beginning (default no)
+##################################################
+export SENDCOM=${SENDCOM:-YES}
+export SENDECF=${SENDECF:-YES}
+export SENDDBN=${SENDDBN:-YES}
+
+export HOMEsref=${HOMEsref:-${NWROOT}/${NET}.${sref_ver}}
+export EXECsref=${EXECsref:-$HOMEsref/exec}
+export FIXsref=${FIXsref:-$HOMEsref/fix}
+export PARMsref=${PARMsref:-$HOMEsref/parm}
+export USHsref=${USHsref:-$HOMEsref/ush}
+
+#export HOMEnam=${HOMEnam:-${NWROOTp1}}
+#export HOMEnam=${HOMEnam:-${NWROOTp1}/nam.${nam_ver}}
+#export HOMEnam=${HOMEnam:-${HOMEsref}}
+#export EXECnam=${EXECnam:-$HOMEnam/exec}
+#export PARMnam=${PARMnam:-$HOMEnam/parm}
+
+export PARMgempak=$GEMPAK/tables/pack
+###################################
+# Set up the UTILITIES
+###################################
+#export utilscript=${NWROOTp1}/util/ush
+#export utilexec=${NWROOTp1}/util/exec
+
+# Run setup to initialize working directory and utility scripts
+## setup.sh  # no need, since using module load prod_util 
+
+# Run setpdy and initialize PDY variables
+setpdy.sh
+. ./PDY
+
+#############################################
+# COMIN and COMOUT
+#############################################
+export COM_OUT=${COM_OUT:-${COMROOT}/${NET}/${envir}}
+
+export COMOUT=$COM_OUT/${RUN}.${PDY}/${cyc}
+
+mkdir -p -m 775 $COMOUT 
+ 
+env
+
+########################################
+# Define forecast hour and interval
+########################################
+export LENGTH=${LENGTH:-87}
+export ENDHOUR=${ENDHOUR:-87}
+export ENDHOUR_HRLY=${ENDHOUR_HRLY:-38}
+export INCR=${INCR:-1}
+
+export IOFORM=2
+########################################################
+# Execute the script.
+########################################################
+export FCSTDIR=$DATA_IN/sref_${MODEL}_fcst_${CYC}_${envir}/fcst.$MEMBER
+
+$HOMEsref/scripts/exsref_wrfbufr.sh.ecf
+
+########################################################
+cat $pgmout
+
+msg="JOB COMPLETED NORMALLY"
+postmsg "$jlogfile" "$msg"
+
+################################
+# Remove the Working Directory
+################################
+cd $DATA_IN
+if [ ${RM_TMPDIR:-YES} = YES ] ; then rm -rf $DATA ; fi
+
+date
