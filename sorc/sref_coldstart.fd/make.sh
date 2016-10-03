@@ -49,7 +49,47 @@ if [ $mac = t -o $mac = g ] ; then  #For WCOSS
   module load landsfcutil/v2.0.0
 
 # ensure libraries and include directories exist.
+  export CHECK_LIBS=/nwprod/spa_util/check_libs.bash
+  make check_prereqs
+  rc=$?
+  if ((rc != 0));then
+    echo "MISSING LIBRARY AND/OR INCLUDE DIRECTORY. EXIT."
+    exit
+  fi
 
+elif [ $mac = s -o $mac = l ] ; then  #For WCOSS_CRAY
+
+  echo
+  echo "BUILD EMCSFC_COLDSTART PROGRAM ON WCOSS_CRAY"
+  echo
+
+
+# load intel compiler
+  module load PrgEnv-intel
+  module load cray-mpich
+
+  export FCOMP=ftn
+  export FFLAGS="-O0 -r8 -i4 -FR -convert big_endian"
+  export FPPFLAGS="-fpp -DGFS=0 -save-temps"
+  export LFLAGS="-openmp"
+
+# load ncep library modules
+
+  module load NetCDF-intel-sandybridge/3.6.3
+  module load sfcio-intel/1.0.0
+  module load ip-intel/2.0.0
+  module load sp-intel/2.0.2
+  module load w3nco-intel/2.0.6
+  module load bacio-intel/2.0.1
+  module load jasper-gnu-sandybridge/1.900.1
+  module load zlib-intel-sandybridge/1.2.7
+  module load png-intel-sandybridge/1.2.44
+  module load g2-intel/2.5.0
+  module load nemsio-intel/2.2.2
+  module load landsfcutil-intel/2.0.0
+
+# ensure libraries and include directories exist.
+  export CHECK_LIBS=/gpfs/hps/nco/ops/nwprod/spa_util/check_libs.bash
   make check_prereqs
   rc=$?
   if ((rc != 0));then

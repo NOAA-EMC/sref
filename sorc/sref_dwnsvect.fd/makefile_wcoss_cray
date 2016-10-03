@@ -1,0 +1,12 @@
+SHELL=	/bin/sh
+LIBS=  ${W3NCO_LIB4} ${W3EMC_LIB4}  ${BACIO_LIB4}
+SRCS=	sref_dvrtma_bias.f90
+CMD=	sref_dvrtma_bias
+FC=	ftn
+FFLAGS=	-O3
+
+$(CMD):	$(SRCS)
+	$(FC) $(SRCS) $(FFLAGS) -o $(@) $(OBJS) $(LIBS)
+
+clean:
+	rm -f *.o $(CMD)

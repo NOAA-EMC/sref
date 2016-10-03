@@ -7,6 +7,7 @@ echo " NEED TO ENTER AN OPTION:                   "
 echo "                                            "
 echo " conf zeus (for R&D Machine zeus)           "
 echo " conf wcoss (for tide/gyre)                 "
+echo " conf wcoss_cray (for luna/surge)           "
 echo " conf yellowstone (for NCAR machine)        "
 echo " conf linux (for generic linux)             "
 echo "                                            "
@@ -15,13 +16,13 @@ fi
 
 set -x
 
-if [ $1 == "zeus" -o $1 == "wcoss" -o $1 == "yellowstone"  -o $1 == "linux" ]
+if [ $1 == "zeus" -o $1 == "wcoss" -o $1 == "wcoss_cray" -o $1 == "yellowstone"  -o $1 == "linux" ]
 then
 cp arch/preamble.${1} arch/preamble
 else
 set +x
 echo "bad option " $1
-echo " needs to be zeus/wcoss/yellowstone/linux, otherwise develop a new arch/preamble.${1} file"
+echo " needs to be zeus/wcoss/wcoss_cray/yellowstone/linux, otherwise develop a new arch/preamble.${1} file"
 set -x
 fi
 

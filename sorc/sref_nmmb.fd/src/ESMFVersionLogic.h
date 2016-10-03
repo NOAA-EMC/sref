@@ -17,8 +17,10 @@
 // ESMF >= 5.2.0r
 #endif
 
-#define ESMF_MAJOR_VERSION 5
-#define ESMF_520r
+#if 0
+//#define ESMF_MAJOR_VERSION 5
+//#define ESMF_520r
+#endif
 
 #define esmf_mod ESMF
 #define ESMF_MOD ESMF

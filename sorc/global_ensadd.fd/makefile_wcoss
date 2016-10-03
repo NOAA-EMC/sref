@@ -1,0 +1,36 @@
+SHELL=  /bin/bash
+CMD=	global_ensadd
+FC=     ifort
+#FOPTS=  -qsmp=noauto
+FFLAGS=  -list -traceback
+LDFLAGS=
+INCS=
+SRCS=	ENSADD.f 
+OBJS=   $(SRCS:.f=.o)
+LIBS    = ${BACIO_LIB4}   ${W3NCO_LIB4}
+
+#$(CMD): $(SRCS)
+#	$(FC) $(FOPTS) $(SRCS) $(LIBS) -o $(CMD)
+#global_ensadd: $(SRCS)
+#	$(FC) $(FOPTS) $(SRCS) $(LIBS) -o ensadd
+
+# Lines from here on down should not need to be changed.  They are the
+# actual rules which make uses to build a.out.
+#
+all:    $(CMD)
+
+$(CMD): $(OBJS)
+	$(FC) $(LDFLAGS) $(FFLAGS) -o $(@) $(OBJS) $(LIBS)
+
+$(OBJS):        $(SRCS)
+	$(FC) $(FFLAGS) $(INCS) -c $(SRCS)
+
+$(OBJS):        makefile_wcoss
+
+allclean:       clean all
+
+clean:
+	-rm -f $(OBJS) *.lst $(CMD)
+
+clobber:        clean
+	-rm -f $(CMD)

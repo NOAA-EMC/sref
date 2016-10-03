@@ -1,0 +1,17 @@
+SHELL=/bin/sh
+SRCS 	= cluster_NCEP.f
+OBJS	= cluster_NCEP.o
+
+FC 	= ftn
+#FC 	= ftn -O3 -convert big_endian
+LDFLAGS =
+LIBS 	=  ${W3NCO_LIB4} ${W3EMC_LIB4} ${BACIO_LIB4}
+CMD 	= sref_cluster_NCEP
+
+all:	$(CMD)
+
+$(CMD):	 ${OBJS}
+	$(FC) $(LDFLAGS) -o $(@) $(OBJS) $(LIBS)
+
+clean:
+	$(RM) -f $(CMD) $(OBJS)

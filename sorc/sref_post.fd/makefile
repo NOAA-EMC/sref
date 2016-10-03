@@ -8,10 +8,10 @@ TARGET   = sref_post
 #
 FC       = mpfort -compiler ifort
 CPP      = /lib/cpp -P
-CPPFLAGS = -DLINUX 
+CPPFLAGS = -DLINUX
 OPTS     = -O -fp-model strict
 FREE     = -FR
-TRAPS    = 
+TRAPS    =
 DEBUG    = -g
 
 #
@@ -50,7 +50,7 @@ FFLAGS   = $(OPTS) $(FREE) $(TRAPS) $(DEBUG) \
            -I$(W3EMC_INC4) \
            -I$(Z_INC) \
            -I$(CRTM_INC) \
-           -I$(NETCDF_INCLUDE)
+           $(NETCDF_INCLUDE)
 
 LIBS     = $(WRF_LIB) \
            $(XMLPARSE_LIB) \
@@ -69,7 +69,7 @@ LIBS     = $(WRF_LIB) \
            $(BACIO_LIB4) \
            $(Z_LIB)   \
            $(NETCDF_LIB)   \
-           $(CRTM_LIB) 
+           $(CRTM_LIB)
 
 
 OBJS =  wrf_io_flags.o getVariable.o getIVariable.o getIVariableN.o \

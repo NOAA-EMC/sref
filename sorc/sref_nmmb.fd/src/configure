@@ -40,6 +40,13 @@ elif [[ $1 = 6.3r_nmm_wcoss ]]; then
      cp ESMFVersionDefine_ESMF_630rAPI.h ESMFVersionDefine.h
      set +x
      echo "Use an ESMF 6.3.0r library"
+elif [[ $1 = 6.3r_nmm_wcoss_cray ]]; then
+     set -x
+     cp conf/configure.nems.Wcoss_cray.intel_ESMF_630r_nmm conf/configure.nems
+     cp conf/modules.nems.wcoss_cray_ESMF_630rAPI_nmm conf/modules.nems
+     cp ESMFVersionDefine_ESMF_630rAPI.h ESMFVersionDefine.h
+     set +x
+     echo "Use an ESMF 6.3.0r library"
 elif [[ $1 = 6.3r_gsm_wcoss ]]; then
      set -x
      cp conf/configure.nems.Wcoss.intel_ESMF_630r_gsm conf/configure.nems
@@ -129,6 +136,7 @@ else
      echo " 'configure 3_yellowstone'      : ESMF 3.1.0rp2 library on yellowstone"
      echo;
      echo " 'configure 6.3r_nmm_wcoss'     : ESMF 6.3.0r library on wcoss for nmm"
+     echo " 'configure 6.3r_nmm_wcoss_cray': ESMF 6.3.0r library on wcoss for nmm"
      echo " 'configure 6.3r_gsm_wcoss'     : ESMF 6.3.0r library on wcoss for gsm"
      echo " 'configure 6_nmm_zeus'         : ESMF 6.3.0r series library on zeus nmm"
      echo " 'configure 6_gsm_zeus'         : ESMF 6.3.0r series library on zeus gsm"

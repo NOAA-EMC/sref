@@ -480,6 +480,22 @@ CPP             =       /lib/cpp -C -P -traditional
 CPPFLAGS        =       -D_UNDERSCORE -DBYTESWAP -DLINUX -DIO_NETCDF -DIO_BINARY -DIO_GRIB1 -DBIT32
 
 #########################################################
+#ARCH    PC Linux x86_64 (wcoss_cray), Intel(ifort) compiler, DM parallel
+#
+FC              =       ftn -O3 -fp-model strict -g # -debug all -check all -O0 -ftrapuv -fpe0
+SFC             =       ftn -O3 -fp-model strict -g # -debug all -check all -O0 -ftrapuv -fpe0
+FFLAGS          =       -FR -convert big_endian -assume noold_ldout_format
+F77FLAGS        =       -convert big_endian -assume noold_ldout_format
+FNGFLAGS        =       $(FFLAGS)
+R8              =       -r8
+LDFLAGS         =       -openmp -auto
+CC              =       cc
+SCC             =       cc
+CFLAGS          =       -O
+CPP             =       /lib/cpp -C -P -traditional
+CPPFLAGS        =       -D_UNDERSCORE -DBYTESWAP -DLINUX -DIO_NETCDF -DIO_BINARY -DIO_GRIB1 -D_MPI -DBIT32
+
+#########################################################
 #ARCH    PC Linux i486 i586 i686 (generic), Intel(ifort) compiler, DM parallel
 #
 FC              =       mpif90 -O3 # -g -traceback -debug all -check all -O0 -ftrapuv -fpe0

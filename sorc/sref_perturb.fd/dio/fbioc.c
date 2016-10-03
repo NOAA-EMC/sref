@@ -49,7 +49,7 @@ void c_swap(char *a, const int width, const int size)
 void c_fbopen (int *iunit, char *fname, int *flen, char *mode, int *ierr)
 {
 
-   char *lfname;
+   char *lfname = NULL;
    int len;
    int oflag = -1;
 
@@ -81,6 +81,8 @@ void c_fbopen (int *iunit, char *fname, int *flen, char *mode, int *ierr)
       fprintf(stderr," File: %s opened \n",lfname);
       *ierr = 0;
    }
+
+   if (lfname) free(lfname);
 }
 
 void c_fbread (int *iunit, char *buffer, const int *width, const int *size, const int *swap, int *ierr)
@@ -177,7 +179,7 @@ void c_fbseekset (int *iunit, uint64_t *seek, int *ierr)
    off_t seek_result;
    seek_result = lseek(*iunit, *seek, SEEK_SET);
    if ( seek_result != *seek ) {
-      fprintf(stderr," in c_fbseekset seek_result = %ld   seek = "PRIu64" \n", seek_result, *seek );
+      fprintf(stderr," in c_fbseekset seek_result = %ld   seek = %"PRIu64" \n", seek_result, *seek );
       *ierr = -1;
    } else {
       *ierr = 0;

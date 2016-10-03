@@ -57,5 +57,5 @@ install:
 	/usr/bin/install -c -d ../../exec
 	/usr/bin/install -c $(EXE) ../../exec
 check_prereqs:
-	/nwprod/spa_util/check_libs.bash $(LIBS)
+	$(CHECK_LIBS) $(LIBS)
 #	/nwprod/spa_util/check_incs.bash $(LANDSFCUTIL_INCd) $(G2_INCd) $(NEMSIO_INC) $(NETCDF_INCLUDE) $(SFCIO_INC4)

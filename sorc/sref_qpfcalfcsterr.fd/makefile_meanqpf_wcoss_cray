@@ -1,0 +1,15 @@
+SHELL=/bin/sh
+SRCS 	= sref_cal_meanqpffcsterr.f
+OBJS	= sref_cal_meanqpffcsterr.o
+FC 	= ftn -O3 -convert big_endian
+LDFLAGS =
+LIBS 	= ${W3NCO_LIB4} ${W3EMC_LIB4} ${BACIO_LIB4}
+CMD 	= sref_cal_meanqpffcsterr
+
+all:	$(CMD)
+
+$(CMD):	 ${OBJS}
+	$(FC) $(LDFLAGS) -o $(@) $(OBJS) $(LIBS)
+
+clean:
+	$(RM) -f $(CMD) $(OBJS)

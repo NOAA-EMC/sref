@@ -41,7 +41,7 @@ SIGIO_INCMOD            =       -I/nwprod/lib/incmod/sigio_4
 
 BACIO_LIBS              =       -L/nwprod/lib -lbacio_4
 
-NEMSIO_INC              =       -I/nwprod/lib/incmod/nemsio
+NEMSIO_INC              =       /nwprod/lib/incmod/nemsio
 NEMSIO_LIBS             =       -L/nwprod/lib -lnemsio_v2.2.0
 
 LANDSFCUTIL_INC         =       -I/nwprod/lib/incmod/landsfcutil_d
