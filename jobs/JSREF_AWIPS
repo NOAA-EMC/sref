@@ -1,0 +1,143 @@
+#!/bin/ksh
+
+#################################################################
+# 9/20/2009, Julia Zhu   Scripts are modified to be sharable
+#                        between EMC and NCO
+#         Please note that variable "RUN_ENVIR" is set and used
+#         in the development enviroment only.
+#################################################################
+
+############################################
+# Set up environment for ensemble products job
+############################################
+
+set -xa
+# #### 04/16/2001 ###################
+# SET SHELL PROCESSING VARIABLES
+# ###################################
+export PS4='$SECONDS + ' 
+date
+
+export RUN_ENVIR=${RUN_ENVIR:-nco}
+
+export NET=sref
+export RUN=sref
+
+
+###########################################
+# Run sref_config to get input parameters
+###########################################
+if [ "$RUN_ENVIR" != nco ]    ### For Developers
+then
+  . /meso/save/$LOGNAME/sref${NWROOTp1}/parm/sref_config
+  export DATA_IN=${DATA_IN:-/ptmp/$LOGNAME${DATAROOT}}
+  export jlogfile=${jlogfile:-$DATA_IN/jlogfile}
+
+  export SENDCOM=${SENDCOM:-YES}
+  export SENDDBN=${SENDDBN:-NO}
+  export SENDECF=${SENDECF:-YES}
+
+  export HOMEsref=${HOMEsref:-${NWROOT}}
+  export EXECsref=${EXECsref:-$HOMEsref/exec}
+  export FIXsref=${FIXsref:-$HOMEsref/fix}
+  export PARMsref=${PARMsref:-$HOMEsref/parm}
+  export USHsref=${USHsref:-$HOMEsref/ush}
+
+  export com=${com:-/meso/noscrub/$LOGNAME${COMROOT}/${NET}/${envir}}
+  export COM_IN=${COM_IN:-/meso/noscrub/$LOGNAME${COMROOT}/${NET}/${envir}}
+  export COM_OUT=${COM_OUT:-/meso/noscrub/$LOGNAME${COMROOT}/${NET}/${envir}}
+
+  export COMIN=$COM_IN/${RUN}.${PDY}/${cyc}/ensprod
+  export COMOUT=$COM_OUT/${RUN}.${PDY}/${cyc}/misc
+  export pcom_in=${pcom_in:-/pcom}
+  export pcom=$pcom_in/${RUN}.${PDY}
+
+fi
+
+###############################################################
+# This block can be modified for different test environment
+###############################################################
+if [ $RUN_ENVIR = nco -a $envir != prod ]; then
+#  export SENDDBN=${SENDDBN:-YES}
+ export DBNROOT=${NWROOTp1}/spa_util/fakedbn
+# export jlogfile=${jlogfile:-${COMROOT}/logs/${envir}/jlogfile}
+fi
+
+# 
+# obtain unique process id (pid) and make temp directories
+#
+export pid=$$
+export pid=$$
+export DATA_IN=${DATA_IN:-${DATAROOT}}
+export DATA=$DATA_IN/${job}.${pid}
+
+mkdir -p $DATA
+cd $DATA
+
+####################################
+# File To Log Msgs
+####################################
+export jlogfile=${jlogfile:-${COMROOT}/logs/jlogfiles/jlogfile.${job}.${pid}}
+
+####################################
+# Determine Job Output Name on System
+####################################
+export outid="LL$job"
+export jobid="${outid}.o${pid}"
+export pgmout="OUTPUT.${pid}"
+
+export cycle=t${cyc}z 
+
+# Run setpdy and initialize PDY variables
+setpdy.sh
+. ./PDY
+
+##################################################
+# SAVEGES  - Copy Files From TMPDIR to $GESdir
+# SENDECF  - Flag Events on ecFflow
+# SENDCOM  - Copy Files From TMPDIR to $COMOUT
+# SENDDBN  - Issue DBNet Client Calls
+# RERUN    - Rerun fcst from beginning (default no)
+##################################################
+export SENDCOM=${SENDCOM:-YES}
+export SENDECF=${SENDECF:-YES}
+export SENDDBN=${SENDDBN:-YES}
+
+export HOMEsref=${HOMEsref:-${NWROOT}/${NET}.${sref_ver}}
+export EXECsref=${EXECsref:-$HOMEsref/exec}
+export FIXsref=${FIXsref:-$HOMEsref/fix}
+export PARMsref=${PARMsref:-$HOMEsref/parm}
+export USHsref=${USHsref:-$HOMEsref/ush}
+export PARMshared=${PARMsref}                 # for /nwprod2/util_shared.v?.?.?/ush/mkawpgrb.sh
+
+###################################
+# Set up the UTILITIES
+###################################
+
+msg="JOB $job HAS BEGUN"
+postmsg "$jlogfile" "$msg"
+
+export COM_IN=${COM_IN:-${COMROOT}/${NET}/${envir}}
+export COMIN=$COM_IN/${RUN}.${PDY}/${cyc}/ensprod
+
+export COM_OUT=${COM_OUT:-${COMROOT}/${NET}/${envir}}
+export COMOUT=$COM_OUT/${RUN}.${PDY}/${cyc}/misc
+export pcom=${pcom:-${PCOMROOT}/${NET}}
+
+mkdir -p $COMOUT $pcom
+ 
+###################################################
+# Execute the Script
+#
+$HOMEsref/ush/sref_awips.sh
+###################################################
+
+cat $pgmout
+
+msg="JOB $job HAS COMPLETED NORMALLY."
+postmsg "$jlogfile" "$msg"
+
+cd $DATA_IN
+if [ ${RM_TMPDIR:-NO} = YES ] ; then rm -rf $DATA ; fi
+
+date

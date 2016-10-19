@@ -1,0 +1,655 @@
+46a47
+> c    & (NSTAT=1500,LCL1ML=13,LCL1SL=50
+78c79
+<      &,Z0(:),CZEN(:),CZMEAN(:),U00(:),SR(:),CPRATE(:)
+---
+>      &,Z0(:),CZEN(:),CZMEAN(:),U00(:),SR(:)
+93,94d93
+<      &,F_RAIN(:,:),F_ICE(:,:),CLDFRA(:,:)
+<      &,F_RIMEF(:,:)
+131c130
+<      & IDAT(3),IDAT0(3),GDS(200),SYSDEPINFO
+---
+>      & IDAT(3),IDAT0(3),GDS(200)
+138c137
+<      &,FNAME*256,ENVAR*98,BLANK*4
+---
+>      &,FNAME*98,ENVAR*98,BLANK*4
+142,144c141,143
+< 	character(len=256) :: fileName
+< 	character(len=256) :: fileNamehold
+<        character(len=256) :: newname
+---
+> 	character(len=98) :: fileName
+> 	character(len=98) :: fileNamehold
+>        character(len=98) :: newname
+168a168,170
+>         write(6,*) 'STNLAT(1), STNLON(1): ', STNLAT(1), STNLON(1)
+>         write(6,*) 'IHINDX(1),JHINDX(1): ', IHINDX(1),JHINDX(1)
+>         write(6,*) 'IVINDX(1),JVINDX(1): ', IVINDX(1),JVINDX(1)
+171c173
+< 	if (ITAG .eq. 0) then
+---
+>       if (ITAG .eq. 0) then
+175,176c177,178
+< 	endif
+<    30 FORMAT(3X,I7,2F9.3,4I9,4X,A10)
+---
+>       endif
+>    30 FORMAT(2X,I6,2F8.2,4I8,4X,A8)
+187d188
+<         write(0,*) 'calling ext_ncd_ioinit: '
+189c190
+<           write(0,*) 'CALLed ioinit', Status
+---
+>           print*,'CALLed ioinit', Status
+317c318
+<      &,TLMIN(NUMSTA),TLMAX(NUMSTA),CPRATE(NUMSTA)
+---
+>      &,TLMIN(NUMSTA),TLMAX(NUMSTA)
+327,328c328
+<      &,F_RAIN(NUMSTA,LM),F_ICE(NUMSTA,LM),CLDFRA(NUMSTA,LM)
+<      &,TCUCN(NUMSTA,LM),F_RIMEF(NUMSTA,LM)
+---
+>      &,TCUCN(NUMSTA,LM)
+392c392
+< !      VarName='HTM'
+---
+>       VarName='HTM'
+394,396c394,395
+< !        write(6,*) 'LM: ', LM
+< !      call getVariable(fileName,DateStr,DataHandle,VarName,DUM3D,
+< !     &  IM+1,1,JM+1,LM+1,IM,JS,JE,LM)
+---
+>       call getVariable(fileName,DateStr,DataHandle,VarName,DUM3D,
+>      &  IM+1,1,JM+1,LM+1,IM,JS,JE,LM)
+403c402
+<             HTM(N,L) = 1.
+---
+>             HTM(N,L) = DUM3D(I,J,L)
+561d559
+<          CPRATE(N)=-9999.
+588,589d585
+<         
+< 
+679c675
+< 	write(6,*) 'call getVariable for : ', VarName
+---
+> !	write(6,*) 'call getVariable for : ', VarName
+692,747d687
+< 	varname='F_ICE'
+< 	write(6,*) 'call getVariable for : ', VarName
+<       call getVariable(fileName,DateStr,DataHandle,VarName,DUM3D,
+<      &  IM+1,1,JM+1,LM+1,IM,JS,JE,LM)
+< !	write(6,*) 'DUM3D(20,20,30): ', DUM3D(20,20,30)
+< 
+<       DO L = 1,LM
+<       DO N=1,NUMSTA
+< 	I=IHINDX(N)	
+< 	J=JHINDX(N)
+<             F_ICE(N,L) = DUM3D(I,J,L)
+<       END DO 
+<       END DO
+< 
+< 	varname='F_RAIN'
+< 	write(6,*) 'call getVariable for : ', VarName
+<       call getVariable(fileName,DateStr,DataHandle,VarName,DUM3D,
+<      &  IM+1,1,JM+1,LM+1,IM,JS,JE,LM)
+< !	write(6,*) 'DUM3D(20,20,30): ', DUM3D(20,20,30)
+< 
+<       DO L = 1,LM
+<       DO N=1,NUMSTA
+< 	I=IHINDX(N)	
+< 	J=JHINDX(N)
+<             F_RAIN(N,L) = DUM3D(I,J,L)
+<       END DO 
+<       END DO
+< 
+< 	varname='F_RIMEF'
+< 	write(6,*) 'call getVariable for : ', VarName
+<       call getVariable(fileName,DateStr,DataHandle,VarName,DUM3D,
+<      &  IM+1,1,JM+1,LM+1,IM,JS,JE,LM)
+< !	write(6,*) 'DUM3D(20,20,30): ', DUM3D(20,20,30)
+< 
+<       DO L = 1,LM
+<       DO N=1,NUMSTA
+< 	I=IHINDX(N)	
+< 	J=JHINDX(N)
+<             F_RIMEF(N,L) = DUM3D(I,J,L)
+<       END DO 
+<       END DO
+< 
+< 	varname='CLDFRA'
+< 	write(6,*) 'call getVariable for : ', VarName
+<       call getVariable(fileName,DateStr,DataHandle,VarName,DUM3D,
+<      &  IM+1,1,JM+1,LM+1,IM,JS,JE,LM)
+< !	write(6,*) 'DUM3D(20,20,30): ', DUM3D(20,20,30)
+< 
+<       DO L = 1,LM
+<       DO N=1,NUMSTA
+< 	I=IHINDX(N)	
+< 	J=JHINDX(N)
+<             CLDFRA(N,L) = DUM3D(I,J,L)
+<       END DO 
+<       END DO
+< 
+749c689
+< 	write(6,*) 'call getVariable for : ', VarName
+---
+> !	write(6,*) 'call getVariable for : ', VarName
+761c701
+< 	write(6,*) 'call getVariable for : ', VarName
+---
+> !	write(6,*) 'call getVariable for : ', VarName
+816c756
+<         write(6,*) 'call getVariable for : ', VarName
+---
+> !        write(6,*) 'call getVariable for : ', VarName
+827c767
+<         write(6,*) 'call getVariable for : ', VarName
+---
+> !        write(6,*) 'call getVariable for : ', VarName
+839c779
+< 	write(6,*) 'call getVariable for : ', VarName
+---
+> !	write(6,*) 'call getVariable for : ', VarName
+849,850c789,790
+< 	if (mod(N,20) .eq. 0) write(6,*) 'N, VEGFRC(N): ', 
+<      &			N, VEGFRC(N)
+---
+> !	if (mod(N,20) .eq. 0) write(6,*) 'N, VEGFRC(N): ', 
+> !     &			N, VEGFRC(N)
+855d794
+< 	write(6,*) 'call getVariable for : ', VarName
+868c807
+< 	write(6,*) 'call getVariable for : ', VarName
+---
+> !	write(6,*) 'call getVariable for : ', VarName
+884,886c823,824
+<         write(6,*) 'past SMC definition, about to print SMC values'
+<       print*,'SMC at N=10 ',smc(10,1),smc(10,2)
+<      &,smc(10,3),smc(10,4)
+---
+>       print*,'SMC at ', N ,' = ',smc(N,1),smc(N,2)
+>      &,smc(N,3),smc(N,4)
+889c827
+< 	write(6,*) 'call getVariable for : ', VarName
+---
+> !	write(6,*) 'call getVariable for : ', VarName
+900,901c838,839
+< !      print*,'STC at ', N ,' = ',stc(N,1),stc(N,2)
+< !     &,stc(N,3),stc(N,4)
+---
+>       print*,'STC at ', N ,' = ',stc(N,1),stc(N,2)
+>      &,stc(N,3),stc(N,4)
+1336a1275
+> 	write(6,*) 'to TKE_MYJ'
+1341c1280
+<       VarName='Q2'
+---
+>       VarName='TKE_MYJ'
+1361c1300
+< 	call ext_ncd_ioclose(SYSDEPINFO, Status)
+---
+> 	call ext_ncd_ioclose(DataHandle,status)
+1368,1369c1307
+< !      DO L=1,LM+1
+<       DO L=1,LM
+---
+>       DO L=1,LM+1
+1378,1381c1316,1319
+< 	if (mod(N,60) .eq. 0 .and. mod(L,10) .eq. 0) then
+< 	write(6,*) 'N, L, W, PINT, T, Q, OMGA: ', N,L,W(N,L),PINT(N,L),
+<      &  T(N,L),Q(N,L),OMGA(N,L)
+< 	endif
+---
+> !	if (mod(N,60) .eq. 0 .and. mod(L,10) .eq. 0) then
+> !	write(6,*) 'N, L, W, PINT, T, Q, OMGA: ', N,L,W(N,L),PINT(N,L),
+> !     &  T(N,L),Q(N,L),OMGA(N,L)
+> !	endif
+1567d1504
+<         write(6,*) 'calling ext_ncd_ioinit'
+1570,1571d1506
+<         write(6,*) 'status from call: ', status
+<         write(6,*) 'trim(filename): ', trim(filename)
+1586d1520
+<           DO L=1,LM
+1590d1523
+<           ENDDO
+2066d1998
+<         write(6,*) 'DT is: ', dt
+2071,2072d2002
+<         else
+<         NPHS=8
+2075,2079d2004
+< 
+<         write(6,*) 'NPHS set to : ', NPHS
+< 
+<         IFCST=3600*ITAG
+< 
+2081d2005
+<         write(6,*) 'set time to : ', TIME
+2086,2087d2009
+<         write(6,*) 'NPHS, RESET0, RESET1: ', NPHS, RESET0, RESET1
+< 
+2099c2021
+< 	write(6,*) 'set STATPR'
+---
+> C	write(6,*) 'set STATPR'
+2109c2031
+< 	write(6,*) 'past set'
+---
+> c	write(6,*) 'past set'
+2306,2308d2227
+< !
+<         ACUTIM=0
+< 
+2315,2317c2234,2236
+< !      IF(ARATIM.GT.0.)THEN
+< !        RTSRA=1./ARATIM
+< !      ELSE
+---
+>       IF(ARATIM.GT.0.)THEN
+>         RTSRA=1./ARATIM
+>       ELSE
+2319c2238
+< !      ENDIF
+---
+>       ENDIF
+2329d2247
+<        
+2335d2252
+<         write(0,*) 'working station N: ', N
+2367,2368d2283
+<       NWORD14  = 14*LMHK
+<       NWORD15  = 15*LMHK
+2441,2461c2356,2360
+< !        IF(IW(N,LV).GT.0.5)THEN
+< !          PRODAT(NWORD6+LVL) = -CWM(N,LV)
+< !        ELSE
+< !          PRODAT(NWORD6+LVL) = CWM(N,LV)
+< !        ENDIF
+< 
+< 
+< !--- Separate posting of cloud water (NWORD6), rain (NWORD14), and
+< !    ice (cloud ice + snow, NWORD13).  The ice and rain fields are
+< !    *APPENDED* at the end of the section dealing with vertical
+< !    profile fields  (Ferrier/Manikin 11/30/04)
+< !
+<         QLIQ = (1.-F_ice(N,LV))*CWM(N,LV)
+<         PRODAT(NWORD13+LVL) = F_rain(N,LV)*QLIQ
+<         PRODAT(NWORD6+LVL) = QLIQ-PRODAT(NWORD13+LVL)
+<         PRODAT(NWORD14+LVL) = F_ice(N,LV)*CWM(N,LV)
+<         PRODAT(NWORD7+LVL) = TCUCN(N,LV)
+<         PRODAT(NWORD8+LVL) = TRAIN(N,LV)
+<         PRODAT(NWORD9+LVL) = RSWTT(N,LV)
+<         PRODAT(NWORD10+LVL)= RLWTT(N,LV)
+<         PRODAT(NWORD11+LVL)= CLDFRA(N,LV)*100.
+---
+>         IF(IW(N,LV).GT.0.5)THEN
+>           PRODAT(NWORD6+LVL) = -CWM(N,LV)
+>         ELSE
+>           PRODAT(NWORD6+LVL) = CWM(N,LV)
+>         ENDIF
+2462a2362,2365
+> 	if (LV .eq. LM/2) then
+> !	write(6,*) 'N,IW,CWM,PRODAT: ',N,IW(N,LV),CWM(N,LV),
+> !     &		PRODAT(NWORD6+LVL)
+> 	endif
+2489,2490c2392,2393
+<         STADHC(LL) = PRODAT(NWORD7+LL) - DHCNVC(LVL,N)
+<         STADHR(LL) = PRODAT(NWORD8+LL) - DHRAIN(LVL,N)
+---
+> !        STADHC(LL) = PRODAT(NWORD7+LL) - DHCNVC(LVL,N)
+> !        STADHR(LL) = PRODAT(NWORD8+LL) - DHRAIN(LVL,N)
+2492,2493c2395,2396
+<         DHCNVC(LVL,N) = PRODAT(NWORD7+LL)
+<         DHRAIN(LVL,N) = PRODAT(NWORD8+LL)
+---
+> !        DHCNVC(LVL,N) = PRODAT(NWORD7+LL)
+> !        DHRAIN(LVL,N) = PRODAT(NWORD8+LL)
+2503,2511c2406,2414
+<       PRODAT(NWORD15+1)  = PSLP  (N)
+<       PRODAT(NWORD15+2)  = PDS   (N)
+<       PRODAT(NWORD15+3)  = EGRID2(N)
+<       PRODAT(NWORD15+4)  = TLMIN (N)
+<       PRODAT(NWORD15+5)  = TLMAX (N)
+<       PRODAT(NWORD15+6)  = SMSTAV(N)*100.
+<       PRODAT(NWORD15+7)  = ACPREC(N)*1000.
+<       PRODAT(NWORD15+8)  = CUPREC(N)*1000.
+<       PRODAT(NWORD15+27) = Z0    (N)
+---
+>       PRODAT(NWORD13+1)  = PSLP  (N)
+>       PRODAT(NWORD13+2)  = PDS   (N)
+>       PRODAT(NWORD13+3)  = EGRID2(N)
+>       PRODAT(NWORD13+4)  = TLMIN (N)
+>       PRODAT(NWORD13+5)  = TLMAX (N)
+>       PRODAT(NWORD13+6)  = SMSTAV(N)*100.
+>       PRODAT(NWORD13+7)  = ACPREC(N)*1000.
+>       PRODAT(NWORD13+8)  = CUPREC(N)*1000.
+>       PRODAT(NWORD13+27) = Z0    (N)
+2513,2514c2416,2417
+<       STAPRX=PRODAT(NWORD15+7)-STATPR(N)
+<       STACRX=PRODAT(NWORD15+8)-STACPR(N)
+---
+>       STAPRX=PRODAT(NWORD13+7)-STATPR(N)
+>       STACRX=PRODAT(NWORD13+8)-STACPR(N)
+2524,2525c2427,2428
+<       PRODAT(NWORD15+28) = UT*COSALP+VT*SINALP
+<       PRODAT(NWORD15+29) = VT*COSALP-UT*SINALP
+---
+>       PRODAT(NWORD13+28) = UT*COSALP+VT*SINALP
+>       PRODAT(NWORD13+29) = VT*COSALP-UT*SINALP
+2527,2569c2430,2470
+<       PRODAT(NWORD15+30) = TH10  (N)
+<       PRODAT(NWORD15+31) = Q10   (N)
+<       PRODAT(NWORD15+32) = TSHLTR(N)
+<       PRODAT(NWORD15+33) = QSHLTR(N)
+<       PRODAT(NWORD15+34) = SFCEXC(N)
+<       PRODAT(NWORD15+35) = VEGFRC(N)*100.
+<       PRODAT(NWORD15+36) = CMC   (N)*1000.
+<       PRODAT(NWORD15+37) = SMC   (N,1)
+<       PRODAT(NWORD15+38) = SMC   (N,2)
+<       PRODAT(NWORD15+39) = SMC   (N,3)
+<       PRODAT(NWORD15+40) = SMC   (N,4)
+<       PRODAT(NWORD15+41) = STC   (N,1)
+<       PRODAT(NWORD15+42) = STC   (N,2)
+<       PRODAT(NWORD15+43) = STC   (N,3)
+<       PRODAT(NWORD15+44) = STC   (N,4)
+<       PRODAT(NWORD15+45) = SM    (N) + SICE(N)
+<       PRODAT(NWORD15+46) = CFRACL(N)*100.
+<       PRODAT(NWORD15+47) = CFRACM(N)*100.
+<       PRODAT(NWORD15+48) = CFRACH(N)*100.
+<       PRODAT(NWORD15+49) = SR    (N)*100.
+<       PRODAT(NWORD15+50) = NINT(HBOT(N))
+<       PRODAT(NWORD15+51) = CPRATE(N)
+<       PRODAT(NWORD15+52) = F_RIMEF(N,LMHK)
+< 
+< C
+<       PRODAT(NWORD15+9)   = SFCLHX(N)
+<       PRODAT(NWORD15+10)  = POTFLX(N)
+<       PRODAT(NWORD15+11)  = SFCSHX(N)
+<       PRODAT(NWORD15+12)  = SUBSHX(N)
+<       PRODAT(NWORD15+13)  = SNOPCX(N)
+<       PRODAT(NWORD15+14)  = ASWIN (N)
+<       PRODAT(NWORD15+15)  = ASWOUT(N)
+<       PRODAT(NWORD15+16)  = ALWIN (N)
+<       PRODAT(NWORD15+17)  = ALWOUT(N)
+<       PRODAT(NWORD15+18)  =-ALWTOA(N)
+<       PRODAT(NWORD15+19)  = ASWTOA(N)
+<       PRODAT(NWORD15+20)  = ACSNOW(N)
+<       PRODAT(NWORD15+21)  = SMSTOT(N)
+<       PRODAT(NWORD15+22)  = SNO   (N)
+<       PRODAT(NWORD15+23)  = ACSNOM(N)
+<       PRODAT(NWORD15+24)  = SSROFF(N)
+<       PRODAT(NWORD15+25)  = BGROFF(N)
+<       PRODAT(NWORD15+26)  = SOILTB(N)
+---
+>       PRODAT(NWORD13+30) = TH10  (N)
+>       PRODAT(NWORD13+31) = Q10   (N)
+>       PRODAT(NWORD13+32) = TSHLTR(N)
+>       PRODAT(NWORD13+33) = QSHLTR(N)
+>       PRODAT(NWORD13+34) = SFCEXC(N)
+>       PRODAT(NWORD13+35) = VEGFRC(N)
+>       PRODAT(NWORD13+36) = CMC   (N)*1000.
+>       PRODAT(NWORD13+37) = SMC   (N,1)
+>       PRODAT(NWORD13+38) = SMC   (N,2)
+>       PRODAT(NWORD13+39) = SMC   (N,3)
+>       PRODAT(NWORD13+40) = SMC   (N,4)
+>       PRODAT(NWORD13+41) = STC   (N,1)
+>       PRODAT(NWORD13+42) = STC   (N,2)
+>       PRODAT(NWORD13+43) = STC   (N,3)
+>       PRODAT(NWORD13+44) = STC   (N,4)
+>       PRODAT(NWORD13+45) = SM    (N) + SICE(N)
+>       PRODAT(NWORD13+46) = CFRACL(N)*100.
+>       PRODAT(NWORD13+47) = CFRACM(N)*100.
+>       PRODAT(NWORD13+48) = CFRACH(N)*100.
+>       PRODAT(NWORD13+49) = SR    (N)*100.
+>       PRODAT(NWORD13+50) = NINT(HBOT(N))
+> C
+>       PRODAT(NWORD13+9)   = SFCLHX(N)
+>       PRODAT(NWORD13+10)  = POTFLX(N)
+>       PRODAT(NWORD13+11)  = SFCSHX(N)
+>       PRODAT(NWORD13+12)  = SUBSHX(N)
+>       PRODAT(NWORD13+13)  = SNOPCX(N)
+>       PRODAT(NWORD13+14)  = ASWIN (N)
+>       PRODAT(NWORD13+15)  = ASWOUT(N)
+>       PRODAT(NWORD13+16)  = ALWIN (N)
+>       PRODAT(NWORD13+17)  = ALWOUT(N)
+>       PRODAT(NWORD13+18)  =-ALWTOA(N)
+>       PRODAT(NWORD13+19)  = ASWTOA(N)
+>       PRODAT(NWORD13+20)  = ACSNOW(N)*1000.
+>       PRODAT(NWORD13+21)  = SMSTOT(N)*1000.
+> !      PRODAT(NWORD13+22)  = SNO   (N)*1000.
+>       PRODAT(NWORD13+22)  = SNO   (N)
+>       PRODAT(NWORD13+23)  = ACSNOM(N)*1000.
+>       PRODAT(NWORD13+24)  = SSROFF(N)*1000.
+>       PRODAT(NWORD13+25)  = BGROFF(N)*1000.
+>       PRODAT(NWORD13+26)  = SOILTB(N)
+2573,2578c2474,2479
+<       PSFCEVP  = PRODAT(NWORD15+9 ) - STAEVP(N)
+<       PPOTEVP  = PRODAT(NWORD15+10) - STAPOT(N)
+<       PSFCSHX  = PRODAT(NWORD15+11) - STASHX(N)
+<       PSFCSUB  = PRODAT(NWORD15+12) - STASUB(N)
+<       PSNOPCX  = PRODAT(NWORD15+13) - STAPCX(N)
+<       PRSWIN   = PRODAT(NWORD15+14) - STASWI(N)
+---
+>       PSFCEVP  = PRODAT(NWORD13+9 ) - STAEVP(N)
+>       PPOTEVP  = PRODAT(NWORD13+10) - STAPOT(N)
+>       PSFCSHX  = PRODAT(NWORD13+11) - STASHX(N)
+>       PSFCSUB  = PRODAT(NWORD13+12) - STASUB(N)
+>       PSNOPCX  = PRODAT(NWORD13+13) - STAPCX(N)
+>       PRSWIN   = PRODAT(NWORD13+14) - STASWI(N)
+2580,2581c2481,2482
+< 	write(6,*) 'N, PRODAT(NWORD15+14) , STASWI(N), PRSWIN: ', N,
+<      &     PRODAT(NWORD15+14), STASWI(N), PRSWIN
+---
+> 	write(6,*) 'N, PRODAT(NWORD13+14) , STASWI(N), PRSWIN: ', N,
+>      &     PRODAT(NWORD13+14), STASWI(N), PRSWIN
+2583,2584c2484,2485
+<       PRSWOUT  = PRODAT(NWORD15+15) - STASWO(N)
+<       PRLWIN   = PRODAT(NWORD15+16) - STALWI(N)
+---
+>       PRSWOUT  = PRODAT(NWORD13+15) - STASWO(N)
+>       PRLWIN   = PRODAT(NWORD13+16) - STALWI(N)
+2586,2587c2487,2488
+< 	write(6,*) 'N, PRODAT(NWORD53+16) , STALWI(N), PRLWIN: ', N,
+<      &     PRODAT(NWORD15+16), STALWI(N), PRLWIN
+---
+> 	write(6,*) 'N, PRODAT(NWORD13+16) , STALWI(N), PRLWIN: ', N,
+>      &     PRODAT(NWORD13+16), STALWI(N), PRLWIN
+2589,2596c2490,2497
+<       PRLWOUT  = PRODAT(NWORD15+17) - STALWO(N)
+<       PRLWTOA  = PRODAT(NWORD15+18) - STALWT(N)
+<       PRSWTOA  = PRODAT(NWORD15+19) - STASWT(N)
+<       PACSNOW  = PRODAT(NWORD15+20) - STASNO(N)
+<       PACSNOM  = PRODAT(NWORD15+23) - STASNM(N)
+<       PSSROFF  = PRODAT(NWORD15+24) - STASRF(N)
+<       PBGROFF  = PRODAT(NWORD15+25) - STABRF(N)
+< 	write(6,*) 'N, PBGROFF: ', N, PBGROFF
+---
+>       PRLWOUT  = PRODAT(NWORD13+17) - STALWO(N)
+>       PRLWTOA  = PRODAT(NWORD13+18) - STALWT(N)
+>       PRSWTOA  = PRODAT(NWORD13+19) - STASWT(N)
+>       PACSNOW  = PRODAT(NWORD13+20) - STASNO(N)
+>       PACSNOM  = PRODAT(NWORD13+23) - STASNM(N)
+>       PSSROFF  = PRODAT(NWORD13+24) - STASRF(N)
+>       PBGROFF  = PRODAT(NWORD13+25) - STABRF(N)
+> !	write(6,*) 'N, PBGROFF: ', N, PBGROFF
+2602c2503,2505
+<         write(6,*) 'SHELT TEMP ', PRODAT(NWORD15+32) 
+---
+> C	write(6,*) 'NWORD13+41,NWORD13+32 ', NWORD13+41,NWORD13+32
+> C	write(6,*) 'SOIL TEMP ', PRODAT(NWORD13+41)
+> C        write(6,*) 'SHELT TEMP ', PRODAT(NWORD13+32) 
+2619c2522
+<       FPACK(9+NWORD15+7)  = STAPRX
+---
+>       FPACK(9+NWORD13+7)  = STAPRX
+2621,2623c2524,2526
+<       FPACK(9+NWORD15+8)  = STACRX
+<       FPACK(9+NWORD15+9)  = PSFCEVP * RTSPH
+<       FPACK(9+NWORD15+10) = PPOTEVP * RTSPH
+---
+>       FPACK(9+NWORD13+8)  = STACRX
+>       FPACK(9+NWORD13+9)  = PSFCEVP * RTSPH
+>       FPACK(9+NWORD13+10) = PPOTEVP * RTSPH
+2630,2633c2533,2537
+<       FPACK(9+NWORD15+11) = PSFCSHX * RTSPH
+<       FPACK(9+NWORD15+12) =-PSFCSUB * RTSPH
+<       FPACK(9+NWORD15+13) = PSNOPCX * RTSPH
+<       FPACK(9+NWORD15+14) = PRSWIN  * RTSPH
+---
+>       FPACK(9+NWORD13+11) = PSFCSHX * RTSPH
+> !sign problem?      FPACK(9+NWORD13+12) = PSFCSUB * RTSPH
+>       FPACK(9+NWORD13+12) =-PSFCSUB * RTSPH
+>       FPACK(9+NWORD13+13) = PSNOPCX * RTSPH
+>       FPACK(9+NWORD13+14) = PRSWIN  * RTSPH
+2637,2645c2541,2549
+<       FPACK(9+NWORD15+15) = PRSWOUT * RTSPH
+<       FPACK(9+NWORD15+16) = PRLWIN  * RTSPH
+<       FPACK(9+NWORD15+17) = PRLWOUT * RTSPH
+<       FPACK(9+NWORD15+18) = PRLWTOA * RTSPH
+<       FPACK(9+NWORD15+19) = PRSWTOA * RTSPH
+<       FPACK(9+NWORD15+20) = PACSNOW
+<       FPACK(9+NWORD15+23) = PACSNOM
+<       FPACK(9+NWORD15+24) = PSSROFF
+<       FPACK(9+NWORD15+25) = PBGROFF
+---
+>       FPACK(9+NWORD13+15) = PRSWOUT * RTSPH
+>       FPACK(9+NWORD13+16) = PRLWIN  * RTSPH
+>       FPACK(9+NWORD13+17) = PRLWOUT * RTSPH
+>       FPACK(9+NWORD13+18) = PRLWTOA * RTSPH
+>       FPACK(9+NWORD13+19) = PRSWTOA * RTSPH
+>       FPACK(9+NWORD13+20) = PACSNOW
+>       FPACK(9+NWORD13+23) = PACSNOM
+>       FPACK(9+NWORD13+24) = PSSROFF
+>       FPACK(9+NWORD13+25) = PBGROFF
+2654,2670c2558,2574
+<         FPACK(9+NWORD15+7)  = 0.
+<         FPACK(9+NWORD15+8)  = 0.
+<         FPACK(9+NWORD15+9)  = 0.
+<         FPACK(9+NWORD15+10) = 0.
+<         FPACK(9+NWORD15+11) = 0.
+<         FPACK(9+NWORD15+12) = 0.
+<         FPACK(9+NWORD15+13) = 0.
+<         FPACK(9+NWORD15+14) = 0.
+<         FPACK(9+NWORD15+15) = 0.
+<         FPACK(9+NWORD15+16) = 0.
+<         FPACK(9+NWORD15+17) = 0.
+<         FPACK(9+NWORD15+18) = 0.
+<         FPACK(9+NWORD15+19) = 0.
+<         FPACK(9+NWORD15+20) = 0.
+<         FPACK(9+NWORD15+23) = 0.
+<         FPACK(9+NWORD15+24) = 0.
+<         FPACK(9+NWORD15+25) = 0.
+---
+>         FPACK(9+NWORD13+7)  = 0.
+>         FPACK(9+NWORD13+8)  = 0.
+>         FPACK(9+NWORD13+9)  = 0.
+>         FPACK(9+NWORD13+10) = 0.
+>         FPACK(9+NWORD13+11) = 0.
+>         FPACK(9+NWORD13+12) = 0.
+>         FPACK(9+NWORD13+13) = 0.
+>         FPACK(9+NWORD13+14) = 0.
+>         FPACK(9+NWORD13+15) = 0.
+>         FPACK(9+NWORD13+16) = 0.
+>         FPACK(9+NWORD13+17) = 0.
+>         FPACK(9+NWORD13+18) = 0.
+>         FPACK(9+NWORD13+19) = 0.
+>         FPACK(9+NWORD13+20) = 0.
+>         FPACK(9+NWORD13+23) = 0.
+>         FPACK(9+NWORD13+24) = 0.
+>         FPACK(9+NWORD13+25) = 0.
+2679c2583
+<       write(6,*) 'NREC,IHRST,IDAT: ', NREC,IHRST,IDAT,IFCST
+---
+> C      write(6,*) 'NREC,IHRST,IDAT: ', NREC,IHRST,IDAT,IFCST
+2681,2684c2585,2588
+<         if (mod(NREC,5) .eq. 0) then
+<         write(6,*) 'IDAT, IFCST, ISTAT, CISTAT: ',
+<      &  IDAT, IFCST, ISTAT, CISTAT
+<         endif
+---
+> !        if (mod(NREC,10) .eq. 0) then
+> !        write(6,*) 'IDAT, IFCST, ISTAT, CISTAT: ',
+> !     &  IDAT, IFCST, ISTAT, CISTAT
+> !        endif
+2688c2592
+< 	write(6,*) 'FPACK(458) written: ', FPACK(458)
+---
+> !	write(6,*) 'FPACK(458) written: ', FPACK(458)
+2692d2595
+<         write(6,*) 'past 1000 continue'
+2695d2597
+<         write(6,*) 'past file close'
+2700d2601
+<         write(6,*) 'to deallocate'
+2704,2706c2605,2606
+<      &,SOILTB,SFCEXC,SMSTAV,SMSTOT)
+<         write(6,*) 'past 1st dealloc'
+<         DEALLOCATE(Z0,CZEN,CZMEAN,U00,SR
+---
+>      &,SOILTB,SFCEXC,SMSTAV,SMSTOT
+>      &,Z0,CZEN,CZMEAN,U00,SR
+2711,2714c2611,2612
+<      &,TSHLTR,TSHLTR_hold,QSHLTR,PSHLTR)
+<         write(6,*) 'past 2nd dealloc'
+< 
+<       DEALLOCATE(TH10,Q10,U10,V10
+---
+>      &,TSHLTR,TSHLTR_hold,QSHLTR,PSHLTR
+>      &,TH10,Q10,U10,V10
+2719,2721c2617,2618
+<      &,HBM2,FACTR)
+<         write(6,*) 'past 3rd dealloc'
+<       DEALLOCATE(PTBL,TTBL,VEGFRA
+---
+>      &,HBM2,FACTR
+>      &,PTBL,TTBL,VEGFRA
+2723,2726c2620,2621
+<      &,OMGALF,CWM,TRAIN,TCUCN)
+< 
+<         write(6,*) 'past 4th dealloc'
+<       DEALLOCATE(RSWTT,RLWTT,CCR,RTOP
+---
+>      &,OMGALF,CWM,TRAIN,TCUCN
+>      &,RSWTT,RLWTT,CCR,RTOP
+2728,2732c2623,2624
+<      &,PRODAT,FPACK)
+<         write(6,*) 'past 5th dealloc'
+< 
+<  
+<       DEALLOCATE(STATPR,STACPR,STAEVP
+---
+>      &,PRODAT,FPACK
+>      &,STATPR,STACPR,STAEVP
+2737,2753c2629,2634
+<      &,STADHC,STADHR)
+<         write(6,*) 'past 6th dealloc'
+< 
+<        DEALLOCATE(ACPREC0,CUPREC0,SFCLHX0,POTFLX0
+<      &,SFCSHX0,SUBSHX0,SNOPCX0,ASWIN0)
+< 
+<         write(6,*) 'past 7th dealloc'
+<        DEALLOCATE(ASWOUT0,ALWIN0,ALWOUT0,ALWTOA0)
+<         write(6,*) 'past 8th dealloc'
+<        DEALLOCATE(ASWTOA0,ACSNOW0,ACSNOM0,SSROFF0)
+<         write(6,*) 'past 9th dealloc'
+<         write(6,*) 'to dealloc of BGROFF0'
+<         write(6,*) 'min/max of BGROFF0: ', minval(BGROFF0),
+<      &                                     maxval(BGROFF0)
+<         DEALLOCATE(BGROFF0)
+<          write(6,*) 'past 10th dealloc'
+<         write(6,*) 'past deallocate, to return'
+---
+>      &,STADHC,STADHR
+>      &,ACPREC0,CUPREC0,SFCLHX0,POTFLX0
+>      &,SFCSHX0,SUBSHX0,SNOPCX0,ASWIN0
+>      &,ASWOUT0,ALWIN0,ALWOUT0,ALWTOA0
+>      &,ASWTOA0,ACSNOW0,ACSNOM0,SSROFF0
+>      &,BGROFF0)
+2755c2636
+<         write(6,*) 'End of PROF_NMM_NET'
+---
+>       write(6,*) 'end of PROF_NMM_NET'

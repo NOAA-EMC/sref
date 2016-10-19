@@ -1,0 +1,66 @@
+#!/bin/ksh
+################################################################
+# UNIX Script Documentation Block
+#
+# Script name:         exsref_dwnsfcst.sh.sms
+# Script description:  This program is to set environment and to call a
+#                      ush script, sref_downscaling.sh, to downscale a low-res 
+#                      forecast into a hi-res forecast with a pre-calculated
+#                      dowbscaling vector (from exsref_caldwnsvect.sh.sms)
+#
+# Author:      Jun Du       Org: NP21         Date: 2011-12
+#
+# Change log:
+#  08/xx/2007: Bo Cui, original code works for GEFS
+#  11/28/2011: Brian Etherton/DET, tested/evaluated the GEFS codes for SREF
+#  12/09/2011: Jun Du, rewrote the scripts, extended from 6hrly to 3hrly, 
+#                      excluded sfc PRES and added 2m q, tested and implemented 
+#                      for the operational SREF
+#  03/13/2015: Jun Du, modified to the 2-model, 6-member SREF.v7.0.0 
+#
+################################################################
+set -x
+
+#export hourlist="03 06 09 12 15 18 21 24 27 30 33 36 39 42 45 48 51 54 57 60 63 66 69 72 75 78 81 84 87"
+export hourlist=$1
+export modellist="nmb arw"
+export memberlist="ctl n1 p1 n2 p2 n3 p3 n4 p4 n5 p5 n6 p6"
+#hourlist=$1
+#modellist="nmb nmm em"
+#memberlist="ctl n1 p1 n2 p2 n3 p3"
+
+#mkdir -m 775 $hourlist
+cd $hourlist
+
+for nfhrs in $hourlist; do
+ for model in $modellist; do
+  for member in $memberlist; do
+    export FHRLIST=$nfhrs
+    export MDLLIST=$model
+    export MEMLIST=$member
+    sref_file=sref_${model}.t${cyc}z.pgrb212.${member}.f${nfhrs}
+    in_file=$COMOUT/${sref_file}
+    out_file=sref_ds_${model}.t${cyc}z.pgrb197.${member}.f${nfhrs} 
+
+    icnt=0
+    while [ $icnt -le 1 ]; do
+      if [ -s ${in_file} ]; then
+       $USHsref/sref_downscaling.sh 
+          if [ -s ${out_file} ]; then
+            ${CNVGRIB} -g12 -p40 ${COM_NDGD}/${out_file} ${COM_NDGD}/${out_file}.grib2
+          fi
+        icnt=2
+      else
+        sleep 10
+        icnt=`expr $icnt + 1`
+        echo $icnt
+      fi
+    done
+
+   done
+   done
+
+done
+
+msg="HAS COMPLETED NORMALLY!"
+postmsg "$jlogfile" "$msg"

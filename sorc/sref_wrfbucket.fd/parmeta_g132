@@ -1,0 +1,2 @@
+! grid 132 (double resolution of NA domain 221)
+      PARAMETER (IM=697,JM=553)

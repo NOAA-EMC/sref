@@ -1,0 +1,289 @@
+#!/bin/ksh
+################################################################
+# UNIX Script Documentation Block
+#
+# Script name:         exsref_caldwnsvect.sh.sms
+# Script description:  This program is to calculate a downscaling vector 
+#                      by differencing a lower-resolution analysis (e.g. 
+#                      NDAS) and a higher-resolution analysis (e.g. RTMA) 
+#                      for downscaling low-res forecasts into hi-res forecasts.
+#
+# Author:      Jun Du       Org: NP21         Date: 2011-12
+#
+# Change log:
+#  08/xx/2007: Bo Cui, original code works for GEFS
+#  11/28/2011: Brian Etherton/DET, tested/evaluated the GEFS codes for SREF
+#  12/02/2011: Jun Du, rewrote the scripts, excluded sfc PRES and added 
+#                      2m q, tested and implemented for the operational SREF
+#  03/13/2015: Jun Du, modified to the 2-model and 6-member SREF.v7.0.0
+#  10/19/2016: Jun Du, modified to read in new NAM.v4 ndas data
+#
+################################################################
+set -x
+
+#export WGRIB=${WGRIB:-${NWROOTp1}/util/exec/wgrib}
+#export COPYGB=${COPYGB:-${NWROOTp1}/util/exec/copygb}
+
+#################################################
+### I: Obtaining RTMA data on 5km NDFD grid                   
+#################################################
+anlhr="00 03 06 09 12 15 18 21"
+
+for anlcyc in $anlhr ; do 
+if [ $anlcyc -gt $cyc ];then
+#RTMAdata=${COMROOT}/rtma/prod/rtma.$PDYm1
+ RTMAdata=$COMRTMA/rtma2p5.$PDYm1
+else
+#RTMAdata=${COMROOT}/rtma/prod/rtma.$PDY
+ RTMAdata=$COMRTMA/rtma2p5.$PDY
+fi
+afile=rtma.t${anlcyc}z.2dvaranl_ndfd.grb1
+ln -fs $RTMAdata/rtma.t${anlcyc}z.2dvaranl_ndfd.grb1 $afile.temp 
+
+infile=$afile.temp
+outfile=$afile
+#$WGRIB $infile | grep ":PRES:" | grep "sfc" | $WGRIB -i $infile  -grib -append -o $outfile
+$WGRIB $infile | grep ":TMP:" | grep "2 m" |  $WGRIB -i $infile  -grib -append -o $outfile
+$WGRIB $infile | grep ":UGRD:" | grep "10 m" | $WGRIB -i $infile  -grib -append -o $outfile
+$WGRIB $infile | grep ":VGRD:" | grep "10 m" | $WGRIB -i $infile  -grib -append -o $outfile
+$WGRIB $infile | grep ":SPFH:" | grep "2 m" |  $WGRIB -i $infile  -grib -append -o $outfile
+
+#$WGRIB $infile | grep ":HGT:" | grep "sfc" | $WGRIB -i $infile  -grib -append -o $outfile
+#$WGRIB $infile | grep ":PRES:" | grep "sfc" | $WGRIB -i $infile  -grib -append -o $outfile
+#$WGRIB $infile | grep ":DPT:" | grep "2 m" | $WGRIB -i $infile  -grib -append -o $outfile
+#$WGRIB $infile | grep ":WDIR:" | grep "10 m" | $WGRIB -i $infile  -grib -append -o $outfile
+#$WGRIB $infile | grep ":WIND:" | grep "10 m" | $WGRIB -i $infile  -grib -append -o $outfile
+
+echo "rtma analysis has been correctly obtained?"
+ls -l $afile.temp
+ls -l $afile
+
+##############################################################
+### II: Interpolate low-res analysis (NDAS) on 5km NDFD grid
+##############################################################
+# 5km NDFD/RTMA grid:
+grid='255 3 1073 689 20191 238445 8 265000 5079 5079 0 64 25000 25000 0 0 0'
+
+# Select NDAS data (33km NA domain: awp151; 12km CONUS domain: awphys), e.g.
+# infile=${COMROOT}/nam/prod/nam.$PDY/nam.t06z.awp15100.tm00
+# infile=${COMROOT}/nam/prod/nam.$PDY/nam.t06z.awphys00.tm00
+# infile=${COMROOT}/nam/prod/ndas.$PDY/ndas.t06z.awp15100.tm03
+# infile=${COMROOT}/nam/prod/ndas.$PDY/ndas.t06z.awphys00.tm03
+
+if [ $cyc = 03 ];then
+ if [ $anlcyc = 00 ];then
+  $CNVGRIB -g21 $COMINnam/nam.$PDY/nam.t00z.awphys00.tm00.grib2 nam.t00z.awphys00.tm00
+  infile=nam.t00z.awphys00.tm00
+ fi
+ if [ $anlcyc = 03 ];then
+  $CNVGRIB -g21 $COMINnam/nam.$PDY/nam.t06z.awphys00.tm03.grib2 ndas.t06z.awphys00.tm03
+  infile=ndas.t06z.awphys00.tm03
+ fi
+ if [ $anlcyc = 06 ];then
+  $CNVGRIB -g21 $COMINnam/nam.$PDYm1/nam.t06z.awphys00.tm00.grib2 nam.t06z.awphys00.tm00
+  infile=nam.t06z.awphys00.tm00
+ fi
+ if [ $anlcyc = 09 ];then
+  $CNVGRIB -g21 $COMINnam/nam.$PDYm1/nam.t12z.awphys00.tm03.grib2 ndas.t12z.awphys00.tm03
+  infile=ndas.t12z.awphys00.tm03
+ fi
+ if [ $anlcyc = 12 ];then
+  $CNVGRIB -g21 $COMINnam/nam.$PDYm1/nam.t12z.awphys00.tm00.grib2 nam.t12z.awphys00.tm00
+  infile=nam.t12z.awphys00.tm00
+ fi
+ if [ $anlcyc = 15 ];then
+  $CNVGRIB -g21 $COMINnam/nam.$PDYm1/nam.t18z.awphys00.tm03.grib2 ndas.t18z.awphys00.tm03
+  infile=ndas.t18z.awphys00.tm03
+ fi
+ if [ $anlcyc = 18 ];then
+  $CNVGRIB -g21 $COMINnam/nam.$PDYm1/nam.t18z.awphys00.tm00.grib2 nam.t18z.awphys00.tm00
+  infile=nam.t18z.awphys00.tm00
+ fi
+ if [ $anlcyc = 21 ];then
+  $CNVGRIB -g21 $COMINnam/nam.$PDY/nam.t00z.awphys00.tm03.grib2 ndas.t00z.awphys00.tm03
+  infile=ndas.t00z.awphys00.tm03
+ fi
+fi
+
+if [ $cyc = 09 ];then
+ if [ $anlcyc = 00 ];then
+  $CNVGRIB -g21 $COMINnam/nam.$PDY/nam.t00z.awphys00.tm00.grib2 nam.t00z.awphys00.tm00
+  infile=nam.t00z.awphys00.tm00
+ fi
+ if [ $anlcyc = 03 ];then
+  $CNVGRIB -g21 $COMINnam/nam.$PDY/nam.t06z.awphys00.tm03.grib2 ndas.t06z.awphys00.tm03
+  infile=ndas.t06z.awphys00.tm03
+ fi
+ if [ $anlcyc = 06 ];then
+  $CNVGRIB -g21 $COMINnam/nam.$PDY/nam.t06z.awphys00.tm00.grib2 nam.t06z.awphys00.tm00
+  infile=nam.t06z.awphys00.tm00
+ fi
+ if [ $anlcyc = 09 ];then
+  $CNVGRIB -g21 $COMINnam/nam.$PDY/nam.t12z.awphys00.tm03.grib2 ndas.t12z.awphys00.tm03
+  infile=ndas.t12z.awphys00.tm03
+ fi
+ if [ $anlcyc = 12 ];then
+  $CNVGRIB -g21 $COMINnam/nam.$PDYm1/nam.t12z.awphys00.tm00.grib2 nam.t12z.awphys00.tm00
+  infile=nam.t12z.awphys00.tm00
+ fi
+ if [ $anlcyc = 15 ];then
+  $CNVGRIB -g21 $COMINnam/nam.$PDYm1/nam.t18z.awphys00.tm03.grib2 ndas.t18z.awphys00.tm03
+  infile=ndas.t18z.awphys00.tm03
+ fi
+ if [ $anlcyc = 18 ];then
+  $CNVGRIB -g21 $COMINnam/nam.$PDYm1/nam.t18z.awphys00.tm00.grib2 nam.t18z.awphys00.tm00
+  infile=nam.t18z.awphys00.tm00
+ fi
+ if [ $anlcyc = 21 ];then
+  $CNVGRIB -g21 $COMINnam/nam.$PDY/nam.t00z.awphys00.tm03.grib2 ndas.t00z.awphys00.tm03
+  infile=ndas.t00z.awphys00.tm03
+ fi
+fi
+
+if [ $cyc = 15 ];then
+ if [ $anlcyc = 00 ];then
+  $CNVGRIB -g21 $COMINnam/nam.$PDY/nam.t00z.awphys00.tm00.grib2 nam.t00z.awphys00.tm00
+  infile=nam.t00z.awphys00.tm00
+ fi
+ if [ $anlcyc = 03 ];then
+  $CNVGRIB -g21 $COMINnam/nam.$PDY/nam.t06z.awphys00.tm03.grib2 ndas.t06z.awphys00.tm03
+  infile=ndas.t06z.awphys00.tm03
+ fi
+ if [ $anlcyc = 06 ];then
+  $CNVGRIB -g21 $COMINnam/nam.$PDY/nam.t06z.awphys00.tm00.grib2 nam.t06z.awphys00.tm00
+  infile=nam.t06z.awphys00.tm00
+ fi
+ if [ $anlcyc = 09 ];then
+  $CNVGRIB -g21 $COMINnam/nam.$PDY/nam.t12z.awphys00.tm03.grib2 ndas.t12z.awphys00.tm03
+  infile=ndas.t12z.awphys00.tm03
+ fi
+ if [ $anlcyc = 12 ];then
+  $CNVGRIB -g21 $COMINnam/nam.$PDY/nam.t12z.awphys00.tm00.grib2 nam.t12z.awphys00.tm00
+  infile=nam.t12z.awphys00.tm00
+ fi
+ if [ $anlcyc = 15 ];then
+  $CNVGRIB -g21 $COMINnam/nam.$PDY/nam.t18z.awphys00.tm03.grib2 ndas.t18z.awphys00.tm03
+  infile=ndas.t18z.awphys00.tm03
+ fi
+ if [ $anlcyc = 18 ];then
+  $CNVGRIB -g21 $COMINnam/nam.$PDYm1/nam.t18z.awphys00.tm00.grib2 nam.t18z.awphys00.tm00
+  infile=nam.t18z.awphys00.tm00
+ fi
+ if [ $anlcyc = 21 ];then
+  $CNVGRIB -g21 $COMINnam/nam.$PDY/nam.t00z.awphys00.tm03.grib2 ndas.t00z.awphys00.tm03
+  infile=ndas.t00z.awphys00.tm03
+ fi
+fi
+
+if [ $cyc = 21 ];then
+ if [ $anlcyc = 00 ];then
+  $CNVGRIB -g21 $COMINnam/nam.$PDY/nam.t00z.awphys00.tm00.grib2 nam.t00z.awphys00.tm00
+  infile=nam.t00z.awphys00.tm00
+ fi
+ if [ $anlcyc = 03 ];then
+  $CNVGRIB -g21 $COMINnam/nam.$PDY/nam.t06z.awphys00.tm03.grib2 ndas.t06z.awphys00.tm03
+  infile=ndas.t06z.awphys00.tm03
+ fi
+ if [ $anlcyc = 06 ];then
+  $CNVGRIB -g21 $COMINnam/nam.$PDY/nam.t06z.awphys00.tm00.grib2 nam.t06z.awphys00.tm00
+  infile=nam.t06z.awphys00.tm00
+ fi
+ if [ $anlcyc = 09 ];then
+  $CNVGRIB -g21 $COMINnam/nam.$PDY/nam.t12z.awphys00.tm03.grib2 ndas.t12z.awphys00.tm03
+  infile=ndas.t12z.awphys00.tm03
+ fi
+ if [ $anlcyc = 12 ];then
+  $CNVGRIB -g21 $COMINnam/nam.$PDY/nam.t12z.awphys00.tm00.grib2 nam.t12z.awphys00.tm00
+  infile=nam.t12z.awphys00.tm00
+ fi
+ if [ $anlcyc = 15 ];then
+  $CNVGRIB -g21 $COMINnam/nam.$PDY/nam.t18z.awphys00.tm03.grib2 ndas.t18z.awphys00.tm03
+  infile=ndas.t18z.awphys00.tm03
+ fi
+ if [ $anlcyc = 18 ];then
+  $CNVGRIB -g21 $COMINnam/nam.$PDY/nam.t18z.awphys00.tm00.grib2 nam.t18z.awphys00.tm00
+  infile=nam.t18z.awphys00.tm00
+ fi
+ if [ $anlcyc = 21 ];then
+  $CNVGRIB -g21 $COMINnam/nam.$PDYp1/nam.t00z.awphys00.tm03.grib2 ndas.t00z.awphys00.tm03
+  infile=ndas.t00z.awphys00.tm03
+ fi
+fi
+
+outfile=ndas_temp
+cfile=ndas_5km
+
+>$outfile
+#$WGRIB $infile | grep ":PRES:" | grep "sfc" | $WGRIB -i $infile  -grib -append -o $outfile
+$WGRIB $infile | grep ":TMP:" | grep "2 m" | $WGRIB -i $infile  -grib -append -o $outfile
+$WGRIB $infile | grep ":SPFH:" | grep "2 m" |  $WGRIB -i $infile  -grib -append -o $outfile
+$WGRIB $infile | grep ":UGRD:" | grep "10 m" | $WGRIB -i $infile  -grib -append -o $outfile
+$WGRIB $infile | grep ":VGRD:" | grep "10 m" | $WGRIB -i $infile  -grib -append -o $outfile
+
+echo "TIME TO COPYGB"
+echo "$COPYGB -g\"$grid\" -i1,1 -x $outfile $cfile"
+$COPYGB -g"$grid" -i1,1 -x $outfile $cfile
+
+echo "nam analysis has been correctly converted?"
+ls -l $outfile 
+ls -l $cfile
+
+##############################################################
+### III: Calculate the downscaling vector: 
+###      cstart=0: warm start (past downscaling vector exists)
+###      cstart=1: cold start (past downscaling vector doesn't exist)
+##############################################################
+# set the decaying average weight
+weight=0.30
+
+cstart=0
+
+ifile=dvrtma.t${anlcyc}z.ndgd_conus
+pgbme=bias_rtma_opranl
+mkdir -p ${COMOUT_MISC}
+
+if [ -s $COM_IN/sref.$PDYm1/${cyc}/misc/$ifile ]; then
+  cp $COM_IN/sref.$PDYm1/${cyc}/misc/$ifile $pgbme
+elif [ -s $COM_IN/sref.$PDYm2/${cyc}/misc/$ifile ]; then
+  cp $COM_IN/sref.$PDYm2/${cyc}/misc/$ifile $pgbme
+elif [ -s $COM_IN/sref.$PDYm3/${cyc}/misc/$ifile ]; then
+  cp $COM_IN/sref.$PDYm3/${cyc}/misc/$ifile $pgbme
+elif [ -s $COM_IN/sref.$PDYm4/${cyc}/misc/$ifile ]; then
+  cp $COM_IN/sref.$PDYm4/${cyc}/misc/$ifile $pgbme
+elif [ -s $COM_IN/sref.$PDYm5/${cyc}/misc/$ifile ]; then
+  cp $COM_IN/sref.$PDYm5/${cyc}/misc/$ifile $pgbme
+elif [ -s $COM_IN/sref.$PDYm6/${cyc}/misc/$ifile ]; then
+  cp $COM_IN/sref.$PDYm6/${cyc}/misc/$ifile $pgbme
+elif [ -s $COM_IN/sref.$PDYm7/${cyc}/misc/$ifile ]; then
+  cp $COM_IN/sref.$PDYm7/${cyc}/misc/$ifile $pgbme
+  echo "Past accumulated downscaling vector found, so it is a warm start."
+else
+  echo "Past accumulated downscaling vector not found, so it is a cold Start."
+  cstart=1
+fi
+
+ofile=dvrtma.t${anlcyc}z.ndgd_conus 
+
+echo "&message"  >input
+echo " icstart=${cstart}," >> input
+echo " dec_w=${weight}," >> input
+echo "/" >>input
+
+ln -sf $pgbme fort.11
+ln -sf $afile fort.12
+ln -sf $cfile fort.13
+ln -sf $ofile fort.51
+
+startmsg
+$EXECsref/sref_dvrtma_bias  <input > pgmout.$cyc
+export err=$?;err_chk
+
+if [ -s  $ofile ]; then
+ cp $ofile ${COMOUT_MISC}/$ofile
+fi
+
+done
+
+msg="HAS COMPLETED NORMALLY!"
+postmsg "$jlogfile" "$msg"
+
