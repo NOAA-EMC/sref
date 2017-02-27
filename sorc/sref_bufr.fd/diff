@@ -1,0 +1,412 @@
+3,4c3
+<       SUBROUTINE PROF_NMM_NET(filename,prefilename,startdate,
+<      +                        ITAG,INCR)
+---
+>       SUBROUTINE PROF_NMM_NET(filename,startdate,ITAG,INCR)
+41d39
+<        use kinds, only             : i_llong
+44d41
+<       include 'mpif.h'
+69,72d65
+< C
+<       PARAMETER (GAMMA=6.5/1000.,ZSL=0.0)
+<       PARAMETER (TAUCR=RD*GI*290.66,CONST=0.005*G/RD)
+<       PARAMETER (GORD=G/RD,DP=60.E2)
+100,101d92
+<      &,F_RAIN(:,:),F_ICE(:,:),CLDFRA(:,:)
+<      &,F_RIMEF(:,:)
+110c101
+<      &,STADHC(:),STADHR(:),CPRATE(:)
+---
+>      &,STADHC(:),STADHR(:)
+117,119c108,117
+<  
+< 	real, allocatable:: DUMSOIL(:),DUMSOIL3(:,:,:)
+<      &,DUM3D(:,:,:),DUM3D2(:,:,:),DUM3DIKJ(:,:,:)
+---
+> C
+> !     & DUMSOIL(NSOIL)
+> !     &,DUM3D(IM+1,JM+1,LM+1),DUM3D2(IM+1,JM+1,LM+1)
+> !     &,DUM3D3(IM+1,JM+1,LM+1),DUMMY2(IM,JM),DUMMY(IM,JM)
+> !     &,PD(:),PDS(:),GDLAT(IM,JM),GDLON(IM,JM)
+> !       REAL:: PMID(NSTAT,LM),PINT(NSTAT,LM+1),LATSTART,LONSTART
+> !       REAL:: W(NSTAT,LM+1),WH(NSTAT,LM),PDTOP,PT
+> 
+> 	real, allocatable:: DUMSOIL(:)
+>      &,DUM3D(:,:,:),DUM3D2(:,:,:)
+124,126c122
+< 
+< 
+<         real, allocatable:: CROT(:),SROT(:)
+---
+> 	
+133,134c129
+<      & IDAT(3),IDAT0(3),GDS(200),SYSDEPINO
+<        DATA SPVAL/-9999./
+---
+>      & IDAT(3),IDAT0(3),GDS(200),SYSDEPINFO
+137c132
+<      & RUN,RESTRT,FRST,PRINT_DIAG
+---
+>      & RUN,RESTRT,FRST
+145,147c140,142
+<       character(len=98) :: fileName
+<       character(len=98) :: prefileName     !Jun Du
+<       character(len=98) :: newname
+---
+> 	character(len=98) :: fileName
+> 	character(len=98) :: fileNamehold
+>        character(len=98) :: newname
+150d144
+< c     character SysDepInfo*80
+153c147
+< 	integer:: IDATE(8),JDATE(8),IDATENEW(8)
+---
+> 	integer:: IDATE(8),JDATE(8)
+214d207
+<          IDATE(1)=iyear
+216a210
+>          IDATE(1)=iyear
+333,334c327
+<      &,F_RAIN(NUMSTA,LM),F_ICE(NUMSTA,LM),CLDFRA(NUMSTA,LM)
+<      &,TCUCN(NUMSTA,LM),F_RIMEF(NUMSTA,LM)
+---
+>      &,TCUCN(NUMSTA,LM)
+345c338
+<      &,STADHC(LM),STADHR(LM),CPRATE(NUMSTA)
+---
+>      &,STADHC(LM),STADHR(LM)
+353c346
+<        ALLOCATE ( DUMSOIL(NSOIL),DUMSOIL3(IM,NSOIL,JM)
+---
+>        ALLOCATE ( DUMSOIL(NSOIL)
+355d347
+<      &,DUM3DIKJ(IM,LM,JM)
+409,410c401
+<             HTM(N,L) = 1.0
+< c           HTM(N,L) = DUM3D(I,J,L)
+---
+>             HTM(N,L) = DUM3D(I,J,L)
+696,751d686
+<         varname='F_ICE'
+<         write(6,*) 'call getVariable for : ', VarName
+<       call getVariable(fileName,DateStr,DataHandle,VarName,DUM3D,
+<      &  IM+1,1,JM+1,LM+1,IM,JS,JE,LM)
+< !       write(6,*) 'DUM3D(20,20,30): ', DUM3D(20,20,30)
+< 
+<       DO L = 1,LM
+<       DO N=1,NUMSTA
+<         I=IHINDX(N)
+<         J=JHINDX(N)
+<             F_ICE(N,L) = DUM3D(I,J,L)
+<       END DO
+<       END DO
+< 
+<         varname='F_RAIN'
+<         write(6,*) 'call getVariable for : ', VarName
+<       call getVariable(fileName,DateStr,DataHandle,VarName,DUM3D,
+<      &  IM+1,1,JM+1,LM+1,IM,JS,JE,LM)
+< !       write(6,*) 'DUM3D(20,20,30): ', DUM3D(20,20,30)
+< 
+<       DO L = 1,LM
+<       DO N=1,NUMSTA
+<         I=IHINDX(N)
+<         J=JHINDX(N)
+<             F_RAIN(N,L) = DUM3D(I,J,L)
+<       END DO
+<       END DO
+< 
+<         varname='F_RIMEF'
+<         write(6,*) 'call getVariable for : ', VarName
+<       call getVariable(fileName,DateStr,DataHandle,VarName,DUM3D,
+<      &  IM+1,1,JM+1,LM+1,IM,JS,JE,LM)
+< !       write(6,*) 'DUM3D(20,20,30): ', DUM3D(20,20,30)
+< 
+<       DO L = 1,LM
+<       DO N=1,NUMSTA
+<         I=IHINDX(N)
+<         J=JHINDX(N)
+<             F_RIMEF(N,L) = DUM3D(I,J,L)
+<       END DO
+<       END DO
+< 
+<         varname='CLDFRA'
+<         write(6,*) 'call getVariable for : ', VarName
+<       call getVariable(fileName,DateStr,DataHandle,VarName,DUM3D,
+<      &  IM+1,1,JM+1,LM+1,IM,JS,JE,LM)
+< !       write(6,*) 'DUM3D(20,20,30): ', DUM3D(20,20,30)
+< 
+<       DO L = 1,LM
+<       DO N=1,NUMSTA
+<         I=IHINDX(N)
+<         J=JHINDX(N)
+<             CLDFRA(N,L) = DUM3D(I,J,L)
+<       END DO
+<       END DO
+< 
+1344,1348c1279
+< c     VarName='TKE_MYJ'
+< c     call getVariable(fileName,DateStr,DataHandle,VarName,DUM3D,
+< c    &  IM+1,1,JM+1,LM+1,IM,JS,JE,LM)
+< 
+<       VarName='Q2'
+---
+>       VarName='TKE_MYJ'
+1455,1456c1386,1387
+< !	  TRAIN(N,L)=-9999.
+< !	  TCUCN(N,L)=-9999.
+---
+> 	  TRAIN(N,L)=-9999.
+> 	  TCUCN(N,L)=-9999.
+1465a1397,1402
+> 
+>       DO N=1,NUMSTA
+> 	I=IHINDX(N)	
+> 	J=JHINDX(N)
+>         HBOT(N)=-9999.
+>       ENDDO
+1467,1477c1404,1408
+< c     DO N=1,NUMSTA
+< c       I=IHINDX(N)	
+< c       J=JHINDX(N)
+< c       HBOT(N)=-9999.
+< c     ENDDO
+< C
+< c     DO N=1,NUMSTA
+< c      PSLP(N)=-9999.
+< c     ENDDO
+< c
+< c     DO N=1,NUMSTA
+---
+>       DO N=1,NUMSTA
+> 	PSLP(N)=-9999.
+>       ENDDO
+> 
+>       DO N=1,NUMSTA
+1481,1483c1412,1414
+< c     ENDDO
+< c
+< C     DO N=1,NUMSTA
+---
+>       ENDDO
+> C
+>       DO N=1,NUMSTA
+1485,1489c1416,1423
+< c	U00(N)=-9999.
+< !	SR(N)=-9999.
+< c     ENDDO
+< c
+< c     DO N=1,NUMSTA
+---
+> 	U00(N)=-9999.
+> 	SR(N)=-9999.
+>       ENDDO
+> C
+> 
+> C
+> C
+>       DO N=1,NUMSTA
+1494,1496c1428,1430
+< c     ENDDO
+< c
+< c     DO N=1,NUMSTA
+---
+>       ENDDO
+> C
+>       DO N=1,NUMSTA
+1502c1436
+< c     ENDDO
+---
+>       ENDDO
+1511c1445
+< !     DO N=1,NUMSTA
+---
+>       DO N=1,NUMSTA
+1513,1515c1447,1449
+< !	TLMIN(N)=-9999.
+< !	TLMAX(N)=-9999.
+< !     ENDDO
+---
+> 	TLMIN(N)=-9999.
+> 	TLMAX(N)=-9999.
+>       ENDDO
+1520,1525c1454,1459
+< !     DO L=1,LM
+< !       DO N=1,NUMSTA
+< !        RSWTT(N,L)=-9999.
+< !        RLWTT(N,L)=-9999.
+< !       ENDDO
+< !     ENDDO
+---
+>       DO L=1,LM
+>         DO N=1,NUMSTA
+>          RSWTT(N,L)=-9999.
+>          RLWTT(N,L)=-9999.
+>         ENDDO
+>       ENDDO
+1585,1588c1519,1522
+< !         DO N=1,NUMSTA
+< !	TRAIN0(N,L)=-9999.
+< !	TCUCN0(N,L)=-9999.
+< !         ENDDO
+---
+>           DO N=1,NUMSTA
+> 	TRAIN0(N,L)=-9999.
+> 	TCUCN0(N,L)=-9999.
+>           ENDDO
+2163,2178c2097,2112
+<       RESET0=TIME-(NTSD/NHEAT)*NHEAT*DT
+<       IF(MOD(NTSD,NHEAT).GE.NCNVC.AND.RESET0.LE.RESET1)THEN
+<         DO N=1,NUMSTA
+<           DO L=1,LM
+<             DHCNVC(L,N)=0.
+<             DHRAIN(L,N)=0.
+<           ENDDO
+<         ENDDO
+<       ELSE
+<         DO N=1,NUMSTA
+<           DO L=1,LM
+<              DHCNVC(L,N)=TCUCN0(N,L)
+<              DHRAIN(L,N)=TRAIN0(N,L)
+<           ENDDO
+<         ENDDO
+<       ENDIF
+---
+> c     RESET0=TIME-(NTSD/NHEAT)*NHEAT*DT
+> c     IF(MOD(NTSD,NHEAT).GE.NCNVC.AND.RESET0.LE.RESET1)THEN
+> c       DO N=1,NUMSTA
+> c         DO L=1,LM
+> c           DHCNVC(L,N)=0.
+> c           DHRAIN(L,N)=0.
+> c         ENDDO
+> c       ENDDO
+> c     ELSE
+> c       DO N=1,NUMSTA
+> c         DO L=1,LM
+> !            DHCNVC(L,N)=TCUCN0(N,L)
+> !            DHRAIN(L,N)=TRAIN0(N,L)
+> c         ENDDO
+> c       ENDDO
+> c     ENDIF
+2421,2440c2355,2359
+< !       IF(IW(N,LV).GT.0.5)THEN
+< !         PRODAT(NWORD6+LVL) = -CWM(N,LV)
+< !       ELSE
+< !         PRODAT(NWORD6+LVL) = CWM(N,LV)
+< !       ENDIF
+< 
+< !--- Separate posting of cloud water (NWORD6), rain (NWORD14), and
+< !    ice (cloud ice + snow, NWORD13).  The ice and rain fields are
+< !    *APPENDED* at the end of the section dealing with vertical
+< !    profile fields  (Ferrier/Manikin 11/30/04)
+< !
+<         QLIQ = (1.-F_ice(N,LV))*CWM(N,LV)
+<         PRODAT(NWORD13+LVL) = F_rain(N,LV)*QLIQ
+<         PRODAT(NWORD6+LVL) = QLIQ-PRODAT(NWORD13+LVL)
+<         PRODAT(NWORD14+LVL) = F_ice(N,LV)*CWM(N,LV)
+<         PRODAT(NWORD7+LVL) = TCUCN(N,LV)
+<         PRODAT(NWORD8+LVL) = TRAIN(N,LV)
+<         PRODAT(NWORD9+LVL) = RSWTT(N,LV)
+<         PRODAT(NWORD10+LVL)= RLWTT(N,LV)
+<         PRODAT(NWORD11+LVL)= CLDFRA(N,LV)*100.
+---
+>         IF(IW(N,LV).GT.0.5)THEN
+>           PRODAT(NWORD6+LVL) = -CWM(N,LV)
+>         ELSE
+>           PRODAT(NWORD6+LVL) = CWM(N,LV)
+>         ENDIF
+2441a2361,2364
+> 	if (LV .eq. LM/2) then
+> !	write(6,*) 'N,IW,CWM,PRODAT: ',N,IW(N,LV),CWM(N,LV),
+> !     &		PRODAT(NWORD6+LVL)
+> 	endif
+2592,2595c2515,2518
+<          FPACK(9+NWORD7+LL) = STADHC(LL)*RTSCU
+<          FPACK(9+NWORD8+LL) = STADHR(LL)*RTSRA
+< !         FPACK(9+NWORD7+LL) = -9999.
+< !         FPACK(9+NWORD8+LL) = -9999.
+---
+> !        FPACK(9+NWORD7+LL) = STADHC(LL)*RTSCU
+> !        FPACK(9+NWORD8+LL) = STADHR(LL)*RTSRA
+>         FPACK(9+NWORD7+LL) = -9999.
+>         FPACK(9+NWORD8+LL) = -9999.
+2598c2521
+<       FPACK(9+NWORD15+7)  = STAPRX
+---
+>       FPACK(9+NWORD13+7)  = STAPRX
+2600,2602c2523,2525
+<       FPACK(9+NWORD15+8)  = STACRX
+<       FPACK(9+NWORD15+9)  = PSFCEVP * RTSPH
+<       FPACK(9+NWORD15+10) = PPOTEVP * RTSPH
+---
+>       FPACK(9+NWORD13+8)  = STACRX
+>       FPACK(9+NWORD13+9)  = PSFCEVP * RTSPH
+>       FPACK(9+NWORD13+10) = PPOTEVP * RTSPH
+2609c2532
+<       FPACK(9+NWORD15+11) = PSFCSHX * RTSPH
+---
+>       FPACK(9+NWORD13+11) = PSFCSHX * RTSPH
+2611,2613c2534,2536
+<       FPACK(9+NWORD15+12) =-PSFCSUB * RTSPH
+<       FPACK(9+NWORD15+13) = PSNOPCX * RTSPH
+<       FPACK(9+NWORD15+14) = PRSWIN  * RTSPH
+---
+>       FPACK(9+NWORD13+12) =-PSFCSUB * RTSPH
+>       FPACK(9+NWORD13+13) = PSNOPCX * RTSPH
+>       FPACK(9+NWORD13+14) = PRSWIN  * RTSPH
+2617,2625c2540,2548
+<       FPACK(9+NWORD15+15) = PRSWOUT * RTSPH
+<       FPACK(9+NWORD15+16) = PRLWIN  * RTSPH
+<       FPACK(9+NWORD15+17) = PRLWOUT * RTSPH
+<       FPACK(9+NWORD15+18) = PRLWTOA * RTSPH
+<       FPACK(9+NWORD15+19) = PRSWTOA * RTSPH
+<       FPACK(9+NWORD15+20) = PACSNOW
+<       FPACK(9+NWORD15+23) = PACSNOM
+<       FPACK(9+NWORD15+24) = PSSROFF
+<       FPACK(9+NWORD15+25) = PBGROFF
+---
+>       FPACK(9+NWORD13+15) = PRSWOUT * RTSPH
+>       FPACK(9+NWORD13+16) = PRLWIN  * RTSPH
+>       FPACK(9+NWORD13+17) = PRLWOUT * RTSPH
+>       FPACK(9+NWORD13+18) = PRLWTOA * RTSPH
+>       FPACK(9+NWORD13+19) = PRSWTOA * RTSPH
+>       FPACK(9+NWORD13+20) = PACSNOW
+>       FPACK(9+NWORD13+23) = PACSNOM
+>       FPACK(9+NWORD13+24) = PSSROFF
+>       FPACK(9+NWORD13+25) = PBGROFF
+2634,2650c2557,2573
+<         FPACK(9+NWORD15+7)  = 0.
+<         FPACK(9+NWORD15+8)  = 0.
+<         FPACK(9+NWORD15+9)  = 0.
+<         FPACK(9+NWORD15+10) = 0.
+<         FPACK(9+NWORD15+11) = 0.
+<         FPACK(9+NWORD15+12) = 0.
+<         FPACK(9+NWORD15+13) = 0.
+<         FPACK(9+NWORD15+14) = 0.
+<         FPACK(9+NWORD15+15) = 0.
+<         FPACK(9+NWORD15+16) = 0.
+<         FPACK(9+NWORD15+17) = 0.
+<         FPACK(9+NWORD15+18) = 0.
+<         FPACK(9+NWORD15+19) = 0.
+<         FPACK(9+NWORD15+20) = 0.
+<         FPACK(9+NWORD15+23) = 0.
+<         FPACK(9+NWORD15+24) = 0.
+<         FPACK(9+NWORD15+25) = 0.
+---
+>         FPACK(9+NWORD13+7)  = 0.
+>         FPACK(9+NWORD13+8)  = 0.
+>         FPACK(9+NWORD13+9)  = 0.
+>         FPACK(9+NWORD13+10) = 0.
+>         FPACK(9+NWORD13+11) = 0.
+>         FPACK(9+NWORD13+12) = 0.
+>         FPACK(9+NWORD13+13) = 0.
+>         FPACK(9+NWORD13+14) = 0.
+>         FPACK(9+NWORD13+15) = 0.
+>         FPACK(9+NWORD13+16) = 0.
+>         FPACK(9+NWORD13+17) = 0.
+>         FPACK(9+NWORD13+18) = 0.
+>         FPACK(9+NWORD13+19) = 0.
+>         FPACK(9+NWORD13+20) = 0.
+>         FPACK(9+NWORD13+23) = 0.
+>         FPACK(9+NWORD13+24) = 0.
+>         FPACK(9+NWORD13+25) = 0.

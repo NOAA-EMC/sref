@@ -1,0 +1,170 @@
+#! /bin/ksh
+################################################################################
+# UNIX Script Documentation Block                                              #
+#                                                                              #
+# Script name:         exsref_wrfbufr.sh.sms                                   #
+# Script description:  makes sref mean bufr and gempak output                  #
+#                                                                              #
+# Author:     Geoff Manikin      Org: NP22      Date: 2012-03-14               #
+#                                                                              #
+# Script history log:                                                          #
+# 2007-07-30  Jun Du  - original script which served as starting point         #
+# 2012-03-14  Geoff Manikin - adapted code to make mean bufr products          #
+# 2015-02-26  Jun Du - modified for sref.v7.0.0 by eliminating nmm and         #
+#                      and increasing members for nmmb and arw                 #
+# 2016-11-07  Jun Du - Increased bufr station from 1642 to 1733                #
+#                                                                              #
+################################################################################
+set -x
+
+msg="JOB $job FOR SREF-MEANBUFR"
+postmsg "$jlogfile" "$msg"
+
+# ------------------------------------------------------------------------------
+# DIRECTORY WHERE THE BUFR-JOB IS DONE
+# ------------------------------------------------------------------------------
+cd $DATA
+
+## setup.sh  # no need, since using module load prod_util 
+
+export tmmark=tm00
+
+members="arw_ctl arw_p1 arw_n1 arw_p2 arw_n2 arw_p3 arw_n3 arw_p4 arw_n4 arw_p5 arw_n5 arw_p6 arw_n6
+ nmb_ctl nmb_p1 nmb_n1 nmb_p2 nmb_n2 nmb_p3 nmb_n3 nmb_p4 nmb_n4 nmb_p5 nmb_n5 nmb_p6 nmb_n6"
+counter=1
+
+for member in $members; do
+# check if the profilm file exists
+echo $COMIN_PROF
+if [ ! -s $COMIN_PROF/${member}.${cycle}.profilm.tm00 ]
+then
+  echo 'missing profilm for ${member};  meanbufr will not run'
+  exit
+fi
+
+cp ${COMIN_PROF}/${member}.${cycle}.profilm.tm00 profilm${counter}
+counter=` expr $counter + 1 `
+done
+
+#------------------
+# run mean bufr sounding program
+#------------------
+export XLFRTEOPTS="unit_vars=yes"
+cp $PARMsref/sref_sndp.parm.mono              nam_sndp.parm.mono
+cp $PARMsref/sref_bufr.tbl                    nam_bufr.tbl
+cp $PARMsref/sref_NMB_modtop.parm             modtop.parm
+
+export FORT11=$DATA/nam_sndp.parm.mono
+export FORT32=$DATA/nam_bufr.tbl
+
+export FORT41=$DATA/profilm1
+export FORT42=$DATA/profilm2
+export FORT43=$DATA/profilm3
+export FORT44=$DATA/profilm4
+export FORT45=$DATA/profilm5
+export FORT46=$DATA/profilm6
+export FORT47=$DATA/profilm7
+export FORT48=$DATA/profilm8
+export FORT49=$DATA/profilm9
+export FORT50=$DATA/profilm10
+export FORT51=$DATA/profilm11
+export FORT52=$DATA/profilm12
+export FORT53=$DATA/profilm13
+export FORT54=$DATA/profilm14
+export FORT55=$DATA/profilm15
+export FORT56=$DATA/profilm16
+export FORT57=$DATA/profilm17
+export FORT58=$DATA/profilm18
+export FORT59=$DATA/profilm19
+export FORT60=$DATA/profilm20
+export FORT61=$DATA/profilm21
+export FORT62=$DATA/profilm22
+export FORT63=$DATA/profilm23
+export FORT64=$DATA/profilm24
+export FORT65=$DATA/profilm25
+export FORT66=$DATA/profilm26
+
+export FORT84=$DATA/class1.bufr
+
+$EXECsref/sref_meansndp < modtop.parm >> meansndp.out
+
+#----------------------------
+# breakout bufr per station
+#----------------------------
+cp class1.bufr $COMIN_PROF/srefmean.t${CYC}z.class1.bufr.${tmmark}
+
+mkdir -p $COMIN_PROF/srefmean
+cat <<EOF > stnmlist_input
+1
+class1.bufr
+$COMIN_PROF/srefmean/srefmean
+EOF
+
+export FORT20=class1.bufr
+date
+#mpirun.lsf $EXECnam/nam_stnmlist < stnmlist_input > nam_stnmlist.out
+mpirun.lsf $EXECsref/sref_stnmlist < stnmlist_input > sref_stnmlist.out
+
+if [ "$SENDDBN" = 'YES' ]; then
+  $DBNROOT/bin/dbn_alert MODEL SREF_MEANBUFR $job \
+    $COMIN_PROF/srefmean.t${CYC}z.class1.bufr.${tmmark}
+fi
+
+############## WANG ###################################
+# Tar and gzip the individual bufr files and send them to /com
+cd ${COMIN_PROF}/srefmean
+tar -cf - . | /usr/bin/gzip > ../srefmean.${cycle}.bufrsnd.tar.gz
+cd $DATA
+
+#Send the alerts
+if test "$SENDDBN" = 'YES'
+  then
+   $DBNROOT/bin/dbn_alert MODEL SREF_MEANBUFRSND_TAR $job $COMIN_PROF/srefmean.${cycle}.bufrsnd.tar.gz
+fi
+############## WANG ############################################
+
+echo "sndp done!"
+
+#------------------
+# run GEMPAK
+#------------------
+ls -l
+mkdir -p $COMOUT/gempak
+#PARMgempak3=${NWROOTp1}/gempak/nawips3/gempak/tables/pack
+PARMgempak1=${NWROOTp1}/gempak/nawips1/gempak/tables/pack
+# PARMgempak is the same as PARMgempak1
+${NWROOTp1}/ush/cwordsh block class1.bufr class1.bufr_blk
+. ${NWROOTp1}/gempak/.gempak
+/bin/rm -f *.nts
+        
+namsnd << EOF > /dev/null
+ SNBUFR   = class1.bufr_blk
+ SNOUTF   = bufr.snd
+ SFOUTF   = bufr.sfc+
+ SNPRMF   = $PARMgempak1/sneta.prm
+ SFPRMF   = $PARMgempak1/sfeta.prm
+ TIMSTN   = 88/1733
+        
+l
+ru
+exit
+EOF
+
+mv bufr.snd      $COMOUT/gempak/srefmean.${PDY}${CYC}.snd
+mv bufr.sfc      $COMOUT/gempak/srefmean.${PDY}${CYC}.sfc
+mv bufr.sfc_aux  $COMOUT/gempak/srefmean.${PDY}${CYC}.sfc_aux
+
+if [ "$SENDDBN" = 'YES' ]; then
+  $DBNROOT/bin/dbn_alert MODEL SREF_SNDMEAN $job \
+    $COMOUT/gempak/srefmean.${PDY}${CYC}.snd
+  $DBNROOT/bin/dbn_alert MODEL SREF_SFCMEAN $job \
+    $COMOUT/gempak/srefmean.${PDY}${CYC}.sfc
+  $DBNROOT/bin/dbn_alert MODEL SREF_SFCMEAN $job \
+    $COMOUT/gempak/srefmean.${PDY}${CYC}.sfc_aux
+fi
+
+    
+exit
+# ------------------------------------------------------------------------------
+#                                             END
+# -----------------------------------------------------------------------------

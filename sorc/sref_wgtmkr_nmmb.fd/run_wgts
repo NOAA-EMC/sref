@@ -1,0 +1,40 @@
+#!/bin/ksh
+
+#=======================================================================
+#-- Instructions are in the README file
+#=======================================================================
+
+set -x
+
+mkdir -p /stmp/Jun.Du/holdwgts11
+cd /stmp/Jun.Du/holdwgts11
+
+#-- Specify domain, wgtmkr executable
+domain=sref16
+wgtmkr_exe=/meso/save/Jun.Du/sref.v6.1.0/sorc/sref_wgtmkr_nmmb.fd/wgtmkr.xc
+
+if [ ! -x $wgtmkr_exe ]; then
+   echo Cannot find $wgtmkr_exe ... exit
+   exit
+fi
+
+rm fort.51 input
+
+##grids="005 006 101 104 110 150 151 180 181 182 183 207 209 211 212 215 216 217 218 221 237 242 243"
+##grids="197 218"
+#grids="212 221 216 243 132"
+grids="132"
+
+# 191 is the native input grid (specified and should be identical in both WGTMKR.f and w3fi71.f)
+for grid in $grids ; do
+   wgt=sref_nmmb_wgt_g${grid}
+   cat > input << !
+191
+$grid
+!
+##   ln -sf /meso/save/wx20er/launcher/nmmb/wgtmkr/griddef_na12exp fort.15
+   ln -sf $wgt fort.51
+   $wgtmkr_exe < input > wgtmkr_${domain}_${grid}.out
+done
+
+exit

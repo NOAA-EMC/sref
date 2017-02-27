@@ -1,0 +1,58 @@
+#BSUB -J %E%sref_cluster_%CYC%
+#BSUB -o /%COM%/output/%ENVIR%/today/sref_cluster_%CYC%.o%J
+#BSUB -e /%COM%/output/%ENVIR%/today/sref_cluster_%CYC%.o%J
+#BSUB -cwd /tmpnwprd
+#BSUB -L /bin/sh
+#BSUB -q %QUEUE%_shared
+#BSUB -W 02:00
+#BSUB -P %PROJ%
+#BSUB -n 1
+#BSUB -R rusage[mem=5000] -R affinity[core]
+#BSUB -a poe
+
+%include <head.h>
+%include <envir-p2.h>
+%include <envir-p2.h>
+
+
+set -x
+module load grib_util
+
+export cyc=%CYC%
+
+#  PURPOSE:      To execute the SREF Post Processing
+
+
+
+# versions file for SREF model $sref_ver
+VERSION_FILE=$NWROOT/versions/sref.ver
+if [ -f $VERSION_FILE ]; then
+  . $VERSION_FILE
+else
+  exit
+fi
+
+$NWROOT/sref.${sref_ver}/jobs/JSREF_CLUSTER
+
+if [ $? -ne 0 ]; then
+  ecflow_client --msg="***JOB ${ECF_NAME} ERROR RUNNING J-SCRIPT ***"
+  ecflow_client --abort
+  exit
+fi
+
+
+%include <tail.h>
+%manual
+######################################################################
+#
+#
+######################################################################
+
+######################################################################
+# Job specific troubleshooting instructions:
+#  see generic troubleshoot manual page
+#
+######################################################################
+
+# include manual page below
+%end

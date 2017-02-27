@@ -1,0 +1,195 @@
+#!/bin/sh
+############################################
+# Set up environment for ensemble products job
+# initial program, Jun Du, 2001
+# change log:
+# 10/23/2003, Jun Du: use $REGPAIR (for Eta members)
+#               and $RSMPAIR to replace $TOTALPAIR to
+#               deal with different ensemble size in
+#               the two components
+# 06/16/2005, Jun Du: (1) extend forecast lead time from 63hr
+#               to 87hr; (2) call multiple grids in stead of
+#               212 one grid only
+# 9/20/2009, Julia Zhu   Scripts are modified to be sharable
+#                        between EMC and NCO
+#         Please note that variable "RUN_ENVIR" is set and used
+#         in the development enviroment only.
+# 11/15/2011, Jun Du: modified to new 2012 version of SREF (v6.0)
+#             and added hourly output capability
+# 05/01/2012, Jun Du: added a new 16km grid (g132)
+#
+# Instruction: This job is particularly for the 16km g132. Please submit 
+#              this job 8 times simutaneously by setting the parameter 
+#              order=1,2,3,4,5,6,7,8, respectively. Note: The first job 
+#              uses 2 tasks, while the rest (2-8) use 4 tasks.
+############################################
+set -xa
+export OMP_NUM_THREADS=1
+export MP_EUIDEVICE=sn_all
+export MP_EUILIB=us
+export MP_MPILIB=mpich2
+export MP_TASK_AFFINITY=core:1
+
+#
+# Specify whether the run is production or development
+#
+export RUN_ENVIR=${RUN_ENVIR:-nco}
+
+#####################################################################################
+# Run config file to get input parameters
+# This config file should define the following variables
+# DATA_IN: Location of working directory, default to ${DATAROOT}
+# DEV_SMS: If the job is to be running using ecFflow, default to YES
+# SENDDBN: Set to NO for developers, default to YES
+# COM_IN:  Directory for input files, default to ${COMROOT}/$NET/${envir}
+# COM_OUT: Directory for output file, default to ${COMROOT}/$NET/${envir}
+# gespath: Directory for the guess or restart files, default to ${GESROOT}/${envir}
+#####################################################################################
+if [ "$RUN_ENVIR" != nco ]      ### For Developers, "group_name" is passed from the ecFflow script
+then
+  CONFIG_FILE=${CONFIG_FILE:-/meso/save/${LOGNAME}/sref.v7.0.0/parm/sref_para_config_wcoss}
+  . $CONFIG_FILE
+  export userid=$LOGNAME
+  export DATA_IN=${DATA_IN:-/ptmpp1/$userid}
+fi
+
+###############################################################
+# This block can be modified for different test environment
+###############################################################
+if [ $RUN_ENVIR = nco -a $envir != prod ]; then
+  export SENDDBN=${SENDDBN:-NO}
+# export DBNROOT=${NWROOTp1}/spa_util/fakedbn
+# export jlogfile=${jlogfile:-${COMROOT}/logs/${envir}/jlogfile}
+fi
+
+echo `date` $0 `date -u` begin
+export PS4='$SECONDS + '
+
+########################################################### 
+# obtain unique process id (pid) and make temp directories
+###########################################################
+export pid=$$
+export DATA_IN=${DATA_IN:-${DATAROOT}}
+
+export DATA=$DATA_IN/${job}.${pid}
+rm -rf $DATA
+mkdir -p $DATA
+
+cd $DATA
+
+####################################
+# File To Log Msgs
+####################################
+export jlogfile=${jlogfile:-${COMROOT}/logs/jlogfiles/jlogfile.${job}.${pid}}
+
+####################################
+# Determine Job Output Name on System
+####################################
+export outid="LL$job"
+export jobid="${outid}.o${pid}"
+export pgmout="OUTPUT.${pid}"
+
+export cycle=t${cyc}z 
+
+###############################
+# Specify NET and RUN name
+##############################
+export NET=sref
+export RUN=sref
+
+##################################################
+# SAVEGES  - Copy Files From TMPDIR to $GESdir
+# SENDECF  - Flag Events on ecFflow
+# SENDCOM  - Copy Files From TMPDIR to $COMOUT
+# SENDDBN  - Issue DBNet Client Calls
+# RERUN    - Rerun fcst from beginning (default no)
+##################################################
+export SENDCOM=${SENDCOM:-YES}
+export SENDECF=${SENDECF:-YES}
+export SENDDBN=${SENDDBN:-YES}
+
+export HOMEsref=${HOMEsref:-${NWROOT}/${NET}.${sref_ver}}
+export EXECsref=${EXECsref:-$HOMEsref/exec}
+export FIXsref=${FIXsref:-$HOMEsref/fix}
+export PARMsref=${PARMsref:-$HOMEsref/parm}
+export USHsref=${USHsref:-$HOMEsref/ush}
+
+#export SPCfix=${SPCfix:-$HOMEsref/fix}
+
+export HOMEspc=${HOMEspc:-${NWROOT}/spcsref.${spcsref_ver}}
+export SPCfix=${SPCfix:-$HOMEspc/fix}
+
+###################################
+# Load the GRIB Utilities module
+####################################
+. /usrx/local/Modules/default/init/ksh
+module load grib_util
+ 
+
+###################################
+# Set up the UTILITIES
+###################################
+# Run setup to initialize working directory and utility scripts
+## setup.sh  # no need, since using module load prod_util 
+
+# Run setpdy and initialize PDY variables
+setpdy.sh
+. ./PDY
+
+#############################################
+# COMIN and COMOUT
+#############################################
+export COM_IN=${COM_IN:-${COMROOT}/${NET}/${envir}}
+export COM_OUT=${COM_OUT:-${COMROOT}/${NET}/${envir}}
+
+export COMIN=$COM_IN/${RUN}.${PDY}/${cyc}/pgrb
+export COMOUT=$COM_OUT/${RUN}.${PDY}/${cyc}/ensprod
+export COMOUT_TRACK=$COM_OUT/${RUN}.${PDY}/${cyc}/track
+
+mkdir -p -m 775 $COMOUT $COMOUT_TRACK
+ 
+env
+
+#######################################################
+# Pass information which is needed to run the Script
+#######################################################
+export ENDHOUR=87
+export INCHOUR=3
+
+########################################################
+# Execute the script
+########################################################
+mkdir -p $DATA/132_3hrly
+cd $DATA/132_3hrly
+$HOMEsref/scripts/exsref_enspost.sh.ecf  3hrly 132 $DATA/132_3hrly 111 $order > $DATA/132_3hrly.out 2>&1
+
+export err=$?; err_chk
+
+#############################################
+# Run run sref_trak_ave.sh to compute the
+# SREF ensemble mean cyclone forecast tracks.
+#############################################
+if [ ${RUN_TCTRACK} = 'YES' ]
+then
+  export cmodel=sref
+  export srefdir=$COMOUT
+  export COM=$COMOUT_TRACK
+  sh $utilscript/ens_trak_ave.sh
+fi
+
+cd $DATA
+cat $DATA/132_3hrly.out >>$pgmout
+
+########################################################
+cat $pgmout
+
+msg="JOB COMPLETED NORMALLY"
+postmsg "$jlogfile" "$msg"
+
+################################
+# Remove the Working Directory
+################################
+cd $DATA_IN
+if [ ${RM_TMPDIR:-YES} = YES ] ; then rm -rf $DATA ; fi
+
+date

@@ -1,0 +1,47 @@
+#!/bin/ksh -l
+
+#PBS -o _SREFDIR_/run/sref_prep__MODEL___MEMBER_.log
+#PBS -j oe
+#PBS -N SREF_PREP__MODEL___MEMBER_
+#PBS -A rm
+#PBS -l procs=36
+#PBS -l walltime=1:00:00
+
+set -aeux
+
+trap 'echo "SREF error _MODEL_ _MEMBER_ PREP" >> /ptmp/Dusan.Jovic/tmpnwprd/jlogfile_sref' INT TERM ERR
+echo "SREF started _MODEL_ _MEMBER_ PREP" >> /ptmp/Dusan.Jovic/tmpnwprd/jlogfile_sref
+
+module load intel
+module load mpt
+module load netcdf
+module load adaptive
+module load grads
+
+export PATH=$PATH:/home/George.Vandenberghe/nwprod/util/exec
+
+cd $PBS_O_WORKDIR
+
+export RUN_ENVIR=para
+export envir=para
+export job=$$
+
+export CONFIG_FILE=_SREFDIR_/parm/sref_para_config_zeus
+
+export PDY=_PDY_
+export cyc=_CYC_
+export FLENGTH=_FLENGTH_
+export INCR=_INCR_
+export MODEL=_MODEL_
+export MEMBER=_MEMBER_
+export IOFORM=_IOFORM_
+export RES=_RES_
+export MACHINE=_MACHINE_
+
+_SREFDIR_/jobs/JSREF_WRF_PREP.sms.prod
+
+echo "SREF finished _MODEL_ _MEMBER_ PREP" >> /ptmp/Dusan.Jovic/tmpnwprd/jlogfile_sref
+
+qsub _SREFDIR_/run/SREF_REAL__MODEL___MEMBER_.qsub
+echo "SREF waiting _MODEL_ _MEMBER_ REAL" >> /ptmp/Dusan.Jovic/tmpnwprd/jlogfile_sref
+

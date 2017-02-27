@@ -1,0 +1,58 @@
+#!/bin/bash
+
+#BSUB -oo _SREFDIR_/run/sref_bufr__MODEL___MEMBER_.log
+#BSUB -eo _SREFDIR_/run/sref_bufr__MODEL___MEMBER_.log
+#BSUB -J SREF_BUFR__MODEL___MEMBER_
+#BSUB -n 1
+##BSUB -x
+#BSUB -R span[ptile=1]
+##BSUB -R "rusage[mem=2000]"
+##BSUB -R affinity[core(2):distribute=balance] 
+#BSUB -W 01:30
+#BSUB -P SREF-T2O
+#BSUB -q "devhigh"
+##BSUB -q "prod_class1"
+#BSUB -a poe
+
+set -aeux
+
+trap 'echo "SREF error _MODEL_ _MEMBER_ BUFR" >> /ptmpp1/$LOGNAME/tmpnwprd/jlogfile_sref' INT TERM ERR
+echo "SREF started _MODEL_ _MEMBER_ BUFR" >> /ptmpp1/$LOGNAME/tmpnwprd/jlogfile_sref
+
+. /usrx/local/Modules/3.2.9/init/bash
+module load ibmpe
+module load ics
+
+export OMP_NUM_THREADS=1
+export MP_EUIDEVICE=sn_all
+export MP_EUILIB=us
+export MP_MPILIB=mpich2
+export MP_TASK_AFFINITY=core:1
+
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usrx/local/NetCDF/3.6.3/lib
+
+
+export RUN_ENVIR=para
+export envir=prod
+export job=$$
+
+export CONFIG_FILE=_SREFDIR_/parm/sref_para_config_wcoss
+
+export PDY=_PDY_
+export cyc=_CYC_
+export LENGTH=_FLENGTH_
+export ENDHOUR=_FLENGTH_
+export INCR=_INCR_
+export MODEL=_MODEL_
+export MEMBER=_MEMBER_
+export RES=_RES_
+export MACHINE=_MACHINE_
+export N_TASK=$LSB_DJOB_NUMPROC
+
+_SREFDIR_/jobs/JSREF_WRF_BUFR
+
+echo "SREF finished _MODEL_ _MEMBER_ BUFR" >> /ptmpp1/$LOGNAME/tmpnwprd/jlogfile_sref
+
+#bsub < _SREFDIR_/run/SREF_POST__MODEL___MEMBER_.bsub
+#echo "SREF waiting _MODEL_ _MEMBER_ POST" >> /ptmpp1/$LOGNAME/tmpnwprd/jlogfile_sref
+

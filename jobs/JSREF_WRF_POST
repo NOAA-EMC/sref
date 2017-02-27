@@ -1,0 +1,270 @@
+#!/bin/sh
+########################################
+# Set up environment for WRF ENSEMBLE POST
+# change log:
+# 09/xx/2005, Jun Du - initial implementation
+# 07/18/2008, Jun Du - upgrade to WRFv2.2
+# MEMBER names, i.e., MODEL(MEMBER....) = NMB(ctl,p01,n01,p02,n02,p03,n03)
+# NMM(ctl,p01,n01,p02,n02,p03,n03) and ARW(ctl,p01,n01,p02,n02,p03,n03)
+# simutaneously!!!!!
+# This job should be lunched at the same time as the FCST job to shorten
+# the entire SREF system running time window
+# 9/20/2009, Julia Zhu   Scripts are modified to be sharable
+#                        between EMC and NCO
+# 4/15/2010, Jun Du  Generalized the script to run NEMS-NMMB
+#                    ensemble (MODEL=NMB)
+########################################
+set -aeux
+export PS4='$SECONDS + '
+
+export OMP_NUM_THREADS=1
+export MP_MPILIB=mpich2
+export MP_I_BINDPROC=NO
+
+###################################
+# Load the GRIB Utilities module
+####################################
+. /usrx/local/Modules/default/init/ksh
+module load grib_util
+
+#
+# Specify whether the run is production or development
+#
+export RUN_ENVIR=${RUN_ENVIR:-nco}
+
+#####################################################################################
+# Run config file to get input parameters
+# This config file should define the following variables
+# DATA_IN: Location of working directory, default to ${DATAROOT}
+# DEV_SMS: If the job is to be running using ecFflow, default to YES
+# SENDDBN: Set to NO for developers, default to YES
+# COM_IN:  Directory for input files, default to ${COMROOT}/$NET/${envir}
+# COM_OUT: Directory for output file, default to ${COMROOT}/$NET/${envir}
+# gespath: Directory for the guess or restart files, default to ${GESROOT}/${envir}
+#####################################################################################
+if [ "$RUN_ENVIR" != nco ]      ### For Developers, "group_name" is passed from the ecFflow script
+then
+  CONFIG_FILE=${CONFIG_FILE:-/meso/save/${LOGNAME}/sref${NWROOTp1}/parm/sref_para_config}
+  . $CONFIG_FILE
+  export userid=$LOGNAME
+  export DATA_IN=${DATA_IN:-/ptmpp1/$userid}
+fi
+
+###############################################################
+# This block can be modified for different test environment
+###############################################################
+if [ $RUN_ENVIR = nco -a $envir != prod ]; then
+  export SENDDBN=${SENDDBN:-NO}
+# export DBNROOT=${NWROOTp1}/spa_util/fakedbn
+# export jlogfile=${jlogfile:-${COMROOT}/logs/${envir}/jlogfile}
+fi
+
+echo `date` $0 `date -u` begin
+
+export CYC=${CYC:-${cyc}}
+export MEMBER=${MEMBER:-ctl}
+export MODEL=${MODEL:-ARW}
+export RES=${RES:-16km}
+export runflag=${runflag:-3hrly}
+export OUTGRD=${OUTGRD:-255}
+
+########################################################### 
+# obtain unique process id (pid) and make temp directories
+# Note: ctl member needs to be run only once and can be used 
+# for both NMM and ARW cores!
+###########################################################
+export pid=$$
+export DATA_IN=${DATA_IN:-${DATAROOT}}
+
+export DATA=$DATA_IN/sref_${MODEL}_post${runflag}${OUTGRD}_${CYC}_${envir}
+export WORK_DIR=$DATA/post.$MEMBER
+
+# Remove old directory if it exists
+rm -rf $WORK_DIR
+mkdir -p $WORK_DIR
+
+while [ ! -d $WORK_DIR ]
+do
+   mkdir -p $WORK_DIR
+done
+
+cd $WORK_DIR
+
+####################################
+# File To Log Msgs
+####################################
+export jlogfile=${jlogfile:-${COMROOT}/logs/jlogfiles/jlogfile.${job}.${pid}}
+
+####################################
+# Determine Job Output Name on System
+####################################
+export outid="LL$job"
+export jobid="${outid}.o${pid}"
+export pgmout="OUTPUT.${pid}"
+
+export cycle=t${cyc}z 
+
+###############################
+# Specify NET and RUN name
+##############################
+export NET=sref
+export RUN=sref
+
+##################################################
+# SAVEGES  - Copy Files From TMPDIR to $GESdir
+# SENDECF  - Flag Events on ecFflow
+# SENDCOM  - Copy Files From TMPDIR to $COMOUT
+# SENDDBN  - Issue DBNet Client Calls
+# RERUN    - Rerun fcst from beginning (default no)
+##################################################
+export SENDCOM=${SENDCOM:-YES}
+export SENDECF=${SENDECF:-YES}
+export SENDDBN=${SENDDBN:-YES}
+export RUN_TCTRACK=${RUN_TCTRACK:-NO}
+export RERUN=${RERUN:-NO}
+
+export HOMEsref=${HOMEsref:-${NWROOT}/${NET}.${sref_ver}}
+export EXECsref=${EXECsref:-$HOMEsref/exec}
+export FIXsref=${FIXsref:-$HOMEsref/fix}
+export PARMsref=${PARMsref:-$HOMEsref/parm}
+export USHsref=${USHsref:-$HOMEsref/ush}
+
+###################################
+# Set up the UTILITIES
+###################################
+machine=`hostname |cut -c1`
+if [ $machine = t -o $machine = g ]; then
+  export MACHINE=wcoss
+fi
+
+if [ $MACHINE == zeus ]; then
+  export utilscript=/scratch2/portfolios/NCEPDEV/meso/save/$USER${NWROOTp1}/util/ush
+  export utilexec=/scratch2/portfolios/NCEPDEV/meso/save/$USER${NWROOTp1}/util/exec
+fi
+
+# Run setup to initialize working directory and utility scripts
+## setup.sh  # no need, since using module load prod_util 
+
+# Run setpdy and initialize PDY variables
+setpdy.sh
+. ./PDY
+
+#############################################
+# COMIN and COMOUT
+#############################################
+export COM_IN=${COM_IN:-${COMROOT}/${NET}/${envir}}
+export COM_OUT=${COM_OUT:-${COMROOT}/${NET}/${envir}}
+
+export COMIN=$COM_IN/${RUN}.${PDY}
+export COMOUT=$COM_OUT/${RUN}.${PDY}/$cyc/pgrb
+export COMOUT_TRACK=$COM_OUT/${RUN}.${PDY}/$CYC/track
+
+mkdir -p -m 775 $COMOUT $COMOUT_TRACK
+ 
+env
+
+########################################
+# Define forecast hour and interval
+########################################
+if [ $runflag = "hrly" ]
+then
+  export SFHR=01
+  export FLENGTH=38
+  export INCR=01
+else
+  export SFHR=00
+  export FLENGTH=${FLENGTH:-87}
+  export INCR=03
+fi
+
+if [ $MODEL = NMM ];then CORE=nmm;fi
+#if [ $MODEL = ARW ];then CORE=em;fi
+if [ $MODEL = ARW ];then CORE=arw;fi
+if [ $MODEL = NMB ];then CORE=nmb;fi
+
+if test -s $COMOUT/${RUN}_${CORE}${OUTGRD}.t${CYC}z.$MEMBER.${runflag}.control
+then
+   modelrecvy=`cat < $COMOUT/${RUN}_${CORE}${OUTGRD}.t${CYC}z.$MEMBER.${runflag}.control`
+   recvy_pdy=`echo $modelrecvy | cut -c1-8`
+   recvy_cyc=`echo $modelrecvy | cut -c9-10`
+   recvy_shour=`echo $modelrecvy | cut -c11-13`
+
+   if test $RERUN = "NO"
+   then
+      NEW_SHOUR=`expr $recvy_shour + $INCR`
+      if test $NEW_SHOUR -ge $SFHR
+      then
+         export SFHR=$NEW_SHOUR
+         if [ $SFHR -lt 10 ]; then SFHR=0$SFHR; fi
+      fi
+      if test $recvy_shour -ge $FLENGTH
+      then
+         msg="Forecast Post Already Completed to $FLENGTH"
+         postmsg "$jlogfile" "$msg"
+      else
+         msg="add message here"
+         postmsg "$jlogfile" "$msg"
+      fi
+   fi
+fi
+
+export IOFORM=2
+########################################################
+# Execute the script.
+########################################################
+export FCSTDIR=$DATA_IN/sref_${MODEL}_fcst_${CYC}_${envir}/fcst.$MEMBER
+
+$HOMEsref/scripts/exsref_wrfpost.sh.ecf
+
+if [ ${runflag} != "hrly" ]
+then
+  # Create the one file per member for NAWIPS
+  if [ $MODEL = NMM ];then export model=nmm;fi
+# if [ $MODEL = ARW ];then export model=em;fi
+  if [ $MODEL = ARW ];then export model=arw;fi
+  if [ $MODEL = NMB ];then export model=nmb;fi
+  if [ $MEMBER = ctl ];then export member=ctl;fi
+  if [ $MEMBER = n01 ];then export member=n1;fi
+  if [ $MEMBER = n02 ];then export member=n2;fi
+  if [ $MEMBER = n03 ];then export member=n3;fi
+  if [ $MEMBER = n04 ];then export member=n4;fi
+  if [ $MEMBER = n05 ];then export member=n5;fi
+  if [ $MEMBER = n06 ];then export member=n6;fi
+  if [ $MEMBER = p01 ];then export member=p1;fi
+  if [ $MEMBER = p02 ];then export member=p2;fi
+  if [ $MEMBER = p03 ];then export member=p3;fi
+  if [ $MEMBER = p04 ];then export member=p4;fi
+  if [ $MEMBER = p05 ];then export member=p5;fi
+  if [ $MEMBER = p06 ];then export member=p6;fi
+  export memberlist=$member
+
+  export COMIN=$COMIN/${CYC}/pgrb
+  ksh $USHsref/sref_thin_post.sh
+
+ #
+ # Run the cyclone tracker
+ #
+ if [ ${RUN_TCTRACK} = 'YES' ]
+ then
+  export cmodel=sref
+  export sref_pert=$member
+  export sref_model=$model
+  export srefdir=$COMOUT
+  export COM=$COMOUT_TRACK
+  sh $utilscript/extrkr.sh
+ fi
+fi
+
+########################################################
+#cat $pgmout
+
+msg="JOB COMPLETED NORMALLY"
+postmsg "$jlogfile" "$msg"
+
+################################
+# Remove the Working Directory
+################################
+cd $DATA_IN
+if [ ${RM_TMPDIR:-NO} = YES ] ; then rm -rf $DATA ; fi
+
+date
