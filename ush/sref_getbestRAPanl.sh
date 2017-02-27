@@ -53,6 +53,40 @@ case $HH00 in
      rap2=$COMINrap/rap.$PDY01/rap.t${HH01}z.awp130pgrbf01.grib2
      rap3=$COMINrap/rap.$PDY02/rap.t${HH02}z.awp130pgrbf02.grib2
      rap4=$COMINrap/rap.$PDY03/rap.t${HH03}z.awp130pgrbf03.grib2;;
+
+# Note this new larger domain data has several extra pressure levels including 75mb
+#00) rap1=$COMINrap/rap.$PDY00/rap.t${HH00}z.awip32f00.grib2
+#    rap2=$COMINrap/rap.$PDY01/rap.t${HH01}z.awip32f01.grib2
+#    rap3=$COMINrap/rap.$PDY02/rap.t${HH02}z.awip32f02.grib2
+#    rap4=$COMINrap/rap.$PDY03/rap.t${HH03}z.awip32f03.grib2;;
+#03) rap1=$COMINrap/rap.$PDY00/rap.t${HH00}z.awip32f00.grib2
+#    rap2=$COMINrap/rap.$PDY01/rap.t${HH01}z.awip32f01.grib2
+#    rap3=$COMINrap/rap.$PDY02/rap.t${HH02}z.awip32f02.grib2
+#    rap4=$COMINrap/rap.$PDY03/rap.t${HH03}z.awip32f03.grib2;;
+#06) rap1=$COMINrap/rap.$PDY00/rap.t${HH00}z.awip32f00.grib2
+#    rap2=$COMINrap/rap.$PDY01/rap.t${HH01}z.awip32f01.grib2
+#    rap3=$COMINrap/rap.$PDY02/rap.t${HH02}z.awip32f02.grib2
+#    rap4=$COMINrap/rap.$PDY03/rap.t${HH03}z.awip32f03.grib2;;
+#09) rap1=$COMINrap/rap.$PDY00/rap.t${HH00}z.awip32f00.grib2
+#    rap2=$COMINrap/rap.$PDY01/rap.t${HH01}z.awip32f01.grib2
+#    rap3=$COMINrap/rap.$PDY02/rap.t${HH02}z.awip32f02.grib2
+#    rap4=$COMINrap/rap.$PDY03/rap.t${HH03}z.awip32f03.grib2;;
+#12) rap1=$COMINrap/rap.$PDY00/rap.t${HH00}z.awip32f00.grib2
+#    rap2=$COMINrap/rap.$PDY01/rap.t${HH01}z.awip32f01.grib2
+#    rap3=$COMINrap/rap.$PDY02/rap.t${HH02}z.awip32f02.grib2
+#    rap4=$COMINrap/rap.$PDY03/rap.t${HH03}z.awip32f03.grib2;;
+#15) rap1=$COMINrap/rap.$PDY00/rap.t${HH00}z.awip32f00.grib2
+#    rap2=$COMINrap/rap.$PDY01/rap.t${HH01}z.awip32f01.grib2
+#    rap3=$COMINrap/rap.$PDY02/rap.t${HH02}z.awip32f02.grib2
+#    rap4=$COMINrap/rap.$PDY03/rap.t${HH03}z.awip32f03.grib2;;
+#18) rap1=$COMINrap/rap.$PDY00/rap.t${HH00}z.awip32f00.grib2
+#    rap2=$COMINrap/rap.$PDY01/rap.t${HH01}z.awip32f01.grib2
+#    rap3=$COMINrap/rap.$PDY02/rap.t${HH02}z.awip32f02.grib2
+#    rap4=$COMINrap/rap.$PDY03/rap.t${HH03}z.awip32f03.grib2;;
+#21) rap1=$COMINrap/rap.$PDY00/rap.t${HH00}z.awip32f00.grib2
+#    rap2=$COMINrap/rap.$PDY01/rap.t${HH01}z.awip32f01.grib2
+#    rap3=$COMINrap/rap.$PDY02/rap.t${HH02}z.awip32f02.grib2
+#    rap4=$COMINrap/rap.$PDY03/rap.t${HH03}z.awip32f03.grib2;;
 esac
 
 if [ -s $rap1 ]; then
