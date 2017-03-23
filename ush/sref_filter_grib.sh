@@ -22,6 +22,7 @@ $WGRIB -s ${GRIBFILE} | grep -v ":1 mb:" \\
                                | grep -v ":3 mb:" \\
                                | grep -v ":5 mb:" \\
                                | grep -v ":7 mb:" \\
+                               | grep -v ":75 mb:" \\
                                | $WGRIB -i -grib ${GRIBFILE} -o ${GRIBFILE}_new
 mv ${GRIBFILE}_new ${GRIBFILE}
 END_OF_JOB
@@ -44,6 +45,7 @@ else
                                  | grep -v ":3 mb:" \
                                  | grep -v ":5 mb:" \
                                  | grep -v ":7 mb:" \
+                                 | grep -v ":75 mb:" \
                                  | ${WGRIB} -i -grib ${GRIBFILE} -o new_grib_file
   
   mv new_grib_file ${GRIBFILE}
