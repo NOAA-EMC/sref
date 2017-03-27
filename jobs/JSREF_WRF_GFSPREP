@@ -163,7 +163,8 @@ mkdir -p -m 775 $COMOUT $GFSOUT
 export cyc MEMBER
 export CYC=${cyc}
 export START=00
-export LENGTH=186
+#export LENGTH=186
+export LENGTH=84
 export DATE=$PDY
  
 env
