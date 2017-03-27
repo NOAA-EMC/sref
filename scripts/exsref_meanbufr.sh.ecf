@@ -12,6 +12,7 @@
 # 2012-03-14  Geoff Manikin - adapted code to make mean bufr products          #
 # 2015-02-26  Jun Du - modified for sref.v7.0.0 by eliminating nmm and         #
 #                      and increasing members for nmmb and arw                 #
+# 2016-11-07  Jun Du - Increased bufr station from 1642 to 1733                #
 #                                                                              #
 ################################################################################
 set -x
@@ -142,7 +143,7 @@ namsnd << EOF > /dev/null
  SFOUTF   = bufr.sfc+
  SNPRMF   = $PARMgempak1/sneta.prm
  SFPRMF   = $PARMgempak1/sfeta.prm
- TIMSTN   = 88/1642
+ TIMSTN   = 88/1733
         
 l
 ru
