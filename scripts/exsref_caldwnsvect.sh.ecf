@@ -16,12 +16,14 @@
 #  12/02/2011: Jun Du, rewrote the scripts, excluded sfc PRES and added 
 #                      2m q, tested and implemented for the operational SREF
 #  03/13/2015: Jun Du, modified to the 2-model and 6-member SREF.v7.0.0
+#  10/19/2016: Jun Du, modified to read in new NAM.v4 ndas data
 #
 ################################################################
 set -x
 
 #export WGRIB=${WGRIB:-${NWROOTp1}/util/exec/wgrib}
 #export COPYGB=${COPYGB:-${NWROOTp1}/util/exec/copygb}
+#export CNVGRIB=${CNVGRIB:-${NWROOTp1}/util/exec/cnvgrib}
 
 #################################################
 ### I: Obtaining RTMA data on 5km NDFD grid                   
@@ -71,109 +73,141 @@ grid='255 3 1073 689 20191 238445 8 265000 5079 5079 0 64 25000 25000 0 0 0'
 
 if [ $cyc = 03 ];then
  if [ $anlcyc = 00 ];then
-  infile=$COMINnam/nam.$PDY/nam.t00z.awphys00.tm00
+  $CNVGRIB -g21 $COMINnam/nam.$PDY/nam.t00z.awphys00.tm00.grib2 nam.t00z.awphys00.tm00
+  infile=nam.t00z.awphys00.tm00
  fi
  if [ $anlcyc = 03 ];then
-  infile=$COMINnam/ndas.$PDY/ndas.t06z.awphys00.tm03
+  $CNVGRIB -g21 $COMINnam/nam.$PDY/nam.t06z.awphys00.tm03.grib2 ndas.t06z.awphys00.tm03
+  infile=ndas.t06z.awphys00.tm03
  fi
  if [ $anlcyc = 06 ];then
-  infile=$COMINnam/nam.$PDYm1/nam.t06z.awphys00.tm00
+  $CNVGRIB -g21 $COMINnam/nam.$PDYm1/nam.t06z.awphys00.tm00.grib2 nam.t06z.awphys00.tm00
+  infile=nam.t06z.awphys00.tm00
  fi
  if [ $anlcyc = 09 ];then
-  infile=$COMINnam/ndas.$PDYm1/ndas.t12z.awphys00.tm03
+  $CNVGRIB -g21 $COMINnam/nam.$PDYm1/nam.t12z.awphys00.tm03.grib2 ndas.t12z.awphys00.tm03
+  infile=ndas.t12z.awphys00.tm03
  fi
  if [ $anlcyc = 12 ];then
-  infile=$COMINnam/nam.$PDYm1/nam.t12z.awphys00.tm00
+  $CNVGRIB -g21 $COMINnam/nam.$PDYm1/nam.t12z.awphys00.tm00.grib2 nam.t12z.awphys00.tm00
+  infile=nam.t12z.awphys00.tm00
  fi
  if [ $anlcyc = 15 ];then
-  infile=$COMINnam/ndas.$PDYm1/ndas.t18z.awphys00.tm03
+  $CNVGRIB -g21 $COMINnam/nam.$PDYm1/nam.t18z.awphys00.tm03.grib2 ndas.t18z.awphys00.tm03
+  infile=ndas.t18z.awphys00.tm03
  fi
  if [ $anlcyc = 18 ];then
-  infile=$COMINnam/nam.$PDYm1/nam.t18z.awphys00.tm00
+  $CNVGRIB -g21 $COMINnam/nam.$PDYm1/nam.t18z.awphys00.tm00.grib2 nam.t18z.awphys00.tm00
+  infile=nam.t18z.awphys00.tm00
  fi
  if [ $anlcyc = 21 ];then
-  infile=$COMINnam/ndas.$PDY/ndas.t00z.awphys00.tm03
+  $CNVGRIB -g21 $COMINnam/nam.$PDY/nam.t00z.awphys00.tm03.grib2 ndas.t00z.awphys00.tm03
+  infile=ndas.t00z.awphys00.tm03
  fi
 fi
 
 if [ $cyc = 09 ];then
  if [ $anlcyc = 00 ];then
-  infile=$COMINnam/nam.$PDY/nam.t00z.awphys00.tm00
+  $CNVGRIB -g21 $COMINnam/nam.$PDY/nam.t00z.awphys00.tm00.grib2 nam.t00z.awphys00.tm00
+  infile=nam.t00z.awphys00.tm00
  fi
  if [ $anlcyc = 03 ];then
-  infile=$COMINnam/ndas.$PDY/ndas.t06z.awphys00.tm03
+  $CNVGRIB -g21 $COMINnam/nam.$PDY/nam.t06z.awphys00.tm03.grib2 ndas.t06z.awphys00.tm03
+  infile=ndas.t06z.awphys00.tm03
  fi
  if [ $anlcyc = 06 ];then
-  infile=$COMINnam/nam.$PDY/nam.t06z.awphys00.tm00
+  $CNVGRIB -g21 $COMINnam/nam.$PDY/nam.t06z.awphys00.tm00.grib2 nam.t06z.awphys00.tm00
+  infile=nam.t06z.awphys00.tm00
  fi
  if [ $anlcyc = 09 ];then
-  infile=$COMINnam/ndas.$PDY/ndas.t12z.awphys00.tm03
+  $CNVGRIB -g21 $COMINnam/nam.$PDY/nam.t12z.awphys00.tm03.grib2 ndas.t12z.awphys00.tm03
+  infile=ndas.t12z.awphys00.tm03
  fi
  if [ $anlcyc = 12 ];then
-  infile=$COMINnam/nam.$PDYm1/nam.t12z.awphys00.tm00
+  $CNVGRIB -g21 $COMINnam/nam.$PDYm1/nam.t12z.awphys00.tm00.grib2 nam.t12z.awphys00.tm00
+  infile=nam.t12z.awphys00.tm00
  fi
  if [ $anlcyc = 15 ];then
-  infile=$COMINnam/ndas.$PDYm1/ndas.t18z.awphys00.tm03
+  $CNVGRIB -g21 $COMINnam/nam.$PDYm1/nam.t18z.awphys00.tm03.grib2 ndas.t18z.awphys00.tm03
+  infile=ndas.t18z.awphys00.tm03
  fi
  if [ $anlcyc = 18 ];then
-  infile=$COMINnam/nam.$PDYm1/nam.t18z.awphys00.tm00
+  $CNVGRIB -g21 $COMINnam/nam.$PDYm1/nam.t18z.awphys00.tm00.grib2 nam.t18z.awphys00.tm00
+  infile=nam.t18z.awphys00.tm00
  fi
  if [ $anlcyc = 21 ];then
-  infile=$COMINnam/ndas.$PDY/ndas.t00z.awphys00.tm03
+  $CNVGRIB -g21 $COMINnam/nam.$PDY/nam.t00z.awphys00.tm03.grib2 ndas.t00z.awphys00.tm03
+  infile=ndas.t00z.awphys00.tm03
  fi
 fi
 
 if [ $cyc = 15 ];then
  if [ $anlcyc = 00 ];then
-  infile=$COMINnam/nam.$PDY/nam.t00z.awphys00.tm00
+  $CNVGRIB -g21 $COMINnam/nam.$PDY/nam.t00z.awphys00.tm00.grib2 nam.t00z.awphys00.tm00
+  infile=nam.t00z.awphys00.tm00
  fi
  if [ $anlcyc = 03 ];then
-  infile=$COMINnam/ndas.$PDY/ndas.t06z.awphys00.tm03
+  $CNVGRIB -g21 $COMINnam/nam.$PDY/nam.t06z.awphys00.tm03.grib2 ndas.t06z.awphys00.tm03
+  infile=ndas.t06z.awphys00.tm03
  fi
  if [ $anlcyc = 06 ];then
-  infile=$COMINnam/nam.$PDY/nam.t06z.awphys00.tm00
+  $CNVGRIB -g21 $COMINnam/nam.$PDY/nam.t06z.awphys00.tm00.grib2 nam.t06z.awphys00.tm00
+  infile=nam.t06z.awphys00.tm00
  fi
  if [ $anlcyc = 09 ];then
-  infile=$COMINnam/ndas.$PDY/ndas.t12z.awphys00.tm03
+  $CNVGRIB -g21 $COMINnam/nam.$PDY/nam.t12z.awphys00.tm03.grib2 ndas.t12z.awphys00.tm03
+  infile=ndas.t12z.awphys00.tm03
  fi
  if [ $anlcyc = 12 ];then
-  infile=$COMINnam/nam.$PDY/nam.t12z.awphys00.tm00
+  $CNVGRIB -g21 $COMINnam/nam.$PDY/nam.t12z.awphys00.tm00.grib2 nam.t12z.awphys00.tm00
+  infile=nam.t12z.awphys00.tm00
  fi
  if [ $anlcyc = 15 ];then
-  infile=$COMINnam/ndas.$PDY/ndas.t18z.awphys00.tm03
+  $CNVGRIB -g21 $COMINnam/nam.$PDY/nam.t18z.awphys00.tm03.grib2 ndas.t18z.awphys00.tm03
+  infile=ndas.t18z.awphys00.tm03
  fi
  if [ $anlcyc = 18 ];then
-  infile=$COMINnam/nam.$PDYm1/nam.t18z.awphys00.tm00
+  $CNVGRIB -g21 $COMINnam/nam.$PDYm1/nam.t18z.awphys00.tm00.grib2 nam.t18z.awphys00.tm00
+  infile=nam.t18z.awphys00.tm00
  fi
  if [ $anlcyc = 21 ];then
-  infile=$COMINnam/ndas.$PDY/ndas.t00z.awphys00.tm03
+  $CNVGRIB -g21 $COMINnam/nam.$PDY/nam.t00z.awphys00.tm03.grib2 ndas.t00z.awphys00.tm03
+  infile=ndas.t00z.awphys00.tm03
  fi
 fi
 
 if [ $cyc = 21 ];then
  if [ $anlcyc = 00 ];then
-  infile=$COMINnam/nam.$PDY/nam.t00z.awphys00.tm00
+  $CNVGRIB -g21 $COMINnam/nam.$PDY/nam.t00z.awphys00.tm00.grib2 nam.t00z.awphys00.tm00
+  infile=nam.t00z.awphys00.tm00
  fi
  if [ $anlcyc = 03 ];then
-  infile=$COMINnam/ndas.$PDY/ndas.t06z.awphys00.tm03
+  $CNVGRIB -g21 $COMINnam/nam.$PDY/nam.t06z.awphys00.tm03.grib2 ndas.t06z.awphys00.tm03
+  infile=ndas.t06z.awphys00.tm03
  fi
  if [ $anlcyc = 06 ];then
-  infile=$COMINnam/nam.$PDY/nam.t06z.awphys00.tm00
+  $CNVGRIB -g21 $COMINnam/nam.$PDY/nam.t06z.awphys00.tm00.grib2 nam.t06z.awphys00.tm00
+  infile=nam.t06z.awphys00.tm00
  fi
  if [ $anlcyc = 09 ];then
-  infile=$COMINnam/ndas.$PDY/ndas.t12z.awphys00.tm03
+  $CNVGRIB -g21 $COMINnam/nam.$PDY/nam.t12z.awphys00.tm03.grib2 ndas.t12z.awphys00.tm03
+  infile=ndas.t12z.awphys00.tm03
  fi
  if [ $anlcyc = 12 ];then
-  infile=$COMINnam/nam.$PDY/nam.t12z.awphys00.tm00
+  $CNVGRIB -g21 $COMINnam/nam.$PDY/nam.t12z.awphys00.tm00.grib2 nam.t12z.awphys00.tm00
+  infile=nam.t12z.awphys00.tm00
  fi
  if [ $anlcyc = 15 ];then
-  infile=$COMINnam/ndas.$PDY/ndas.t18z.awphys00.tm03
+  $CNVGRIB -g21 $COMINnam/nam.$PDY/nam.t18z.awphys00.tm03.grib2 ndas.t18z.awphys00.tm03
+  infile=ndas.t18z.awphys00.tm03
  fi
  if [ $anlcyc = 18 ];then
-  infile=$COMINnam/nam.$PDY/nam.t18z.awphys00.tm00
+  $CNVGRIB -g21 $COMINnam/nam.$PDY/nam.t18z.awphys00.tm00.grib2 nam.t18z.awphys00.tm00
+  infile=nam.t18z.awphys00.tm00
  fi
  if [ $anlcyc = 21 ];then
-  infile=$COMINnam/ndas.$PDYp1/ndas.t00z.awphys00.tm03
+  $CNVGRIB -g21 $COMINnam/nam.$PDYp1/nam.t00z.awphys00.tm03.grib2 ndas.t00z.awphys00.tm03
+  infile=ndas.t00z.awphys00.tm03
  fi
 fi
 
