@@ -12,6 +12,7 @@
 #  7/16/2007:  Jun Du, initial implementation for the SREF operation
 #  10/6/2009:  Jun Du and Julia Zhu, added a check point to make sure 
 #              that NDAS exists
+#  10/18/2016: Jun Du, modified to read in new NAM.v4 ndas data
 #  
 ################################################################
 #!/bin/ksh
@@ -67,184 +68,187 @@ adate0=$yy0$mm0$dd0
 #########################################
 echo 'beginning copy of NDAS analysis...'
 if [ $hh = 00 ]; then
- cp $COMINnam/nam.$adate0/nam.t00z.awip3d00.tm00 grib212.ndas.f00
- cp $COMINnam/nam.$adate0/nam.t06z.awip3d00.tm00 grib212.ndas.f06
- cp $COMINnam/nam.$adate0/nam.t12z.awip3d00.tm00 grib212.ndas.f12
- cp $COMINnam/nam.$adate0/nam.t18z.awip3d00.tm00 grib212.ndas.f18
- cp $COMINnam/nam.$adate1/nam.t00z.awip3d00.tm00 grib212.ndas.f24
- cp $COMINnam/nam.$adate1/nam.t06z.awip3d00.tm00 grib212.ndas.f30
- cp $COMINnam/nam.$adate1/nam.t12z.awip3d00.tm00 grib212.ndas.f36
- cp $COMINnam/nam.$adate1/nam.t18z.awip3d00.tm00 grib212.ndas.f42
- cp $COMINnam/nam.$adate2/nam.t00z.awip3d00.tm00 grib212.ndas.f48
- cp $COMINnam/nam.$adate2/nam.t06z.awip3d00.tm00 grib212.ndas.f54
- cp $COMINnam/nam.$adate2/nam.t12z.awip3d00.tm00 grib212.ndas.f60
- cp $COMINnam/nam.$adate2/nam.t18z.awip3d00.tm00 grib212.ndas.f66
- cp $COMINnam/nam.$adate3/nam.t00z.awip3d00.tm00 grib212.ndas.f72
- cp $COMINnam/nam.$adate3/nam.t06z.awip3d00.tm00 grib212.ndas.f78
- cp $COMINnam/nam.$adate3/nam.t12z.awip3d00.tm00 grib212.ndas.f84
+ $CNVGRIB -g21 $COMINnam/nam.$adate0/nam.t00z.awip3d00.tm00.grib2 grib212.ndas.f00
+ $CNVGRIB -g21 $COMINnam/nam.$adate0/nam.t06z.awip3d00.tm00.grib2 grib212.ndas.f06
+ $CNVGRIB -g21 $COMINnam/nam.$adate0/nam.t12z.awip3d00.tm00.grib2 grib212.ndas.f12
+ $CNVGRIB -g21 $COMINnam/nam.$adate0/nam.t18z.awip3d00.tm00.grib2 grib212.ndas.f18
+ $CNVGRIB -g21 $COMINnam/nam.$adate1/nam.t00z.awip3d00.tm00.grib2 grib212.ndas.f24
+ $CNVGRIB -g21 $COMINnam/nam.$adate1/nam.t06z.awip3d00.tm00.grib2 grib212.ndas.f30
+ $CNVGRIB -g21 $COMINnam/nam.$adate1/nam.t12z.awip3d00.tm00.grib2 grib212.ndas.f36
+ $CNVGRIB -g21 $COMINnam/nam.$adate1/nam.t18z.awip3d00.tm00.grib2 grib212.ndas.f42
+ $CNVGRIB -g21 $COMINnam/nam.$adate2/nam.t00z.awip3d00.tm00.grib2 grib212.ndas.f48
+ $CNVGRIB -g21 $COMINnam/nam.$adate2/nam.t06z.awip3d00.tm00.grib2 grib212.ndas.f54
+ $CNVGRIB -g21 $COMINnam/nam.$adate2/nam.t12z.awip3d00.tm00.grib2 grib212.ndas.f60
+ $CNVGRIB -g21 $COMINnam/nam.$adate2/nam.t18z.awip3d00.tm00.grib2 grib212.ndas.f66
+ $CNVGRIB -g21 $COMINnam/nam.$adate3/nam.t00z.awip3d00.tm00.grib2 grib212.ndas.f72
+ $CNVGRIB -g21 $COMINnam/nam.$adate3/nam.t06z.awip3d00.tm00.grib2 grib212.ndas.f78
+ $CNVGRIB -g21 $COMINnam/nam.$adate3/nam.t12z.awip3d00.tm00.grib2 grib212.ndas.f84
 
- cp $COMINnam/ndas.$adate0/ndas.t06z.awphys00.tm03 ndas_raw_03
+ $CNVGRIB -g21 $COMINnam/nam.$adate0/nam.t06z.awphys00.tm03.grib2 ndas_raw_03
  ${COPYGB} -x -g 212 ndas_raw_03    grib212.ndas.f03
- cp $COMINnam/ndas.$adate0/ndas.t12z.awphys00.tm03 ndas_raw_09
+ $CNVGRIB -g21 $COMINnam/nam.$adate0/nam.t12z.awphys00.tm03.grib2 ndas_raw_09
  ${COPYGB} -x -g 212 ndas_raw_09    grib212.ndas.f09
- cp $COMINnam/ndas.$adate0/ndas.t18z.awphys00.tm03 ndas_raw_15
+ $CNVGRIB -g21 $COMINnam/nam.$adate0/nam.t18z.awphys00.tm03.grib2 ndas_raw_15
  ${COPYGB} -x -g 212 ndas_raw_15    grib212.ndas.f15
- cp $COMINnam/ndas.$adate1/ndas.t00z.awphys00.tm03 ndas_raw_21
+ $CNVGRIB -g21 $COMINnam/nam.$adate1/nam.t00z.awphys00.tm03.grib2 ndas_raw_21
  ${COPYGB} -x -g 212 ndas_raw_21    grib212.ndas.f21
- cp $COMINnam/ndas.$adate1/ndas.t06z.awphys00.tm03 ndas_raw_27
+ $CNVGRIB -g21 $COMINnam/nam.$adate1/nam.t06z.awphys00.tm03.grib2 ndas_raw_27
  ${COPYGB} -x -g 212 ndas_raw_27    grib212.ndas.f27
- cp $COMINnam/ndas.$adate1/ndas.t12z.awphys00.tm03 ndas_raw_33
+ $CNVGRIB -g21 $COMINnam/nam.$adate1/nam.t12z.awphys00.tm03.grib2 ndas_raw_33
  ${COPYGB} -x -g 212 ndas_raw_33    grib212.ndas.f33
- cp $COMINnam/ndas.$adate1/ndas.t18z.awphys00.tm03 ndas_raw_39
+ $CNVGRIB -g21 $COMINnam/nam.$adate1/nam.t18z.awphys00.tm03.grib2 ndas_raw_39
  ${COPYGB} -x -g 212 ndas_raw_39    grib212.ndas.f39
- cp $COMINnam/ndas.$adate2/ndas.t00z.awphys00.tm03 ndas_raw_45
+ $CNVGRIB -g21 $COMINnam/nam.$adate2/nam.t00z.awphys00.tm03.grib2 ndas_raw_45
  ${COPYGB} -x -g 212 ndas_raw_45    grib212.ndas.f45
- cp $COMINnam/ndas.$adate2/ndas.t06z.awphys00.tm03 ndas_raw_51
+ $CNVGRIB -g21 $COMINnam/nam.$adate2/nam.t06z.awphys00.tm03.grib2 ndas_raw_51
  ${COPYGB} -x -g 212 ndas_raw_51    grib212.ndas.f51
- cp $COMINnam/ndas.$adate2/ndas.t12z.awphys00.tm03 ndas_raw_57
+ $CNVGRIB -g21 $COMINnam/nam.$adate2/nam.t12z.awphys00.tm03.grib2 ndas_raw_57
  ${COPYGB} -x -g 212 ndas_raw_57    grib212.ndas.f57
- cp $COMINnam/ndas.$adate2/ndas.t18z.awphys00.tm03 ndas_raw_63
+ $CNVGRIB -g21 $COMINnam/nam.$adate2/nam.t18z.awphys00.tm03.grib2 ndas_raw_63
  ${COPYGB} -x -g 212 ndas_raw_63    grib212.ndas.f63
- cp $COMINnam/ndas.$adate3/ndas.t00z.awphys00.tm03 ndas_raw_69
+ $CNVGRIB -g21 $COMINnam/nam.$adate3/nam.t00z.awphys00.tm03.grib2 ndas_raw_69
  ${COPYGB} -x -g 212 ndas_raw_69    grib212.ndas.f69
- cp $COMINnam/ndas.$adate3/ndas.t06z.awphys00.tm03 ndas_raw_75
+ $CNVGRIB -g21 $COMINnam/nam.$adate3/nam.t06z.awphys00.tm03.grib2 ndas_raw_75
  ${COPYGB} -x -g 212 ndas_raw_75    grib212.ndas.f75
- cp $COMINnam/ndas.$adate3/ndas.t12z.awphys00.tm03 ndas_raw_81
+ $CNVGRIB -g21 $COMINnam/nam.$adate3/nam.t12z.awphys00.tm03.grib2 ndas_raw_81
  ${COPYGB} -x -g 212 ndas_raw_81    grib212.ndas.f81
 fi
 if [ $hh = 06 ]; then
- cp $COMINnam/nam.$adate0/nam.t06z.awip3d00.tm00 grib212.ndas.f00
- cp $COMINnam/nam.$adate0/nam.t12z.awip3d00.tm00 grib212.ndas.f06
- cp $COMINnam/nam.$adate0/nam.t18z.awip3d00.tm00 grib212.ndas.f12
- cp $COMINnam/nam.$adate1/nam.t00z.awip3d00.tm00 grib212.ndas.f18
- cp $COMINnam/nam.$adate1/nam.t06z.awip3d00.tm00 grib212.ndas.f24
- cp $COMINnam/nam.$adate1/nam.t12z.awip3d00.tm00 grib212.ndas.f30
- cp $COMINnam/nam.$adate1/nam.t18z.awip3d00.tm00 grib212.ndas.f36
- cp $COMINnam/nam.$adate2/nam.t00z.awip3d00.tm00 grib212.ndas.f42
- cp $COMINnam/nam.$adate2/nam.t06z.awip3d00.tm00 grib212.ndas.f48
- cp $COMINnam/nam.$adate2/nam.t12z.awip3d00.tm00 grib212.ndas.f54
- cp $COMINnam/nam.$adate2/nam.t18z.awip3d00.tm00 grib212.ndas.f60
- cp $COMINnam/nam.$adate3/nam.t00z.awip3d00.tm00 grib212.ndas.f66
- cp $COMINnam/nam.$adate3/nam.t06z.awip3d00.tm00 grib212.ndas.f72
- cp $COMINnam/nam.$adate3/nam.t12z.awip3d00.tm00 grib212.ndas.f78
- cp $COMINnam/nam.$adate3/nam.t18z.awip3d00.tm00 grib212.ndas.f84
- cp $COMINnam/ndas.$adate0/ndas.t12z.awphys00.tm03 ndas_raw_03
+ $CNVGRIB -g21 $COMINnam/nam.$adate0/nam.t06z.awip3d00.tm00 grib212.ndas.f00
+ $CNVGRIB -g21 $COMINnam/nam.$adate0/nam.t12z.awip3d00.tm00 grib212.ndas.f06
+ $CNVGRIB -g21 $COMINnam/nam.$adate0/nam.t18z.awip3d00.tm00 grib212.ndas.f12
+ $CNVGRIB -g21 $COMINnam/nam.$adate1/nam.t00z.awip3d00.tm00 grib212.ndas.f18
+ $CNVGRIB -g21 $COMINnam/nam.$adate1/nam.t06z.awip3d00.tm00 grib212.ndas.f24
+ $CNVGRIB -g21 $COMINnam/nam.$adate1/nam.t12z.awip3d00.tm00 grib212.ndas.f30
+ $CNVGRIB -g21 $COMINnam/nam.$adate1/nam.t18z.awip3d00.tm00 grib212.ndas.f36
+ $CNVGRIB -g21 $COMINnam/nam.$adate2/nam.t00z.awip3d00.tm00 grib212.ndas.f42
+ $CNVGRIB -g21 $COMINnam/nam.$adate2/nam.t06z.awip3d00.tm00 grib212.ndas.f48
+ $CNVGRIB -g21 $COMINnam/nam.$adate2/nam.t12z.awip3d00.tm00 grib212.ndas.f54
+ $CNVGRIB -g21 $COMINnam/nam.$adate2/nam.t18z.awip3d00.tm00 grib212.ndas.f60
+ $CNVGRIB -g21 $COMINnam/nam.$adate3/nam.t00z.awip3d00.tm00 grib212.ndas.f66
+ $CNVGRIB -g21 $COMINnam/nam.$adate3/nam.t06z.awip3d00.tm00 grib212.ndas.f72
+ $CNVGRIB -g21 $COMINnam/nam.$adate3/nam.t12z.awip3d00.tm00 grib212.ndas.f78
+ $CNVGRIB -g21 $COMINnam/nam.$adate3/nam.t18z.awip3d00.tm00 grib212.ndas.f84
+
+ $CNVGRIB -g21 $COMINnam/nam.$adate0/nam.t12z.awphys00.tm03.grib2 ndas_raw_03
  ${COPYGB} -x -g 212 ndas_raw_03    grib212.ndas.f03
- cp $COMINnam/ndas.$adate0/ndas.t18z.awphys00.tm03 ndas_raw_09
+ $CNVGRIB -g21 $COMINnam/nam.$adate0/nam.t18z.awphys00.tm03.grib2 ndas_raw_09
  ${COPYGB} -x -g 212 ndas_raw_09    grib212.ndas.f09
- cp $COMINnam/ndas.$adate1/ndas.t00z.awphys00.tm03 ndas_raw_15
+ $CNVGRIB -g21 $COMINnam/nam.$adate1/nam.t00z.awphys00.tm03.grib2 ndas_raw_15
  ${COPYGB} -x -g 212 ndas_raw_15    grib212.ndas.f15
- cp $COMINnam/ndas.$adate1/ndas.t06z.awphys00.tm03 ndas_raw_21
+ $CNVGRIB -g21 $COMINnam/nam.$adate1/nam.t06z.awphys00.tm03.grib2 ndas_raw_21
  ${COPYGB} -x -g 212 ndas_raw_21    grib212.ndas.f21
- cp $COMINnam/ndas.$adate1/ndas.t12z.awphys00.tm03 ndas_raw_27
+ $CNVGRIB -g21 $COMINnam/nam.$adate1/nam.t12z.awphys00.tm03.grib2 ndas_raw_27
  ${COPYGB} -x -g 212 ndas_raw_27    grib212.ndas.f27
- cp $COMINnam/ndas.$adate1/ndas.t18z.awphys00.tm03 ndas_raw_33
+ $CNVGRIB -g21 $COMINnam/nam.$adate1/nam.t18z.awphys00.tm03.grib2 ndas_raw_33
  ${COPYGB} -x -g 212 ndas_raw_33   grib212.ndas.f33 
- cp $COMINnam/ndas.$adate2/ndas.t00z.awphys00.tm03 ndas_raw_39
+ $CNVGRIB -g21 $COMINnam/nam.$adate2/nam.t00z.awphys00.tm03.grib2 ndas_raw_39
  ${COPYGB} -x -g 212 ndas_raw_39    grib212.ndas.f39
- cp $COMINnam/ndas.$adate2/ndas.t06z.awphys00.tm03 ndas_raw_45
+ $CNVGRIB -g21 $COMINnam/nam.$adate2/nam.t06z.awphys00.tm03.grib2 ndas_raw_45
  ${COPYGB} -x -g 212 ndas_raw_45    grib212.ndas.f45
- cp $COMINnam/ndas.$adate2/ndas.t12z.awphys00.tm03 ndas_raw_51
+ $CNVGRIB -g21 $COMINnam/nam.$adate2/nam.t12z.awphys00.tm03.grib2 ndas_raw_51
  ${COPYGB} -x -g 212 ndas_raw_51    grib212.ndas.f51
- cp $COMINnam/ndas.$adate2/ndas.t18z.awphys00.tm03 ndas_raw_57
+ $CNVGRIB -g21 $COMINnam/nam.$adate2/nam.t18z.awphys00.tm03.grib2 ndas_raw_57
  ${COPYGB} -x -g 212 ndas_raw_57    grib212.ndas.f57
- cp $COMINnam/ndas.$adate3/ndas.t00z.awphys00.tm03 ndas_raw_63
+ $CNVGRIB -g21 $COMINnam/nam.$adate3/nam.t00z.awphys00.tm03.grib2 ndas_raw_63
  ${COPYGB} -x -g 212 ndas_raw_63    grib212.ndas.f63
- cp $COMINnam/ndas.$adate3/ndas.t06z.awphys00.tm03 ndas_raw_69
+ $CNVGRIB -g21 $COMINnam/nam.$adate3/nam.t06z.awphys00.tm03.grib2 ndas_raw_69
  ${COPYGB} -x -g 212 ndas_raw_69    grib212.ndas.f69
- cp $COMINnam/ndas.$adate3/ndas.t12z.awphys00.tm03 ndas_raw_75
+ $CNVGRIB -g21 $COMINnam/nam.$adate3/nam.t12z.awphys00.tm03.grib2 ndas_raw_75
  ${COPYGB} -x -g 212 ndas_raw_75    grib212.ndas.f75
- cp $COMINnam/ndas.$adate3/ndas.t18z.awphys00.tm03 ndas_raw_81
+ $CNVGRIB -g21 $COMINnam/nam.$adate3/nam.t18z.awphys00.tm03.grib2 ndas_raw_81
  ${COPYGB} -x -g 212 ndas_raw_81    grib212.ndas.f81
 fi
 if [ $hh = 12 ]; then
- cp $COMINnam/nam.$adate0/nam.t12z.awip3d00.tm00 grib212.ndas.f00
- cp $COMINnam/nam.$adate0/nam.t18z.awip3d00.tm00 grib212.ndas.f06
- cp $COMINnam/nam.$adate1/nam.t00z.awip3d00.tm00 grib212.ndas.f12
- cp $COMINnam/nam.$adate1/nam.t06z.awip3d00.tm00 grib212.ndas.f18
- cp $COMINnam/nam.$adate1/nam.t12z.awip3d00.tm00 grib212.ndas.f24
- cp $COMINnam/nam.$adate1/nam.t18z.awip3d00.tm00 grib212.ndas.f30
- cp $COMINnam/nam.$adate2/nam.t00z.awip3d00.tm00 grib212.ndas.f36
- cp $COMINnam/nam.$adate2/nam.t06z.awip3d00.tm00 grib212.ndas.f42
- cp $COMINnam/nam.$adate2/nam.t12z.awip3d00.tm00 grib212.ndas.f48
- cp $COMINnam/nam.$adate2/nam.t18z.awip3d00.tm00 grib212.ndas.f54
- cp $COMINnam/nam.$adate3/nam.t00z.awip3d00.tm00 grib212.ndas.f60
- cp $COMINnam/nam.$adate3/nam.t06z.awip3d00.tm00 grib212.ndas.f66
- cp $COMINnam/nam.$adate3/nam.t12z.awip3d00.tm00 grib212.ndas.f72
- cp $COMINnam/nam.$adate3/nam.t18z.awip3d00.tm00 grib212.ndas.f78
- cp $COMINnam/nam.$adate4/nam.t00z.awip3d00.tm00 grib212.ndas.f84
- cp $COMINnam/ndas.$adate0/ndas.t18z.awphys00.tm03 ndas_raw_03
+ $CNVGRIB -g21 $COMINnam/nam.$adate0/nam.t12z.awip3d00.tm00.grib2 grib212.ndas.f00
+ $CNVGRIB -g21 $COMINnam/nam.$adate0/nam.t18z.awip3d00.tm00.grib2 grib212.ndas.f06
+ $CNVGRIB -g21 $COMINnam/nam.$adate1/nam.t00z.awip3d00.tm00.grib2 grib212.ndas.f12
+ $CNVGRIB -g21 $COMINnam/nam.$adate1/nam.t06z.awip3d00.tm00.grib2 grib212.ndas.f18
+ $CNVGRIB -g21 $COMINnam/nam.$adate1/nam.t12z.awip3d00.tm00.grib2 grib212.ndas.f24
+ $CNVGRIB -g21 $COMINnam/nam.$adate1/nam.t18z.awip3d00.tm00.grib2 grib212.ndas.f30
+ $CNVGRIB -g21 $COMINnam/nam.$adate2/nam.t00z.awip3d00.tm00.grib2 grib212.ndas.f36
+ $CNVGRIB -g21 $COMINnam/nam.$adate2/nam.t06z.awip3d00.tm00.grib2 grib212.ndas.f42
+ $CNVGRIB -g21 $COMINnam/nam.$adate2/nam.t12z.awip3d00.tm00.grib2 grib212.ndas.f48
+ $CNVGRIB -g21 $COMINnam/nam.$adate2/nam.t18z.awip3d00.tm00.grib2 grib212.ndas.f54
+ $CNVGRIB -g21 $COMINnam/nam.$adate3/nam.t00z.awip3d00.tm00.grib2 grib212.ndas.f60
+ $CNVGRIB -g21 $COMINnam/nam.$adate3/nam.t06z.awip3d00.tm00.grib2 grib212.ndas.f66
+ $CNVGRIB -g21 $COMINnam/nam.$adate3/nam.t12z.awip3d00.tm00.grib2 grib212.ndas.f72
+ $CNVGRIB -g21 $COMINnam/nam.$adate3/nam.t18z.awip3d00.tm00.grib2 grib212.ndas.f78
+ $CNVGRIB -g21 $COMINnam/nam.$adate4/nam.t00z.awip3d00.tm00.grib2 grib212.ndas.f84
+
+ $CNVGRIB -g21 $COMINnam/nam.$adate0/nam.t18z.awphys00.tm03.grib2 ndas_raw_03
  ${COPYGB} -x -g 212 ndas_raw_03    grib212.ndas.f03
- cp $COMINnam/ndas.$adate1/ndas.t00z.awphys00.tm03 ndas_raw_09
+ $CNVGRIB -g21 $COMINnam/nam.$adate1/nam.t00z.awphys00.tm03.grib2 ndas_raw_09
  ${COPYGB} -x -g 212 ndas_raw_09    grib212.ndas.f09
- cp $COMINnam/ndas.$adate1/ndas.t06z.awphys00.tm03 ndas_raw_15
+ $CNVGRIB -g21 $COMINnam/nam.$adate1/nam.t06z.awphys00.tm03.grib2 ndas_raw_15
  ${COPYGB} -x -g 212 ndas_raw_15    grib212.ndas.f15
- cp $COMINnam/ndas.$adate1/ndas.t12z.awphys00.tm03 ndas_raw_21
+ $CNVGRIB -g21 $COMINnam/nam.$adate1/nam.t12z.awphys00.tm03.grib2 ndas_raw_21
  ${COPYGB} -x -g 212 ndas_raw_21    grib212.ndas.f21
- cp $COMINnam/ndas.$adate1/ndas.t18z.awphys00.tm03 ndas_raw_27
+ $CNVGRIB -g21 $COMINnam/nam.$adate1/nam.t18z.awphys00.tm03.grib2 ndas_raw_27
  ${COPYGB} -x -g 212 ndas_raw_27    grib212.ndas.f27
- cp $COMINnam/ndas.$adate2/ndas.t00z.awphys00.tm03 ndas_raw_33
+ $CNVGRIB -g21 $COMINnam/nam.$adate2/nam.t00z.awphys00.tm03.grib2 ndas_raw_33
  ${COPYGB} -x -g 212 ndas_raw_33    grib212.ndas.f33
- cp $COMINnam/ndas.$adate2/ndas.t06z.awphys00.tm03 ndas_raw_39
+ $CNVGRIB -g21 $COMINnam/nam.$adate2/nam.t06z.awphys00.tm03.grib2 ndas_raw_39
  ${COPYGB} -x -g 212 ndas_raw_39    grib212.ndas.f39
- cp $COMINnam/ndas.$adate2/ndas.t12z.awphys00.tm03 ndas_raw_45
+ $CNVGRIB -g21 $COMINnam/nam.$adate2/nam.t12z.awphys00.tm03.grib2 ndas_raw_45
  ${COPYGB} -x -g 212 ndas_raw_45    grib212.ndas.f45
- cp $COMINnam/ndas.$adate2/ndas.t18z.awphys00.tm03 ndas_raw_51
+ $CNVGRIB -g21 $COMINnam/nam.$adate2/nam.t18z.awphys00.tm03.grib2 ndas_raw_51
  ${COPYGB} -x -g 212 ndas_raw_51    grib212.ndas.f51
- cp $COMINnam/ndas.$adate3/ndas.t00z.awphys00.tm03 ndas_raw_57
+ $CNVGRIB -g21 $COMINnam/nam.$adate3/nam.t00z.awphys00.tm03.grib2 ndas_raw_57
  ${COPYGB} -x -g 212 ndas_raw_57    grib212.ndas.f57
- cp $COMINnam/ndas.$adate3/ndas.t06z.awphys00.tm03 ndas_raw_63
+ $CNVGRIB -g21 $COMINnam/nam.$adate3/nam.t06z.awphys00.tm03.grib2 ndas_raw_63
  ${COPYGB} -x -g 212 ndas_raw_63    grib212.ndas.f63
- cp $COMINnam/ndas.$adate3/ndas.t12z.awphys00.tm03 ndas_raw_69
+ $CNVGRIB -g21 $COMINnam/nam.$adate3/nam.t12z.awphys00.tm03.grib2 ndas_raw_69
  ${COPYGB} -x -g 212 ndas_raw_69    grib212.ndas.f69
- cp $COMINnam/ndas.$adate3/ndas.t18z.awphys00.tm03 ndas_raw_75
+ $CNVGRIB -g21 $COMINnam/nam.$adate3/nam.t18z.awphys00.tm03.grib2 ndas_raw_75
  ${COPYGB} -x -g 212 ndas_raw_75    grib212.ndas.f75
- cp $COMINnam/ndas.$adate4/ndas.t00z.awphys00.tm03 ndas_raw_81
+ $CNVGRIB -g21 $COMINnam/nam.$adate4/nam.t00z.awphys00.tm03.grib2 ndas_raw_81
  ${COPYGB} -x -g 212 ndas_raw_81    grib212.ndas.f81
 fi
 if [ $hh = 18 ]; then
- cp $COMINnam/nam.$adate0/nam.t18z.awip3d00.tm00 grib212.ndas.f00
- cp $COMINnam/nam.$adate1/nam.t00z.awip3d00.tm00 grib212.ndas.f06
- cp $COMINnam/nam.$adate1/nam.t06z.awip3d00.tm00 grib212.ndas.f12
- cp $COMINnam/nam.$adate1/nam.t12z.awip3d00.tm00 grib212.ndas.f18
- cp $COMINnam/nam.$adate1/nam.t18z.awip3d00.tm00 grib212.ndas.f24
- cp $COMINnam/nam.$adate2/nam.t00z.awip3d00.tm00 grib212.ndas.f30
- cp $COMINnam/nam.$adate2/nam.t06z.awip3d00.tm00 grib212.ndas.f36
- cp $COMINnam/nam.$adate2/nam.t12z.awip3d00.tm00 grib212.ndas.f42
- cp $COMINnam/nam.$adate2/nam.t18z.awip3d00.tm00 grib212.ndas.f48
- cp $COMINnam/nam.$adate3/nam.t00z.awip3d00.tm00 grib212.ndas.f54
- cp $COMINnam/nam.$adate3/nam.t06z.awip3d00.tm00 grib212.ndas.f60
- cp $COMINnam/nam.$adate3/nam.t12z.awip3d00.tm00 grib212.ndas.f66
- cp $COMINnam/nam.$adate3/nam.t18z.awip3d00.tm00 grib212.ndas.f72
- cp $COMINnam/nam.$adate4/nam.t00z.awip3d00.tm00 grib212.ndas.f78
- cp $COMINnam/nam.$adate4/nam.t06z.awip3d00.tm00 grib212.ndas.f84
- cp $COMINnam/ndas.$adate1/ndas.t00z.awphys00.tm03 ndas_raw_03
+ $CNVGRIB -g21 $COMINnam/nam.$adate0/nam.t18z.awip3d00.tm00.grib2 grib212.ndas.f00
+ $CNVGRIB -g21 $COMINnam/nam.$adate1/nam.t00z.awip3d00.tm00.grib2 grib212.ndas.f06
+ $CNVGRIB -g21 $COMINnam/nam.$adate1/nam.t06z.awip3d00.tm00.grib2 grib212.ndas.f12
+ $CNVGRIB -g21 $COMINnam/nam.$adate1/nam.t12z.awip3d00.tm00.grib2 grib212.ndas.f18
+ $CNVGRIB -g21 $COMINnam/nam.$adate1/nam.t18z.awip3d00.tm00.grib2 grib212.ndas.f24
+ $CNVGRIB -g21 $COMINnam/nam.$adate2/nam.t00z.awip3d00.tm00.grib2 grib212.ndas.f30
+ $CNVGRIB -g21 $COMINnam/nam.$adate2/nam.t06z.awip3d00.tm00.grib2 grib212.ndas.f36
+ $CNVGRIB -g21 $COMINnam/nam.$adate2/nam.t12z.awip3d00.tm00.grib2 grib212.ndas.f42
+ $CNVGRIB -g21 $COMINnam/nam.$adate2/nam.t18z.awip3d00.tm00.grib2 grib212.ndas.f48
+ $CNVGRIB -g21 $COMINnam/nam.$adate3/nam.t00z.awip3d00.tm00.grib2 grib212.ndas.f54
+ $CNVGRIB -g21 $COMINnam/nam.$adate3/nam.t06z.awip3d00.tm00.grib2 grib212.ndas.f60
+ $CNVGRIB -g21 $COMINnam/nam.$adate3/nam.t12z.awip3d00.tm00.grib2 grib212.ndas.f66
+ $CNVGRIB -g21 $COMINnam/nam.$adate3/nam.t18z.awip3d00.tm00.grib2 grib212.ndas.f72
+ $CNVGRIB -g21 $COMINnam/nam.$adate4/nam.t00z.awip3d00.tm00.grib2 grib212.ndas.f78
+ $CNVGRIB -g21 $COMINnam/nam.$adate4/nam.t06z.awip3d00.tm00.grib2 grib212.ndas.f84
+
+ $CNVGRIB -g21 $COMINnam/nam.$adate1/nam.t00z.awphys00.tm03.grib2 ndas_raw_03
  ${COPYGB} -x -g 212 ndas_raw_03    grib212.ndas.f03
- cp $COMINnam/ndas.$adate1/ndas.t06z.awphys00.tm03 ndas_raw_09
+ $CNVGRIB -g21 $COMINnam/nam.$adate1/nam.t06z.awphys00.tm03.grib2 ndas_raw_09
  ${COPYGB} -x -g 212 ndas_raw_09    grib212.ndas.f09
- cp $COMINnam/ndas.$adate1/ndas.t12z.awphys00.tm03 ndas_raw_15
+ $CNVGRIB -g21 $COMINnam/nam.$adate1/nam.t12z.awphys00.tm03.grib2 ndas_raw_15
  ${COPYGB} -x -g 212 ndas_raw_15    grib212.ndas.f15
- cp $COMINnam/ndas.$adate1/ndas.t18z.awphys00.tm03 ndas_raw_21
+ $CNVGRIB -g21 $COMINnam/nam.$adate1/nam.t18z.awphys00.tm03.grib2 ndas_raw_21
  ${COPYGB} -x -g 212 ndas_raw_21    grib212.ndas.f21
- cp $COMINnam/ndas.$adate2/ndas.t00z.awphys00.tm03 ndas_raw_27
+ $CNVGRIB -g21 $COMINnam/nam.$adate2/nam.t00z.awphys00.tm03.grib2 ndas_raw_27
  ${COPYGB} -x -g 212 ndas_raw_27    grib212.ndas.f27
- cp $COMINnam/ndas.$adate2/ndas.t06z.awphys00.tm03 ndas_raw_33
+ $CNVGRIB -g21 $COMINnam/nam.$adate2/nam.t06z.awphys00.tm03.grib2 ndas_raw_33
  ${COPYGB} -x -g 212 ndas_raw_33    grib212.ndas.f33
- cp $COMINnam/ndas.$adate2/ndas.t12z.awphys00.tm03 ndas_raw_39
+ $CNVGRIB -g21 $COMINnam/nam.$adate2/nam.t12z.awphys00.tm03.grib2 ndas_raw_39
  ${COPYGB} -x -g 212 ndas_raw_39    grib212.ndas.f39
- cp $COMINnam/ndas.$adate2/ndas.t18z.awphys00.tm03 ndas_raw_45
+ $CNVGRIB -g21 $COMINnam/nam.$adate2/nam.t18z.awphys00.tm03.grib2 ndas_raw_45
  ${COPYGB} -x -g 212 ndas_raw_45    grib212.ndas.f45
- cp $COMINnam/ndas.$adate3/ndas.t00z.awphys00.tm03 ndas_raw_51
+ $CNVGRIB -g21 $COMINnam/nam.$adate3/nam.t00z.awphys00.tm03.grib2 ndas_raw_51
  ${COPYGB} -x -g 212 ndas_raw_51    grib212.ndas.f51
- cp $COMINnam/ndas.$adate3/ndas.t06z.awphys00.tm03 ndas_raw_57
+ $CNVGRIB -g21 $COMINnam/nam.$adate3/nam.t06z.awphys00.tm03.grib2 ndas_raw_57
  ${COPYGB} -x -g 212 ndas_raw_57    grib212.ndas.f57
- cp $COMINnam/ndas.$adate3/ndas.t12z.awphys00.tm03 ndas_raw_63
+ $CNVGRIB -g21 $COMINnam/nam.$adate3/nam.t12z.awphys00.tm03.grib2 ndas_raw_63
  ${COPYGB} -x -g 212 ndas_raw_63    grib212.ndas.f63
- cp $COMINnam/ndas.$adate3/ndas.t18z.awphys00.tm03 ndas_raw_69
+ $CNVGRIB -g21 $COMINnam/nam.$adate3/nam.t18z.awphys00.tm03.grib2 ndas_raw_69
  ${COPYGB} -x -g 212 ndas_raw_69    grib212.ndas.f69
- cp $COMINnam/ndas.$adate4/ndas.t00z.awphys00.tm03 ndas_raw_75
+ $CNVGRIB -g21 $COMINnam/nam.$adate4/nam.t00z.awphys00.tm03.grib2 ndas_raw_75
  ${COPYGB} -x -g 212 ndas_raw_75    grib212.ndas.f75
- cp $COMINnam/ndas.$adate4/ndas.t06z.awphys00.tm03 ndas_raw_81
+ $CNVGRIB -g21 $COMINnam/nam.$adate4/nam.t06z.awphys00.tm03.grib2 ndas_raw_81
  ${COPYGB} -x -g 212 ndas_raw_81    grib212.ndas.f81
 fi
 
