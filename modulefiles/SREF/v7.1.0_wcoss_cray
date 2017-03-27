@@ -4,7 +4,7 @@
 ##  Change Log
 ##  04/16/2015: Jun Du, initial setting
 ##
-## SREF v8.0.0
+## SREF v7.1.0
 ## Check available modules: module avail
 ## Check path names: module load xxx
 ##                   env > output
@@ -16,10 +16,10 @@ puts stderr "for the Intel Compiler Suite $version\n"
 }
 module-whatis " SREF whatis description"
 
-set ver v8.0.0
+set ver v7.1.0
 
 set sys [uname sysname]
-set SREF /gpfs/hps/nco/ops/nwtest/sref.v8.0.0/modulefiles/SREF
+set SREF /gpfs/hps/nco/ops/nwtest/sref.v7.1.0/modulefiles/SREF
 set lname SREF
 
 module unuse /gpfs/hps/nco/ops/nwprod/lib/modulefiles
@@ -33,6 +33,8 @@ setenv C_COMP cc
 setenv C_COMP_MP cc
 
 # Known conflicts ???
+
+#module load grib_util/v1.0.3
 
 # Loading Intel Compiler Suite
 module load PrgEnv-intel
