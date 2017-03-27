@@ -15,6 +15,7 @@
 # 2011-08-03  Jun Du -  (1) updated codes for NMMv3.3 and ARWv3.3;             #
 #                       (2) generalized codes to apply to NMMB model too       #
 # 2015-02-25  Jun Du -  Increased members for ARW and NMMB and rename em to arw#
+# 2016-11-07  Jun Du -  Increased bufr station from 1642 to 1733               #
 #                                                                              #
 ################################################################################
 set -x
@@ -172,7 +173,7 @@ rm -f fort.*
 export pgm=sref_${MODEL}_bufr
 prep_step
 
-cp $PARMsref/sref_${CORE}_profdat_1642_$RES      profdat
+cp $PARMsref/sref_${CORE}_profdat_1733_$RES      profdat
 ln -sf profdat       fort.19
 ln -sf intermed.bufr fort.79
 #ln -sf itag          fort.11
@@ -275,7 +276,7 @@ namsnd << EOF > /dev/null
  SFOUTF   = bufr.sfc+
  SNPRMF   = $PARMgempak1/sneta.prm
  SFPRMF   = $PARMgempak1/sfeta.prm
- TIMSTN   = 88/1642
+ TIMSTN   = 88/1733
         
 l
 ru
