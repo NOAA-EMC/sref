@@ -21,6 +21,7 @@
 #                        simutaneously
 # 2013-12-17  Jeff McQueen  - removed seperate codes for CTL or perturbed members
 #                             by adding variable gmdl
+# 2017-02-27  Jun Du - the ctl (gfs) files are directly from gfs master pgrb files
 #
 ################################################################################
 
@@ -64,7 +65,12 @@ fhr=$whr
 while [ $fhr -le $last ]; do
   mkdir -p $DATA/${MEMBER}_$fhr
   echo "SUBMIT sref_prep_sig2pgb for" GFSCYC $gfscyc  MEMBER $MEMBER  MODEL $MODEL FHR $fhr
+
+if [ $MEMBER = "ctl" ];then
+  echo "$USHsref/sref_prep_gfspgrb.sh $DATE $gfscyc $MEMBER $MEMBER $fhr $res $MODEL >$DATA/postgb_${fhr}.out 2>&1" >>$DATA/cmdfile_$gmdl
+else
   echo "$USHsref/sref_prep_sig2pgb.sh $DATE $gfscyc $MEMBER $MEMBER $fhr $res $MODEL >$DATA/postgb_${fhr}.out 2>&1" >>$DATA/cmdfile_$gmdl
+fi
 
   if [ $fhr -lt 126 ]; then 
     INCR=3
@@ -73,7 +79,6 @@ while [ $fhr -le $last ]; do
   fi
 
   fhr=`expr $fhr + $INCR`
-# if [ $fhr -ge 126 ];then INCR=06;fi   #jtm (GEFS file increment change)
   if [ $fhr -lt 10 ];then fhr=0$fhr;fi
 done  
 chmod 775 $DATA/cmdfile_$gmdl   #jtm
