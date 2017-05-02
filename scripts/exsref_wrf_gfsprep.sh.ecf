@@ -95,7 +95,8 @@ echo "COMINgens" $COMINgens
 echo "COMINgfs" $COMINgfs
 cat cmdfile_$gmdl
 
-mpirun.lsf -cmdfile $DATA/cmdfile_$gmdl  -pgmmodel mpmd >${DATA}/postgbmpi_$fhr.out 2>&1 
+#mpirun.lsf -cmdfile $DATA/cmdfile_$gmdl  -pgmmodel mpmd >${DATA}/postgbmpi_$fhr.out 2>&1 
+aprun -n54 -N4 -d6 cfp $DATA/cmdfile_$gmdl >${DATA}/postgbmpi_$fhr.out 2>&1 
 export err=$?; err_chk
 
 rm -f flxfile sigfile
