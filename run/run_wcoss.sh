@@ -2,15 +2,15 @@
 
 set -aeux
 
-SREFDIR=/meso/save/${LOGNAME}/sref.v7.0.0
+SREFDIR=/gpfs/hps/emc/meso/save/${LOGNAME}/sref.v7.1.0
 cd $SREFDIR/run
 
 cyc=$1
 FLENGTH=87
 INCR=3
-ymdh=`cat /com/date/t${cyc}z | cut -c7-16`
+##ymdh=`cat /gpfs/gp2/nco/ops/com/date/t${cyc}z | cut -c7-16`
 
-ymdh=20141223${cyc}
+ymdh=20170502${cyc}
 
 export SMSBIN=${HOME}/sms
 export MACHINE=wcoss
@@ -20,15 +20,12 @@ export IOFORM=2
 PDY=`echo $ymdh | cut -c1-8`
 CYC=`echo $ymdh | cut -c9-10`
 
-rm -rf /ptmpp1/$LOGNAME/sref
-mkdir -p /ptmpp1/$LOGNAME/tmpnwprd
-rm -rf /ptmpp1/$LOGNAME/tmpnwprd/jlogfile_sref
-
+rm -rf /gpfs/hps/ptmp/$LOGNAME/sref
+mkdir -p /gpfs/hps/ptmp/$LOGNAME/tmpnwprd
+rm -rf /gpfs/hps/ptmp/$LOGNAME/tmpnwprd/jlogfile_sref
 rm -f *.bsub *.log
 
-for MODEL in ARW NMB ; do
-#for MODEL in NMB ; do
-#for MODEL in ARW RAW NMM NMB ; do
+for MODEL in ARW NMB; do
 
 for MEMBER in ctl n01 p01 n02 p02 n03 p03 n04 p04 n05 p05 n06 p06; do
 #for MEMBER in ctl n01 p01 n02 p02 n03 p03 n04 p04; do
@@ -47,9 +44,8 @@ cat SREF_PREP.bsub.in | \
 
 if [ $MEMBER != ctl ]; then
 echo "bsub < $SREFDIR/run/SREF_PREP_${MODEL}_${MEMBER}.bsub" >> SREF_PREP_${MODEL}_ctl.bsub
-echo "echo \"SREF waiting ${MODEL} ${MEMBER} PREP\" >> /ptmpp1/$LOGNAME/tmpnwprd/jlogfile_sref" >> SREF_PREP_${MODEL}_ctl.bsub
+echo "echo \"SREF waiting ${MODEL} ${MEMBER} PREP\" >> /gpfs/hps/ptmp/$LOGNAME/tmpnwprd/jlogfile_sref" >> SREF_PREP_${MODEL}_ctl.bsub
 fi
-
 
 cat SREF_REAL.bsub.in | \
     sed s:_PDY_:$PDY:g | \
@@ -62,7 +58,6 @@ cat SREF_REAL.bsub.in | \
     sed s:_IOFORM_:$IOFORM:g | \
     sed s:_RES_:$RES:g | \
     sed s:_MACHINE_:$MACHINE:g > SREF_REAL_${MODEL}_${MEMBER}.bsub
-
 cat SREF_FCST.bsub.in | \
     sed s:_PDY_:$PDY:g | \
     sed s:_CYC_:$CYC:g | \
@@ -146,15 +141,14 @@ cat SREF_POST4.bsub.in | \
 
 #if [ ${MEMBER} == ctl ]; then
 #CTLJOB=`bsub SREF_PREP_${MODEL}_${MEMBER}.bsub`
-#echo "SREF waiting ${MODEL} ${MEMBER} PREP" >> /ptmpp1/Dusan.Jovic/tmpnwprd/jlogfile_sref
+#echo "SREF waiting ${MODEL} ${MEMBER} PREP" >> /gpfs/hps/ptmp/Dusan.Jovic/tmpnwprd/jlogfile_sref
 #else
 #bsub -W depend=afterok:$CTLJOB SREF_PREP_${MODEL}_${MEMBER}.bsub
-#echo "SREF waiting ${MODEL} ${MEMBER} PREP" >> /ptmpp1/Dusan.Jovic/tmpnwprd/jlogfile_sref
+#echo "SREF waiting ${MODEL} ${MEMBER} PREP" >> /gpfs/hps/ptmp/Dusan.Jovic/tmpnwprd/jlogfile_sref
 #fi
 
 done
-
 bsub < SREF_PREP_${MODEL}_ctl.bsub
-echo "SREF waiting ${MODEL} ctl PREP" >> /ptmpp1/$LOGNAME/tmpnwprd/jlogfile_sref
+echo "SREF waiting ${MODEL} ctl PREP" >> /gpfs/hps/ptmp/$LOGNAME/tmpnwprd/jlogfile_sref
 
 done

@@ -3,28 +3,36 @@
 #BSUB -oo _SREFDIR_/run/sref_prep__MODEL___MEMBER_.log
 #BSUB -eo _SREFDIR_/run/sref_prep__MODEL___MEMBER_.log
 #BSUB -J SREF_PREP__MODEL___MEMBER_
-#BSUB -n 16
-#BSUB -x
-#BSUB -R span[ptile=8]
 #BSUB -W 03:00
-#BSUB -q "devhigh"
+#BSUB -q "dev"
+##BSUB -M 400
+#BSUB -R rusage[mem=1000]
 #BSUB -P SREF-T2O
-#BSUB -a poe
+#BSUB -cwd /gpfs/hps/ptmp/Jun.Du
+#BSUB -extsched 'CRAYLINUX[]'
 
 set -aeux
 
-trap 'echo "SREF error _MODEL_ _MEMBER_ PREP" >> /ptmpp1/$LOGNAME/tmpnwprd/jlogfile_sref' INT TERM ERR
-echo "SREF started _MODEL_ _MEMBER_ PREP" >> /ptmpp1/$LOGNAME/tmpnwprd/jlogfile_sref
+export NODES=2
 
-. /usrx/local/Modules/3.2.9/init/bash
-module load ibmpe
-module load ics
+trap 'echo "SREF error _MODEL_ _MEMBER_ PREP" >> /gpfs/hps/ptmp/$LOGNAME/tmpnwprd/jlogfile_sref' INT TERM ERR
+echo "SREF started _MODEL_ _MEMBER_ PREP" >> /gpfs/hps/ptmp/$LOGNAME/tmpnwprd/jlogfile_sref
 
-export OMP_NUM_THREADS=1
+. /opt/modules/default/init/bash
+module load PrgEnv-intel
+module use /gpfs/hps/nco/ops/nwprod/modulefiles
+module load prod_util
+module load grib_util/1.0.3
+module load ecflow
+
+export KMP_AFFINITY=disabled
+export OMP_NUM_THREADS=3
+
+##export OMP_NUM_THREADS=1
 export MP_EUIDEVICE=sn_all
 export MP_EUILIB=us
 export MP_MPILIB=mpich2
-export MP_TASK_AFFINITY=core:1
+##export MP_TASK_AFFINITY=core:1
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usrx/local/netcdf-3.6.3/lib
 
@@ -33,7 +41,7 @@ export RUN_ENVIR=para
 export envir=prod
 export job=$$
 
-export CONFIG_FILE=_SREFDIR_/parm/sref_para_config_wcoss
+export CONFIG_FILE=_SREFDIR_/parm/sref_para_config_cray
 
 export PDY=_PDY_
 export cyc=_CYC_
@@ -44,13 +52,17 @@ export MEMBER=_MEMBER_
 export IOFORM=_IOFORM_
 export RES=_RES_
 export MACHINE=_MACHINE_
-export N_TASK=$LSB_DJOB_NUMPROC
+#export N_TASK=$LSB_DJOB_NUMPROC
+
+APRUN="aprun -n 16 -N 8 -d 3 -cc depth"
+export APRUN=$APRUN
+
 
 
 _SREFDIR_/jobs/JSREF_WRF_PREP
 
-echo "SREF finished _MODEL_ _MEMBER_ PREP" >> /ptmpp1/$LOGNAME/tmpnwprd/jlogfile_sref
+echo "SREF finished _MODEL_ _MEMBER_ PREP" >> /gpfs/hps/ptmp/$LOGNAME/tmpnwprd/jlogfile_sref
 
 bsub < _SREFDIR_/run/SREF_REAL__MODEL___MEMBER_.bsub
-echo "SREF waiting _MODEL_ _MEMBER_ REAL" >> /ptmpp1/$LOGNAME/tmpnwprd/jlogfile_sref
+echo "SREF waiting _MODEL_ _MEMBER_ REAL" >> /gpfs/hps/ptmp/$LOGNAME/tmpnwprd/jlogfile_sref
 

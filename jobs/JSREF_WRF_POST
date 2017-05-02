@@ -17,7 +17,11 @@
 set -aeux
 export PS4='$SECONDS + '
 
+export NODES=6
+export KMP_AFFINITY=disabled
 export OMP_NUM_THREADS=1
+export APRUN=$APRUN
+
 export MP_MPILIB=mpich2
 export MP_I_BINDPROC=NO
 
@@ -136,6 +140,11 @@ machine=`hostname |cut -c1`
 if [ $machine = t -o $machine = g ]; then
   export MACHINE=wcoss
 fi
+
+if [ $machine = s -o $machine = l ]; then
+  export MACHINE=wcoss
+fi
+
 
 if [ $MACHINE == zeus ]; then
   export utilscript=/scratch2/portfolios/NCEPDEV/meso/save/$USER${NWROOTp1}/util/ush

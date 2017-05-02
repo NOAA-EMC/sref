@@ -161,7 +161,8 @@ fi
    if [ $MACHINE == zeus ]; then
    mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_post < itag >> $pgmout 2>errfile
    elif [ $MACHINE == wcoss ]; then
-   mpirun.lsf $EXECsref/sref_post < itag >> $pgmout 2>errfile
+   ##mpirun.lsf $EXECsref/sref_post < itag >> $pgmout 2>errfile
+   $APRUN $EXECsref/sref_post < itag >> $pgmout 2>errfile
    fi
    export err=$?;err_chk
 

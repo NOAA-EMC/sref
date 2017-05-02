@@ -107,13 +107,18 @@ if [ $MEMBER == ctl -o $MEMBER == n01 -o $MEMBER == p01 -o $MEMBER == n02 -o $ME
   # GFS 00 file
    cp $COMglbIN/global_pgrb/gfs.t${GLB_CYC}z.master.grbf03 .
    $USHsref/sref_filter_grib.sh gfs.t${GLB_CYC}z.master.grbf03
-   $USHsref/sref_link_grib.csh gfs.t${GLB_CYC}z.master.grbf03
+
+   $USHsref/sref_link_grib.sh gfs.t${GLB_CYC}z.master.grbf03
+
+
+
+
    cp $PARMsref/sref_Vtable.GFS Vtable
   else
   # GEFS 00 file
    cp $COMglbIN/global_pgrb/gens_${GLBMEM}.t${GLB_CYC}z.pgrbf03 .
    $USHsref/sref_filter_grib.sh gens_${GLBMEM}.t${GLB_CYC}z.pgrbf03
-   $USHsref/sref_link_grib.csh gens_${GLBMEM}.t${GLB_CYC}z.pgrbf03
+   $USHsref/sref_link_grib.sh gens_${GLBMEM}.t${GLB_CYC}z.pgrbf03
    cp $PARMsref/sref_Vtable.GEFS Vtable
   fi
 
@@ -130,8 +135,14 @@ if [ $MEMBER == ctl -o $MEMBER == n01 -o $MEMBER == p01 -o $MEMBER == n02 -o $ME
   # Rapid Refresh (RUC grid 130) 00 file
   $USHsref/sref_getbestRAPanl.sh $START_DATE
   $USHsref/sref_filter_grib.sh rap.t${CYC}z.awp130f00
-  $USHsref/sref_link_grib.csh rap.t${CYC}z.awp130f00
+
+  $USHsref/sref_link_grib.sh rap.t${CYC}z.awp130f00
   cp $PARMsref/sref_Vtable.RUC Vtable
+
+
+##  cat $PARMsref/sref_namelist.wps.in.${MODEL}_$RES | sed s/WPS_START_DATE/$WPS_START_DATE/ | \
+##                                                     sed s/WPS_END_DATE/$WPS_START_DATE/ | \
+##                                                     sed s/IOFORM/$IOFORM/ | \
   cat $PARMsref/sref_namelist.wps.in.${MODEL}_$RES | sed s/WPS_START_DATE/$WPS_START_DATE/ | \
                                                      sed s/WPS_END_DATE/$WPS_START_DATE/ | \
                                                      sed s/IOFORM/$IOFORM/ | \
@@ -144,6 +155,11 @@ if [ $MEMBER == ctl -o $MEMBER == n01 -o $MEMBER == p01 -o $MEMBER == n02 -o $ME
 
 
   cp $PARMsref/sref_METGRID.TBL.$MODEL METGRID.TBL
+
+
+##  cat $PARMsref/sref_namelist.wps.in.${MODEL}_$RES | sed s/WPS_START_DATE/$WPS_START_DATE/ | \
+##                                                     sed s/WPS_END_DATE/$WPS_START_DATE/ | \
+##                                                     sed s/IOFORM/$IOFORM/ | \
   cat $PARMsref/sref_namelist.wps.in.${MODEL}_$RES | sed s/WPS_START_DATE/$WPS_START_DATE/ | \
                                                      sed s/WPS_END_DATE/$WPS_START_DATE/ | \
                                                      sed s/IOFORM/$IOFORM/ | \
@@ -155,7 +171,8 @@ if [ $MEMBER == ctl -o $MEMBER == n01 -o $MEMBER == p01 -o $MEMBER == n02 -o $ME
   if [ $MACHINE == zeus ]; then
   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_metgrid >> $pgmout 2>errfile
   elif [ $MACHINE == wcoss ]; then
-  mpirun.lsf $EXECsref/sref_metgrid >> $pgmout 2>errfile
+##  mpirun.lsf $EXECsref/sref_metgrid >> $pgmout 2>errfile
+  $APRUN $EXECsref/sref_metgrid >> $pgmout 2>errfile
   else
   poe $EXECsref/sref_metgrid >> $pgmout 2>errfile
   fi
@@ -167,7 +184,7 @@ if [ $MEMBER == c00 -o $MEMBER == n03 -o $MEMBER == p03 -o $MEMBER == n04 -o $ME
   # GEFS 00 file
    cp $COMglbIN/global_pgrb/gens_${GLBMEM}.t${GLB_CYC}z.pgrbf03 .
    $USHsref/sref_filter_grib.sh gens_${GLBMEM}.t${GLB_CYC}z.pgrbf03
-   $USHsref/sref_link_grib.csh gens_${GLBMEM}.t${GLB_CYC}z.pgrbf03
+   $USHsref/sref_link_grib.sh gens_${GLBMEM}.t${GLB_CYC}z.pgrbf03
 
   cp $PARMsref/sref_Vtable.GEFS Vtable
   cat $PARMsref/sref_namelist.wps.in.${MODEL}_$RES | sed s/WPS_START_DATE/$WPS_START_DATE/ | \
@@ -188,7 +205,8 @@ if [ $MEMBER == c00 -o $MEMBER == n03 -o $MEMBER == p03 -o $MEMBER == n04 -o $ME
   if [ $MACHINE == zeus ]; then
   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_metgrid >> $pgmout 2>errfile
   elif [ $MACHINE == wcoss ]; then
-  mpirun.lsf $EXECsref/sref_metgrid >> $pgmout 2>errfile
+##  mpirun.lsf $EXECsref/sref_metgrid >> $pgmout 2>errfile
+  $APRUN $EXECsref/sref_metgrid >> $pgmout 2>errfile
   else
   poe $EXECsref/sref_metgrid >> $pgmout 2>errfile
   fi
@@ -203,7 +221,7 @@ if [ $MEMBER == n05 -o $MEMBER == p05 -o $MEMBER == n06 -o $MEMBER == p06 ]; the
 # $USHsref/sref_link_grib.csh gfs.t${GLB_CYC}z.master.grbf03
   cp $COMglbIN/global_pgrb/gens_${GLBMEM}.t${GLB_CYC}z.pgrbf03 .
   $USHsref/sref_filter_grib.sh gens_${GLBMEM}.t${GLB_CYC}z.pgrbf03
-  $USHsref/sref_link_grib.csh gens_${GLBMEM}.t${GLB_CYC}z.pgrbf03
+  $USHsref/sref_link_grib.sh gens_${GLBMEM}.t${GLB_CYC}z.pgrbf03
   cp $PARMsref/sref_Vtable.GEFS Vtable
   cat $PARMsref/sref_namelist.wps.in.${MODEL}_$RES | sed s/WPS_START_DATE/$WPS_START_DATE/ | \
                                                      sed s/WPS_END_DATE/$WPS_START_DATE/ | \
@@ -227,7 +245,8 @@ if [ $MEMBER == n05 -o $MEMBER == p05 -o $MEMBER == n06 -o $MEMBER == p06 ]; the
   $USHsref/sref_getbestndasanl_${MODEL}.sh $START_DATE
 
   $USHsref/sref_filter_grib.sh bgd2arw.${START_DATE}
-  $USHsref/sref_link_grib.csh  bgd2arw.${START_DATE}
+
+  $USHsref/sref_link_grib.sh  bgd2arw.${START_DATE}
 
 
   cp $PARMsref/sref_Vtable.NAM Vtable
@@ -245,7 +264,8 @@ if [ $MEMBER == n05 -o $MEMBER == p05 -o $MEMBER == n06 -o $MEMBER == p06 ]; the
   if [ $MACHINE == zeus ]; then
   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   elif [ $MACHINE == wcoss ]; then
-  mpirun.lsf $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
+##  mpirun.lsf $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
+   $APRUN $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   else
   poe $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   fi
@@ -274,10 +294,12 @@ if [ $MEMBER == n05 -o $MEMBER == p05 -o $MEMBER == n06 -o $MEMBER == p06 ]; the
   if [ $MACHINE == zeus ]; then
   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_metgrid >> $pgmout 2>errfile
   elif [ $MACHINE == wcoss ]; then
-  mpirun.lsf $EXECsref/sref_metgrid >> $pgmout 2>errfile
+##  mpirun.lsf $EXECsref/sref_metgrid >> $pgmout 2>errfile
+  $APRUN $EXECsref/sref_metgrid >> $pgmout 2>errfile
   else
   poe $EXECsref/sref_metgrid >> $pgmout 2>errfile
   fi
+
 mv met_em.d01.${WPS_START_DATE}.nc met_em.d01.${WPS_START_DATE}.nc_IC
   export err=$?; err_chk
 fi
@@ -292,14 +314,15 @@ fi
 
       cp $COMglbIN/global_pgrb/gfs.t${GLB_CYC}z.master.grbf[0123456789]? .
       $USHsref/sref_filter_grib.sh gfs.t${GLB_CYC}z.master.grbf[0123456789]?
-      $USHsref/sref_link_grib.csh gfs.t${GLB_CYC}z.master.grbf[0123456789]?
+      $USHsref/sref_link_grib.sh gfs.t${GLB_CYC}z.master.grbf[0123456789]?
       cp $PARMsref/sref_Vtable.GFS Vtable
 
   else
 
       cp $COMglbIN/global_pgrb/gens_${GLBMEM}.t${GLB_CYC}z.pgrbf[0123456789]? .
       $USHsref/sref_filter_grib.sh gens_${GLBMEM}.t${GLB_CYC}z.pgrbf[0123456789]?
-      $USHsref/sref_link_grib.csh gens_${GLBMEM}.t${GLB_CYC}z.pgrbf[0123456789]?
+
+      $USHsref/sref_link_grib.sh gens_${GLBMEM}.t${GLB_CYC}z.pgrbf[0123456789]?
       cp $PARMsref/sref_Vtable.GEFS Vtable
 
   fi
@@ -323,7 +346,8 @@ fi
   if [ $MACHINE == zeus ]; then
   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_metgrid >> $pgmout 2>errfile
   elif [ $MACHINE == wcoss ]; then
-  mpirun.lsf $EXECsref/sref_metgrid >> $pgmout 2>errfile
+##  mpirun.lsf $EXECsref/sref_metgrid >> $pgmout 2>errfile
+  $APRUN $EXECsref/sref_metgrid >> $pgmout 2>errfile
   else
   poe $EXECsref/sref_metgrid >> $pgmout 2>errfile
   fi
@@ -344,12 +368,12 @@ NMM)
   else
     cp $FIXsref/sref_geo_nmm.d01.nc_$RES geo_nmm.d01.nc
   fi
-
   if [ $MEMBER == ctl ]; then
-      $USHsref/sref_link_grib.csh $COMglbIN/global_pgrb/gfs.t${GLB_CYC}z.master.grbf[0123456789]?
+      $USHsref/sref_link_grib.sh $COMglbIN/global_pgrb/gfs.t${GLB_CYC}z.master.grbf[0123456789]?
   else
-      $USHsref/sref_link_grib.csh $COMglbIN/global_pgrb/gens_${GLBMEM}.t${GLB_CYC}z.pgrbf??
+      $USHsref/sref_link_grib.sh $COMglbIN/global_pgrb/gens_${GLBMEM}.t${GLB_CYC}z.pgrbf??
   fi
+
 
   cp $PARMsref/sref_Vtable.GFS Vtable
   cat $PARMsref/sref_namelist.wps.in.${MODEL}_$RES | sed s/WPS_START_DATE/$WPS_START_DATE/ | \
@@ -371,10 +395,12 @@ NMM)
   if [ $MACHINE == zeus ]; then
   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_metgrid >> $pgmout 2>errfile
   elif [ $MACHINE == wcoss ]; then
-  mpirun.lsf $EXECsref/sref_metgrid >> $pgmout 2>errfile
+##  mpirun.lsf $EXECsref/sref_metgrid >> $pgmout 2>errfile
+ $APRUN $EXECsref/sref_metgrid >> $pgmout 2>errfile
   else
   poe $EXECsref/sref_metgrid >> $pgmout 2>errfile
   fi
+
   export err=$?; err_chk
 
   ;;
@@ -392,13 +418,14 @@ if [ $MEMBER == ctl -o $MEMBER == n01 -o $MEMBER == p01 -o $MEMBER == n02 -o $ME
   # GFS 00 file
    cp $COMglbIN/global_pgrb/gfs.t${GLB_CYC}z.master.grbf03 .
    $USHsref/sref_filter_grib.sh gfs.t${GLB_CYC}z.master.grbf03
-   $USHsref/sref_link_grib.csh gfs.t${GLB_CYC}z.master.grbf03
+
+   $USHsref/sref_link_grib.sh gfs.t${GLB_CYC}z.master.grbf03
    cp $PARMsref/sref_Vtable.GFS Vtable
   else
   # GEFS 00 file
    cp $COMglbIN/global_pgrb/gens_${GLBMEM}.t${GLB_CYC}z.pgrbf03 .
    $USHsref/sref_filter_grib.sh gens_${GLBMEM}.t${GLB_CYC}z.pgrbf03
-   $USHsref/sref_link_grib.csh gens_${GLBMEM}.t${GLB_CYC}z.pgrbf03
+   $USHsref/sref_link_grib.sh gens_${GLBMEM}.t${GLB_CYC}z.pgrbf03
    cp $PARMsref/sref_Vtable.GEFS Vtable
   fi
 
@@ -411,16 +438,19 @@ if [ $MEMBER == ctl -o $MEMBER == n01 -o $MEMBER == p01 -o $MEMBER == n02 -o $ME
   if [ $MACHINE == zeus ]; then
   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   elif [ $MACHINE == wcoss ]; then
-  mpirun.lsf $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
+##  mpirun.lsf $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
+   $APRUN  $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   else
   poe $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   fi
+
+
   export err=$?;err_chk
 
 # # NDAS (Grid 151) f00 file (later start) or NAM f03 file (earlier start)
   $USHsref/sref_getbestndasanl_${MODEL}.sh $START_DATE
   $USHsref/sref_filter_grib.sh bgd2nmb.${START_DATE}
-  $USHsref/sref_link_grib.csh  bgd2nmb.${START_DATE}
+  $USHsref/sref_link_grib.sh  bgd2nmb.${START_DATE}
 
   cp $PARMsref/sref_Vtable.NAM Vtable
   cat $PARMsref/sref_namelist.wps.in.${MODEL}_$RES | sed s/WPS_START_DATE/$WPS_START_DATE/ | \
@@ -434,7 +464,8 @@ if [ $MEMBER == ctl -o $MEMBER == n01 -o $MEMBER == p01 -o $MEMBER == n02 -o $ME
   if [ $MACHINE == zeus ]; then
   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   elif [ $MACHINE == wcoss ]; then
-  mpirun.lsf $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
+##  mpirun.lsf $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
+  $APRUN $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   else
   poe $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   fi
@@ -460,7 +491,7 @@ if [ $MEMBER == c00 -o $MEMBER == n03 -o $MEMBER == p03 -o $MEMBER == n04 -o $ME
   # GEFS 00 file
    cp $COMglbIN/global_pgrb/gens_${GLBMEM}.t${GLB_CYC}z.pgrbf03 .
    $USHsref/sref_filter_grib.sh gens_${GLBMEM}.t${GLB_CYC}z.pgrbf03
-   $USHsref/sref_link_grib.csh gens_${GLBMEM}.t${GLB_CYC}z.pgrbf03
+   $USHsref/sref_link_grib.sh gens_${GLBMEM}.t${GLB_CYC}z.pgrbf03
 
   cp $PARMsref/sref_Vtable.GEFS Vtable
   cat $PARMsref/sref_namelist.wps.in.${MODEL}_$RES | sed s/WPS_START_DATE/$WPS_START_DATE/ | \
@@ -473,7 +504,8 @@ if [ $MEMBER == c00 -o $MEMBER == n03 -o $MEMBER == p03 -o $MEMBER == n04 -o $ME
   if [ $MACHINE == zeus ]; then
   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   elif [ $MACHINE == wcoss ]; then
-  mpirun.lsf $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
+##  mpirun.lsf $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
+  $APRUN $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   else
   poe $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   fi
@@ -487,13 +519,13 @@ if [ $MEMBER == n05 -o $MEMBER == p05 -o $MEMBER == n06 -o $MEMBER == p06 ]; the
   # GFS 00 file
    cp $COMglbIN/global_pgrb/gfs.t${GLB_CYC}z.master.grbf03 .
    $USHsref/sref_filter_grib.sh gfs.t${GLB_CYC}z.master.grbf03
-   $USHsref/sref_link_grib.csh gfs.t${GLB_CYC}z.master.grbf03
+   $USHsref/sref_link_grib.sh gfs.t${GLB_CYC}z.master.grbf03
    cp $PARMsref/sref_Vtable.GFS Vtable
   else
   # GEFS 00 file
    cp $COMglbIN/global_pgrb/gens_${GLBMEM}.t${GLB_CYC}z.pgrbf03 .
    $USHsref/sref_filter_grib.sh gens_${GLBMEM}.t${GLB_CYC}z.pgrbf03
-   $USHsref/sref_link_grib.csh gens_${GLBMEM}.t${GLB_CYC}z.pgrbf03
+   $USHsref/sref_link_grib.sh gens_${GLBMEM}.t${GLB_CYC}z.pgrbf03
    cp $PARMsref/sref_Vtable.GEFS Vtable
   fi
 
@@ -506,7 +538,8 @@ if [ $MEMBER == n05 -o $MEMBER == p05 -o $MEMBER == n06 -o $MEMBER == p06 ]; the
   if [ $MACHINE == zeus ]; then
   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   elif [ $MACHINE == wcoss ]; then
-  mpirun.lsf $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
+##  mpirun.lsf $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
+  $APRUN $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   else
   poe $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   fi
@@ -515,7 +548,7 @@ if [ $MEMBER == n05 -o $MEMBER == p05 -o $MEMBER == n06 -o $MEMBER == p06 ]; the
   # Rapid Refresh (RUC grid 130) 00 file
   $USHsref/sref_getbestRAPanl.sh $START_DATE
   $USHsref/sref_filter_grib.sh rap.t${CYC}z.awp130f00
-  $USHsref/sref_link_grib.csh rap.t${CYC}z.awp130f00
+  $USHsref/sref_link_grib.sh rap.t${CYC}z.awp130f00
   cp $PARMsref/sref_Vtable.RUC Vtable
   cat $PARMsref/sref_namelist.wps.in.${MODEL}_$RES | sed s/WPS_START_DATE/$WPS_START_DATE/ | \
                                                      sed s/WPS_END_DATE/$WPS_START_DATE/ | \
@@ -526,7 +559,8 @@ if [ $MEMBER == n05 -o $MEMBER == p05 -o $MEMBER == n06 -o $MEMBER == p06 ]; the
   if [ $MACHINE == zeus ]; then
   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   elif [ $MACHINE == wcoss ]; then
-  mpirun.lsf $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
+##  mpirun.lsf $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
+  $APRUN $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   else
   poe $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   fi
@@ -544,10 +578,12 @@ fi
   if [ $MACHINE == zeus ]; then
   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_metgrid_nems >> $pgmout 2>errfile
   elif [ $MACHINE == wcoss ]; then
-  mpirun.lsf $EXECsref/sref_metgrid_nems >> $pgmout 2>errfile
+##  mpirun.lsf $EXECsref/sref_metgrid_nems >> $pgmout 2>errfile
+  $APRUN $EXECsref/sref_metgrid_nems >> $pgmout 2>errfile
   else
   poe $EXECsref/sref_metgrid_nems >> $pgmout 2>errfile
   fi
+
 mv met_nmb.d01.${WPS_START_DATE}.dio met_nmb.d01.${WPS_START_DATE}.dio_IC
   export err=$?;err_chk
 
@@ -560,14 +596,14 @@ mv met_nmb.d01.${WPS_START_DATE}.dio met_nmb.d01.${WPS_START_DATE}.dio_IC
 
       cp $COMglbIN/global_pgrb/gfs.t${GLB_CYC}z.master.grbf[0123456789]? .
       $USHsref/sref_filter_grib.sh gfs.t${GLB_CYC}z.master.grbf[0123456789]?
-      $USHsref/sref_link_grib.csh gfs.t${GLB_CYC}z.master.grbf[0123456789]?
+      $USHsref/sref_link_grib.sh gfs.t${GLB_CYC}z.master.grbf[0123456789]?
       cp $PARMsref/sref_Vtable.GFS Vtable
 
   else
 
       cp $COMglbIN/global_pgrb/gens_${GLBMEM}.t${GLB_CYC}z.pgrbf[0123456789]? .
       $USHsref/sref_filter_grib.sh gens_${GLBMEM}.t${GLB_CYC}z.pgrbf[0123456789]?
-      $USHsref/sref_link_grib.csh gens_${GLBMEM}.t${GLB_CYC}z.pgrbf[0123456789]?
+      $USHsref/sref_link_grib.sh gens_${GLBMEM}.t${GLB_CYC}z.pgrbf[0123456789]?
       cp $PARMsref/sref_Vtable.GEFS Vtable
  
   fi
@@ -583,10 +619,12 @@ mv met_nmb.d01.${WPS_START_DATE}.dio met_nmb.d01.${WPS_START_DATE}.dio_IC
   if [ $MACHINE == zeus ]; then
   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   elif [ $MACHINE == wcoss ]; then
-  mpirun.lsf $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
+##  mpirun.lsf $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
+  $APRUN $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   else
   poe $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   fi
+
   export err=$?;err_chk
 
   cp $PARMsref/sref_METGRID.TBL.$MODEL METGRID.TBL
@@ -612,7 +650,8 @@ cat $PARMsref/sref_namelist.wps.in.${MODEL}_$RES | sed s/WPS_START_DATE/$WPS_DAT
   if [ $MACHINE == zeus ]; then
   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_metgrid_nems >> $pgmout 2>errfile
   elif [ $MACHINE == wcoss ]; then
-  mpirun.lsf $EXECsref/sref_metgrid_nems >> $pgmout 2>errfile
+##  mpirun.lsf $EXECsref/sref_metgrid_nems >> $pgmout 2>errfile
+  $APRUN $EXECsref/sref_metgrid_nems >> $pgmout 2>errfile
   else
   poe $EXECsref/sref_metgrid_nems >> $pgmout 2>errfile
   fi

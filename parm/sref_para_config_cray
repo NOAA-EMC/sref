@@ -2,11 +2,11 @@
 # This file defines the various input varibles for the
 # SREF model run
 #######################################################
-##  export NWROOT=/gpfs/hps/nco/ops/nwprod
-  export NWROOT=/gpfs/gp2/nco/ops/nwprod
+  export NWROOT=/gpfs/hps/nco/ops/nwprod
+##  export NWROOT=/gpfs/gp2/nco/ops/nwprod
   export NWROOTp1=/gpfs/tp1/nco/ops/nwprod
-##  export COMROOT=/gpfs/hps/nco/ops/com
-  export COMROOT=/gpfs/gp2/nco/ops/com
+  export COMROOT=/gpfs/hps/nco/ops/com
+##  export COMROOT=/gpfs/gp2/nco/ops/com
   export COMROOTp1=/gpfs/tp1/nco/ops/com
   export GESROOT=/gpfs/hps/nco/ops/nwges
   export GESROOTp1=/gpfs/tp1/nco/ops/nwges
@@ -42,18 +42,22 @@
 # export com=/com/sref/${envir}
 # export COM=/com/sref/${envir}
 
-##  export COMglb_IN=/gpfs/hps/ptmp/$LOGNAME/com/sref/${envir}
-   export COMglb_IN=/gpfs/gp2/nco/ops/com/gfs/${envir}
+   export COMglb_IN=/gpfs/hps/ptmp/$LOGNAME/com/sref/${envir}
+##   export COMglb_IN=/gpfs/gp2/nco/ops/com/gfs/${envir}
 ##  export COMglb_IN=/gpfs/gp2/nco/ops/com/sref/${envir}
 ##  export COM_IN=/gpfs/tp2/nco/ops/com/sref/${envir}
-##  export COM_IN=/gpfs/hps/ptmp/$LOGNAME/com/sref/${envir}
-  export COM_IN=/gpfs/gp2/nco/ops/com/gefs/${envir}
+  export COM_IN=/gpfs/hps/ptmp/$LOGNAME/com/sref/${envir}
+##  export COM_IN=/gpfs/gp2/nco/ops/com/gefs/${envir}
 #
 # ---------------------------------------
   export COM_OUT=/gpfs/hps/ptmp/$LOGNAME/com/sref/${envir}
   export gespath=/gpfs/hps/ptmp/$LOGNAME/nwges/${envir}
 # export gespath=/nwges/${envir}
+
+
  export GESNDAS=/gpfs/hps/ptmp/$LOGNAME/nwges/prod
+
+
 #  export GESNDAS=/gpfs/hps/ptmp/nwges/prod
 
 # com_canned
@@ -77,6 +81,9 @@
   export COMENS=/gpfs/hps/ptmp/$LOGNAME/com/gens/prod
 
   export COMRTMA=/gpfs/hps/ptmp/$LOGNAME/com/rtma/prod
-  export COMINnam=/gpfs/hps/ptmp/$LOGNAME/com/nam/prod
-  export COMINrap=/gpfs/hps/ptmp/$LOGNAME/com/rap/prod
 
+##  export COMINnam=/gpfs/hps/ptmp/$LOGNAME/com/nam/prod
+##  export COMINrap=/gpfs/hps/ptmp/$LOGNAME/com/rap/prod
+
+  export COMINnam=/gpfs/gp2/nco/ops/com/nam/prod
+  export COMINrap=/gpfs/gp2/nco/ops/com/rap/prod

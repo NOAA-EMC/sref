@@ -210,7 +210,8 @@ date
          $EXECsref/sref_lbc_perturb_wrf
          elif [ $MACHINE == wcoss ]; then
          # mpirun.lsf $EXECsref/sref_lbc_perturb_wrf
-         $EXECsref/sref_lbc_perturb_wrf
+         ##$EXECsref/sref_lbc_perturb_wrf
+         $APRUN $EXECsref/sref_lbc_perturb_wrf
          fi
          export err=$?; err_chk
       else
@@ -222,8 +223,10 @@ date
          $EXECsref/sref_lbc_perturb_nmb
          elif [ $MACHINE == wcoss ]; then
          # mpirun.lsf $EXECsref/sref_lbc_perturb_nmb
-         $EXECsref/sref_lbc_perturb_nmb
+         ##$EXECsref/sref_lbc_perturb_nmb
+         $APRUN $EXECsref/sref_lbc_perturb_nmb
          fi
+
          export err=$?; err_chk
       fi
 
@@ -249,7 +252,8 @@ if [ $MODEL == NMM ] && [ $PAIR == 99 ] ; then
   if [ $MACHINE == zeus ]; then
   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_real_${model}_hwrf >> $pgmout 2>errfile
   elif [ $MACHINE == wcoss ]; then
-  mpirun.lsf $EXECsref/sref_real_${model}_hwrf >> $pgmout 2>errfile
+##  mpirun.lsf $EXECsref/sref_real_${model}_hwrf >> $pgmout 2>errfile
+  $APRUN $EXECsref/sref_real_${model}_hwrf >> $pgmout 2>errfile
   fi
   export err=$?; err_chk
 else
@@ -259,7 +263,8 @@ else
   if [ $MACHINE == zeus ]; then
   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_real_${model} >> $pgmout 2>errfile
   elif [ $MACHINE == wcoss ]; then
-  mpirun.lsf $EXECsref/sref_real_${model} >> $pgmout 2>errfile
+##  mpirun.lsf $EXECsref/sref_real_${model} >> $pgmout 2>errfile
+  $APRUN $EXECsref/sref_real_${model}_hwrf >> $pgmout 2>errfile
   fi
   export err=$?; err_chk
 fi
@@ -354,9 +359,8 @@ if [ $MEMBER != ctl ]; then
       $EXECsref/sref_breeding_${model}
       elif [ $MACHINE == wcoss ]; then
       # mpirun.lsf $EXECsref/sref_breeding_${model}
-      $EXECsref/sref_breeding_${model}
-      else
-      $EXECsref/sref_breeding_${model}
+      ##$EXECsref/sref_breeding_${model}
+      $APRUN $EXECsref/sref_breeding_${model}
       fi
       echo "Control analysis is used as base IC superimposed by regional bred perts!!!"
    else
@@ -374,6 +378,8 @@ fi
 #####################################################
 #lsm=gfs
 #lsm=ndas
+  lsm=gfs
+
 if [ $lsm = ndas ]; then
  if [ $MODEL != NMB ]; then
  cp wrfbdy_d01   wrfbdy_d01_b4ndasreplacement
@@ -523,7 +529,8 @@ if [ $lsm = ndas ]; then
  if [ $MACHINE == zeus ]; then
  mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_coldstart_wrf > coldstart_wrf.out
  elif [ $MACHINE == wcoss ]; then
- mpirun.lsf $EXECsref/sref_coldstart_wrf > coldstart_wrf.out
+ ##mpirun.lsf $EXECsref/sref_coldstart_wrf > coldstart_wrf.out
+ $APRUN $EXECsref/sref_coldstart_wrf > coldstart_wrf.out
  else
  $EXECsref/sref_coldstart_wrf > coldstart_wrf.out
  fi

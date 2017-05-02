@@ -400,6 +400,13 @@ CONTAINS
               SMCREF = 0.42
               SMCWLT = 0.40
               SMCDRY = 0.40
+         ELSE
+!
+!-- Limit top-layer soil moisture to 80% of SMCREF (soil moisture threshold below
+!   which transpiration begins to stress), based on launcher experiment apr24d
+!
+             SMC(1)=MIN(SMC(1), 0.8*SMCREF)
+             SH2O(1)=MIN(SH2O(1), 0.8*SMCREF)
          ENDIF
 
          IF ( SHDFAC >= SHDMAX ) THEN
@@ -535,6 +542,12 @@ CONTAINS
 ! DETERMINE SNOW FRACTIONAL COVERAGE.
 ! DETERMINE SURFACE ALBEDO MODIFICATION DUE TO SNOWDEPTH STATE.
 ! ----------------------------------------------------------------------
+!
+!-- Threshold snow depth (in water equivalent m) that implies 100% snow 
+!   coverage is increased by 7x, based on launcher experiment apr24d
+!
+            SNUP=7.*SNUP
+!
             CALL SNFRAC (SNEQV,SNUP,SALP,SNOWH,SNCOVR, &
                          XLAI,SHDFAC,FVB,GAMA,FBUR,    &
                          FGSN,ZTOPV,ZBOTV,UA_PHYS)

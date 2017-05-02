@@ -12,11 +12,16 @@
 set -aeux
 export PS4='$SECONDS + '
 
-export OMP_NUM_THREADS=1
+export KMP_AFFINITY=disabled
+export OMP_NUM_THREADS=3
+export NODES=4
+export APRUN=$APRUN
+
+##export OMP_NUM_THREADS=1
 export MP_MPILIB=mpich2
 
-. /usrx/local/Modules/default/init/ksh
-module load grib_util
+##. /usrx/local/Modules/default/init/ksh
+##module load grib_util
 
 #
 # Specify whether the run is production or development
@@ -124,6 +129,12 @@ machine=`hostname |cut -c1`
 if [ $machine = t -o $machine = g ]; then
   export MACHINE=wcoss
 fi
+
+if [ $machine = s -o $machine = l ]; then
+  export MACHINE=wcoss
+fi
+
+
 
 if [ $MACHINE == zeus ]; then
   export utilscript=/scratch2/portfolios/NCEPDEV/meso/save/$USER${NWROOTp1}/util/ush

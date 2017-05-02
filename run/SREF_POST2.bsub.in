@@ -3,28 +3,35 @@
 #BSUB -oo _SREFDIR_/run/sref_post2__MODEL___MEMBER_.log
 #BSUB -eo _SREFDIR_/run/sref_post2__MODEL___MEMBER_.log
 #BSUB -J SREF_POST2__MODEL___MEMBER_
-#BSUB -n 16
-#BSUB -x
-#BSUB -R span[ptile=16]
-#BSUB -W 01:50
-#BSUB -q "devhigh"
+#BSUB -W 03:50
+#BSUB -q "dev"
+##BSUB -M 2000
+#BSUB -R rusage[mem=1500]
 #BSUB -P SREF-T2O
-#BSUB -a poe
+#BSUB -cwd /gpfs/hps/ptmp/Jun.Du
+#BSUB -extsched 'CRAYLINUX[]'
+
+export NODES=6
 
 set -aeux
 
-trap 'echo "SREF error _MODEL_ _MEMBER_ POST2" >> /ptmpp1/$LOGNAME/tmpnwprd/jlogfile_sref' INT TERM ERR
-echo "SREF started _MODEL_ _MEMBER_ POST2" >> /ptmpp1/$LOGNAME/tmpnwprd/jlogfile_sref
+trap 'echo "SREF error _MODEL_ _MEMBER_ POST2" >> /gpfs/hps/ptmp/$LOGNAME/tmpnwprd/jlogfile_sref' INT TERM ERR
+echo "SREF started _MODEL_ _MEMBER_ POST2" >> /gpfs/hps/ptmp/$LOGNAME/tmpnwprd/jlogfile_sref
 
-. /usrx/local/Modules/3.2.9/init/bash
-module load ibmpe
-module load ics
+. /opt/modules/default/init/bash
+module load PrgEnv-intel
+module use /gpfs/hps/nco/ops/nwprod/modulefiles
+module load prod_util
+module load grib_util/1.0.3
 
+export KMP_AFFINITY=disabled
 export OMP_NUM_THREADS=1
+
+##export OMP_NUM_THREADS=1
 export MP_EUIDEVICE=sn_all
 export MP_EUILIB=us
 export MP_MPILIB=mpich2
-export MP_TASK_AFFINITY=core:1
+##export MP_TASK_AFFINITY=core:1
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usrx/local/netcdf-3.6.3/lib
 
@@ -33,7 +40,7 @@ export RUN_ENVIR=para
 export envir=prod
 export job=$$
 
-export CONFIG_FILE=_SREFDIR_/parm/sref_para_config_wcoss
+export CONFIG_FILE=_SREFDIR_/parm/sref_para_config_cray
 
 export PDY=_PDY_
 export cyc=_CYC_
@@ -46,8 +53,9 @@ export RES=_RES_
 export MACHINE=_MACHINE_
 export runflag=_runflag_
 export OUTGRD=_OUTGRD_
-export N_TASK=$LSB_DJOB_NUMPROC
+##export N_TASK=$LSB_DJOB_NUMPROC
+export APRUN="aprun -n 96 -N 16 -d 1 -cc depth"
 
-_SREFDIR_/jobs/JSREF_WRF_POST
+_SREFDIR/_jobs/JSREF_WRF_POST
 
-echo "SREF finished _MODEL_ _MEMBER_ POST2" >> /ptmpp1/$LOGNAME/tmpnwprd/jlogfile_sref
+echo "SREF finished _MODEL_ _MEMBER_ POST2" >> /gpfs/hps/ptmp/$LOGNAME/tmpnwprd/jlogfile_sref
