@@ -3,31 +3,35 @@
 #BSUB -oo _SREFDIR_/run/sref_gfsprep__MEMBER_.log
 #BSUB -eo _SREFDIR_/run/sref_gfsprep__MEMBER_.log
 #BSUB -J SREF_GFSPREP__MEMBER_
-##BSUB -n 31
-##BSUB -n 43
-#BSUB -n 54
-#BSUB -x
-##BSUB -R span[ptile=16]
-#BSUB -R span[ptile=4]
-#BSUB -W 01:20
+##BSUB -W 01:20
+#BSUB -W 04:00
+#BSUB -q "dev"
+#BSUB -R rusage[mem=700]
 #BSUB -P SREF-T2O
-#BSUB -q "devhigh"
-#BSUB -a poe
-
+#BSUB -cwd /gpfs/hps/ptmp/Jun.Du
+#BSUB -extsched 'CRAYLINUX[]'
+export NODES=14
 set -aeux
 
-trap 'echo "SREF error _MEMBER_ GFSPREP" >> /ptmpp1/$LOGNAME/tmpnwprd/jlogfile_sref' INT TERM ERR
-echo "SREF started _MEMBER_ GFSPREP" >> /ptmpp1/$LOGNAME/tmpnwprd/jlogfile_sref
+trap 'echo "SREF error _MEMBER_ GFSPREP" >> /gpfs/hps/ptmp/$LOGNAME/tmpnwprd/jlogfile_sref' INT TERM ERR
+echo "SREF started _MEMBER_ GFSPREP" >> /gpfs/hps/ptmp/$LOGNAME/tmpnwprd/jlogfile_sref
 
-. /usrx/local/Modules/3.2.9/init/bash
-module load ibmpe
-module load ics
+. /opt/modules/default/init/bash
+module load PrgEnv-intel
+module use /gpfs/hps/nco/ops/nwprod/modulefiles
+module load prod_util
+module load grib_util/1.0.3
+module load cfp-intel-sandybridge
+module load ecflow
 
-export OMP_NUM_THREADS=1
+export KMP_AFFINITY=disabled
+export OMP_NUM_THREADS=6
+
+##export OMP_NUM_THREADS=1
 export MP_EUIDEVICE=sn_all
 export MP_EUILIB=us
 export MP_MPILIB=mpich2
-export MP_TASK_AFFINITY=core:1
+##export MP_TASK_AFFINITY=core:1
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usrx/local/NetCDF/3.6.3/lib
 
@@ -36,7 +40,7 @@ export RUN_ENVIR=para
 export envir=prod
 export job=$$
 
-export CONFIG_FILE=_SREFDIR_/parm/sref_para_config_wcoss
+export CONFIG_FILE=_SREFDIR_/parm/sref_para_config_cray
 
 export PDY=_PDY_
 export cyc=_CYC_
@@ -44,11 +48,14 @@ export cyc=_CYC_
 #export INCR=_INCR_
 export MEMBER=_MEMBER_
 export MACHINE=_MACHINE_
-export N_TASK=$LSB_DJOB_NUMPROC
+##export N_TASK=$LSB_DJOB_NUMPROC
+
+APRUN="aprun -n54 -N4 -d6  cfp"
+export APRUN=$APRUN
 
 _SREFDIR_/jobs/JSREF_WRF_GFSPREP
 
-echo "SREF finished _MEMBER_ GFSPREP" >> /ptmpp1/$LOGNAME/tmpnwprd/jlogfile_sref
+echo "SREF finished _MEMBER_ GFSPREP" >> /gpfs/hps/ptmp/$LOGNAME/tmpnwprd/jlogfile_sref
 
 #bsub < _SREFDIR_/run/SREF_POST__MODEL___MEMBER_.bsub
 #echo "SREF waiting _MODEL_ _MEMBER_ POST" >> /ptmpp1/$LOGNAME/tmpnwprd/jlogfile_sref
