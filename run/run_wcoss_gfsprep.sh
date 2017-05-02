@@ -2,15 +2,19 @@
 
 set -aeux
 
-SREFDIR=/meso/save/${LOGNAME}/sref.v7.0.0
+base=/gpfs/hps
+base1=/gpfs/hps/emc
+base2=/gpfs/gp1/nco/ops
+
+SREFDIR=$base1/meso/save/${LOGNAME}/sref.v7.1.0
 cd $SREFDIR/run
 
 cyc=$1
 #FLENGTH=87
 #INCR=3
-ymdh=`cat /com/date/t${cyc}z | cut -c7-16`
+ymdh=`cat $base2/com/date/t${cyc}z | cut -c7-16`
 
-ymdh=20150324${1}
+#ymdh=20170426${1}
 
 export SMSBIN=${HOME}/sms
 export MACHINE=wcoss
@@ -18,11 +22,10 @@ export MACHINE=wcoss
 PDY=`echo $ymdh | cut -c1-8`
 CYC=`echo $ymdh | cut -c9-10`
 
-#rm -rf /ptmpp1/$LOGNAME/sref
-#mkdir -p /ptmpp1/$LOGNAME/tmpnwprd
-#rm -rf /ptmpp1/$LOGNAME/tmpnwprd/jlogfile_sref
-
-#rm -f *.bsub *.log
+rm -rf $base/ptmp/$LOGNAME/sref
+mkdir -p $base/ptmp/$LOGNAME/tmpnwprd
+rm -rf $base/ptmp/$LOGNAME/tmpnwprd/jlogfile_sref
+rm -f *.bsub *.log
 
 # In operation, ctl and others are run separately: ctl after GFS 90hr finishes; others after GEFS 90hr finishes.
 for MEMBER in ctl c00 p01 p02 p03 p04 p05 p06 p07 p08 p09 p10 p11 p12 p13 p14 p15 p16 p17 p18 p19 p20; do
