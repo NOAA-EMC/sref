@@ -20,13 +20,18 @@ set -xa
 echo `date` $0 `date -u` begin
 export PS4='$SECONDS + '
 
-export OMP_NUM_THREADS=1
+export KMP_AFFINITY=disabled
+export OMP_NUM_THREADS=6
+export NODES=14
+export APRUN=$APRUN
+
+##export OMP_NUM_THREADS=1
 export MP_EUIDEVICE=sn_all
 export MP_EUILIB=us
 export MP_MPILIB=mpich2
 
-. /usrx/local/Modules/default/init/ksh
-module load grib_util
+##. /usrx/local/Modules/default/init/ksh
+##module load grib_util
 #
 # Specify whether the run is production or development
 #
@@ -156,7 +161,7 @@ export GFSOUT=$COMOUT/global_pgrb
 # export COMGFS=${COMGFS:-${COMROOT}/gfs/prod}
 # export COMENS=${COMENS:-${COMROOT}/gens/prod}
 export COMINgfs=${COMINgfs:-$(compath.py gfs/prod)}
-export COMINgens=${COMINgens:-${COMROOT}/gens/prod}
+export COMINgens=${COMINgens:-$(compath.py /gens/prod)}
 
 mkdir -p -m 775 $COMOUT $GFSOUT
 
