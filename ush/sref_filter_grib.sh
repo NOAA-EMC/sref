@@ -4,8 +4,10 @@ set -eux
 
 if [ $MACHINE == wcoss ]; then
 
-  . /usrx/local/Modules/default/init/sh
-  module load cfp
+##  . /usrx/local/Modules/default/init/sh
+##  module load cfp
+###. /opt/modules/default/init/bash
+###module load PrgEnv-intel
 
   CMDFILE=cmdfile
   rm -f $CMDFILE
@@ -32,7 +34,15 @@ END_OF_JOB
 
   done
 
-  mpirun.lsf cfp $CMDFILE
+#export NODES=2
+#module load cfp-intel-sandybridge
+
+##module load PrgEnv-intel                      #not needed for static exe
+##module list
+chmod +x $CMDFILE
+##  mpirun.lsf cfp $CMDFILE
+# aprun -n 16 -N 8 -d 3  cfp $CMDFILE
+$CMDFILE
 
 else
 
