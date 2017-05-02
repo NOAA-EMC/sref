@@ -2,14 +2,21 @@
 # This file defines the various input varibles for the
 # SREF model run
 #######################################################
-  export NWROOT=/nwprod2
-  export NWROOTp1=/nwprod
-  export COMROOT=/com2
-  export COMROOTp1=/com
-  export GESROOT=/nwges2
-  export GESROOTp1=/nwges
+# From Gyre
+# export CRAY1= /gpfs/gp1/nco/ops
+# export CRAY2= /gpfs/gp2/nco/ops
+# From Tide
+  export CRAY1= /gpfs/tp1/nco/ops
+  export CRAY2= /gpfs/tp2/nco/ops
 
-  export HOMEsref=/meso/save/${USER}/sref.v7.0.0
+  export NWROOT=$CRAY2/nwprod
+  export NWROOTp1=CRAY1/nwprod
+  export COMROOT=$CRAY2/com
+  export COMROOTp1=$CRAY1/com
+  export GESROOT=$CRAY2/nwges
+  export GESROOTp1=$CRAY1/nwges
+
+  export HOMEsref=/gpfs/hps/meso/save/${USER}/sref.v7.1.0
   export EXECsref=$HOMEsref/exec
   export FIXsref=$HOMEsref/fix
   export PARMsref=$HOMEsref/parm
@@ -32,45 +39,29 @@
 
   export RUN_TCTRACK=NO
 
-  export DATA_IN=/ptmpp1/$LOGNAME/tmpnwprd
+  export DATA_IN=/gpfs/hps/ptmp/$LOGNAME/tmpnwprd
   export jlogfile=$DATA_IN/jlogfile
 
-  export com=/ptmpp1/$LOGNAME/com/sref/${envir}
-  export COM=/ptmpp1/$LOGNAME/com/sref/${envir}
+  export com=/gpfs/hps/ptmp/$LOGNAME/com/sref/${envir}
+  export COM=/gpfs/hps/ptmp/$LOGNAME/com/sref/${envir}
 # export com=/com/sref/${envir}
 # export COM=/com/sref/${envir}
 
-  export COMglb_IN=/com/sref/${envir}
-  export COM_IN=/ptmpp1/$LOGNAME/com/sref/${envir}
+  export COMglb_IN=$CRAY2/com/sref/${envir}
+  export COM_IN=/gpfs/hps/ptmp/$LOGNAME/com/sref/${envir}
 #
 # ---------------------------------------
-  export COM_OUT=/ptmpp1/$LOGNAME/com/sref/${envir}
-  export gespath=/ptmpp1/$LOGNAME/nwges/${envir}
+  export COM_OUT=/gpfs/hps/ptmp/$LOGNAME/com/sref/${envir}
+  export gespath=/gpfs/hps/ptmp/$LOGNAME/nwges/${envir}
 # export gespath=/nwges/${envir}
 # export GESNDAS=/ptmpp1/$LOGNAME/nwges/prod
-  export GESNDAS=/nwges/prod
-
-# com_canned
-# export COMGFS=/com_canned/gfs/prod
-# export COMENS=/com_canned/gens/prod
-
-# export COMRTMA=/com_canned/rtma/prod
-# export COMNAM=/com_canned/nam/prod
-# export COMRAP=/com_canned/rap/prod
-
-# com_p6
-# export COMGFS=/com_p6/gfs/prod
-# export COMENS=/com_p6/gens/prod
-
-# export COMRTMA=/com_p6/rtma/prod
-# export COMNAM=/com_p6/nam/prod
-# export COMRAP=/com_p6/rap/prod
+  export GESNDAS=$CRAY2/nwges/prod
 
 # com
-  export COMGFS=/com/gfs/prod
-  export COMENS=/com/gens/prod
+  export COMGFS=$CRAY2/com/gfs/prod
+  export COMENS=$CRAY2/com/gens/prod
 
-  export COMRTMA=/com/rtma/prod
-  export COMINnam=/com/nam/prod
-  export COMINrap=/com/rap/prod
+  export COMRTMA=$CRAY2/com/rtma/prod
+  export COMINnam=$CRAY2/com/nam/prod
+  export COMINrap=$CRAY2/com/rap/prod
 
