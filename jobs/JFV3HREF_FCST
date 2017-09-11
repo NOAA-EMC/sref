@@ -1,0 +1,156 @@
+#!/bin/bash
+########################################
+# WRF-SREF Preliminary data setup step
+# change log:
+# 09/xx/2005, Jun Du - initial implementation
+# 04/04/2006, Jun Du - change the directory name $COMENS from
+#              ${COMROOT}/mrf/prod/ to /com/gens/prod to match the new
+#              global ensemble data outout
+#
+########################################
+set -eux
+
+#
+# Specify whether the run is production or development
+#
+export RUN_ENVIR=${RUN_ENVIR:-nco}
+
+#####################################################################################
+# Run config file to get input parameters
+# This config file should define the following variables
+# DATA_IN: Location of working directory, default to ${DATAROOT}
+# DEV_SMS: If the job is to be running using ecFflow, default to YES
+# SENDDBN: Set to NO for developers, default to YES
+# COM_IN:  Directory for input files, default to ${COMROOT}/$NET/${envir}
+# COM_OUT: Directory for output file, default to ${COMROOT}/$NET/${envir}
+# gespath: Directory for the guess or restart files, default to ${GESROOT}/${envir}
+#####################################################################################
+if [ "$RUN_ENVIR" != nco ]      ### For Developers, "group_name" is passed from the ecFflow script
+then
+  CONFIG_FILE=${CONFIG_FILE:-/meso/save/${LOGNAME}/fv3href${NWROOTp1}/parm/fv3href_para_config}
+  . $CONFIG_FILE
+  export userid=$LOGNAME
+  export DATA_IN=${DATA_IN:-/ptmpp1/$userid}
+fi
+
+###############################################################
+# This block can be modified for different test environment
+###############################################################
+if [ $RUN_ENVIR = nco -a $envir != prod ]; then
+  export SENDDBN=${SENDDBN:-NO}
+# export DBNROOT=${NWROOTp1}/spa_util/fakedbn
+# export jlogfile=${jlogfile:-${COMROOT}/logs/${envir}/jlogfile}
+fi
+
+echo `date` $0 `date -u` begin
+export PS4='$SECONDS + '
+
+export CYC=${CYC:-${cyc}}
+export MEMBER=${MEMBER:-ctl}
+
+###########################################################
+# obtain unique process id (pid) and make temp directories
+# Note: ctl member needs to be run only once and can be used
+# for both NMM and ARW cores!
+###########################################################
+export pid=$$
+export DATA_IN=${DATA_IN:-${DATAROOT}}
+
+export DATA=$DATA_IN/fv3href_fcst_${CYC}_${envir}
+export WORK_DIR=$DATA/fcst.$MEMBER
+
+# Remove old directory if it exists
+rm -rf $WORK_DIR
+mkdir -p $WORK_DIR
+
+while [ ! -d $WORK_DIR ]
+do
+   mkdir -p $WORK_DIR
+done
+
+cd $WORK_DIR
+
+####################################
+# File To Log Msgs
+####################################
+export jlogfile=${jlogfile:-${COMROOT}/logs/jlogfiles/jlogfile.${job}.${pid}}
+
+####################################
+# Determine Job Output Name on System
+####################################
+export outid="LL$job"
+export jobid="${outid}.o${pid}"
+
+export cycle=t${cyc}z
+
+###############################
+# Specify NET and RUN name
+##############################
+export NET=fv3href
+export RUN=fv3href
+
+##################################################
+# SAVEGES  - Copy Files From TMPDIR to $GESdir
+# SENDECF  - Flag Events on ecFflow
+# SENDCOM  - Copy Files From TMPDIR to $COMOUT
+# SENDDBN  - Issue DBNet Client Calls
+# RERUN    - Rerun fcst from beginning (default no)
+##################################################
+export SENDCOM=${SENDCOM:-YES}
+export SENDECF=${SENDECF:-YES}
+export SENDDBN=${SENDDBN:-YES}
+
+export HOMEfv3href=${HOMEfv3href:-${NWROOT}/${NET}.${fv3href_ver}}
+export EXECfv3href=${EXECfv3href:-$HOMEfv3href/exec}
+export FIXfv3href=${FIXfv3href:-$HOMEfv3href/fix}
+export PARMfv3href=${PARMfv3href:-$HOMEfv3href/parm}
+export USHfv3href=${USHfv3href:-$HOMEfv3href/ush}
+
+###################################
+# Set up the UTILITIES
+###################################
+##machine=`hostname |cut -c1`
+##if [ $machine = t -o $machine = g ]; then
+##  export MACHINE=wcoss
+##fi
+
+##if [ $machine = s -o $machine = l ]; then
+##  export MACHINE=wcoss
+##fi
+
+# Run setup to initialize working directory and utility scripts
+## setup.sh  # no need, since using module load prod_util
+
+# Run setpdy and initialize PDY variables
+setpdy.sh
+. ./PDY
+
+#############################################
+# COMIN and COMOUT
+#############################################
+export COM_IN=${COM_IN:-${COMROOT}/${NET}/${envir}}
+export COM_OUT=${COM_OUT:-${COMROOT}/${NET}/${envir}}
+
+export COMIN=$COM_IN/${RUN}.${PDY}
+export COMOUT=$COM_OUT/${RUN}.${PDY}/${cyc}/${MEMBER}
+
+mkdir -p -m 775 $COMOUT
+
+env
+
+########################################################
+# Execute the script.
+$HOMEfv3href/scripts/exfv3href_fcst.sh.ecf $MEMBER
+
+########################################################
+
+msg="JOB COMPLETED NORMALLY"
+postmsg "$jlogfile" "$msg"
+
+################################
+# Remove the Working Directory
+################################
+cd $DATA_IN
+if [ ${RM_TMPDIR:-NO} = YES ] ; then rm -rf $DATA ; fi
+
+date

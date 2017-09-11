@@ -1,0 +1,39 @@
+#######################################################
+# This file defines the various input varibles for the
+# fv3href model run
+#######################################################
+
+  export NWROOT=/gpfs/hps/nco/ops/nwprod
+#  export NWROOT=/gpfs/gp2/nco/ops/nwprod
+  export NWROOTp1=/gpfs/tp1/nco/ops/nwprod
+  export COMROOT=/gpfs/hps/nco/ops/com
+#  export COMROOT=/gpfs/gp2/nco/ops/com
+  export COMROOTp1=/gpfs/tp1/nco/ops/com
+
+  export HOMEfv3href=/gpfs/hps/emc/meso/save/${USER}/fv3href/fv3href_trunk
+  export EXECfv3href=$HOMEfv3href/exec
+  export FIXfv3href=$HOMEfv3href/fix
+  export PARMfv3href=$HOMEfv3href/parm
+  export USHfv3href=$HOMEfv3href/ush
+  export SCRIPTSfv3href=$HOMEfv3href/scripts
+
+  export SENDCOM=YES
+  export SENDCOM_GB2=YES
+  export SENDDBN=NO
+  export SENDDBN_GB2=NO
+  export SENDSMS=NO
+  export DBNROOT=DBNROOT_OFF
+
+  export TMPDIR=/gpfs/hps/ptmp/$LOGNAME/fv3href/tmpnwprd
+  export DATA_IN=/gpfs/hps/ptmp/$LOGNAME/fv3href/tmpnwprd
+  export jlogfile=$DATA_IN/jlogfile
+
+  export com=/gpfs/hps/ptmp/$LOGNAME/com/fv3href/${envir}
+  export COM=/gpfs/hps/ptmp/$LOGNAME/com/fv3href/${envir}
+# export com=/com/fv3href/${envir}
+# export COM=/com/fv3href/${envir}
+
+  export COM_IN=/gpfs/hps/ptmp/$LOGNAME/com/fv3href/${envir}
+#  export COM_IN=/gpfs/gp2/nco/ops/com/gefs/${envir}
+
+  export COM_OUT=/gpfs/hps/ptmp/$LOGNAME/com/fv3href/${envir}

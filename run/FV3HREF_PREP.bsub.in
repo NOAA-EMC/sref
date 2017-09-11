@@ -1,0 +1,51 @@
+#!/bin/bash
+
+#BSUB -oo _FV3HREFDIR_/run/fv3href_prep__MEMBER_.log
+#BSUB -eo _FV3HREFDIR_/run/fv3href_prep__MEMBER_.log
+#BSUB -J FV3HREF_PREP__MEMBER_
+#BSUB -W 00:30
+#BSUB -q debug
+#BSUB -M 1024
+#BSUB -P SREF-T2O
+#BSUB -extsched 'CRAYLINUX[]'
+
+set -eux
+
+trap 'echo "FV3HREF error _MEMBER_ PREP" >> /gpfs/hps/ptmp/$LOGNAME/fv3href/jlogfile_sref' INT TERM ERR
+echo "FV3HREF started _MEMBER_ PREP" >> /gpfs/hps/ptmp/$LOGNAME/fv3href/jlogfile_sref
+
+. /opt/modules/default/init/bash
+module load PrgEnv-intel
+module unload intel
+module load intel/16.3.210
+module use /gpfs/hps/nco/ops/nwprod/modulefiles
+module load prod_util
+module list
+
+export NODES=1
+export KMP_AFFINITY=disabled
+export OMP_NUM_THREADS=6
+export OMP_STACKSIZE=1024m
+export PMI_LABEL_ERROUT=1
+export MKL_CBWR=AVX2
+
+export MP_EUIDEVICE=sn_all
+export MP_EUILIB=us
+export MP_MPILIB=mpich2
+
+export RUN_ENVIR=para
+export envir=prod
+export job=$$
+
+export CONFIG_FILE=_FV3HREFDIR_/parm/fv3href_para_config_cray
+
+export PDY=_PDY_
+export cyc=_CYC_
+export MEMBER=_MEMBER_
+export MACHINE=_MACHINE_
+
+export APRUN="aprun -n 1 -N 1 -j 1 -d 24 -cc depth"
+
+_FV3HREFDIR_/jobs/JFV3HREF_PREP
+
+echo "FV3HREF finished _MEMBER_ PREP" >> /gpfs/hps/ptmp/$LOGNAME/fv3href/jlogfile_sref
