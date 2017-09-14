@@ -74,10 +74,10 @@ cyc=`echo $CDATE |cut -c 9-10`
 
 # export gfs_dir=${inidir:-$COMROOTp2/gfs/prod/gfs.$ymd}  #directory that contains GFS input file(s)
 if [ $member = ctl ];  then
-  gfs_dir=/gpfs/hps/nco/ops/com/gfs/para/gfs.$ymd  #directory that contains GFS input file(s)
-  gdas_dir=/gpfs/hps/nco/ops/com/gfs/para/gdas.$ymd  #directory that contains GFS input file(s)
+  gfs_dir=/gpfs/hps/nco/ops/com/gfs/prod/gfs.$ymd  #directory that contains GFS input file(s)
+  gdas_dir=/gpfs/hps/nco/ops/com/gfs/prod/gdas.$ymd  #directory that contains GFS input file(s)
 else
-  enkf_dir=/gpfs/hps/nco/ops/com/gfs/para/enkf.$ymd/$cyc  #directory that contains GFS input file(s)
+  enkf_dir=/gpfs/hps/nco/ops/com/gfs/prod/enkf.$ymd/$cyc  #directory that contains GFS input file(s)
 fi
 
 #if [ -s ${gfs_dir}/siganl.gfs.$CDATE ]; then

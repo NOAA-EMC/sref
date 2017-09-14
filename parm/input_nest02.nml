@@ -14,7 +14,7 @@
 /
 
 &diag_manager_nml
-           conserve_water = .false.
+!conserve_water = .false.
            prepend_date = .F.
 /
 
@@ -26,7 +26,7 @@
 
  &fms_nml
        clock_grain = 'ROUTINE',
-       domains_stack_size = 115200,
+       domains_stack_size = 3000000,
        print_memory_usage = .F.
 /
 
@@ -76,6 +76,7 @@
        ke_bg = 0.
        do_vort_damp = .T.
        external_ic = .T.
+       external_eta = .F.
        gfs_phil = .false.
        nggps_ic = .T.
        mountain = .F.
@@ -128,9 +129,25 @@
     peak_fac = 1.
 /
 
- &external_ic_nml
+
+
+# &coupler_nml
+#       months = 0
+#       days  = 2
+#       hours = 0
+#       seconds = 0
+#       dt_atmos = 450
+#       dt_ocean = 450
+#       current_date =  2017,03,01,00,0,0
+#       calendar = 'julian'
+#       memuse_verbose = .false.
+#       atmos_nthreads = 2
+#       use_hyper_thread = .false.
+#       ncores_per_node = 24
+#/
+
+ &external_ic_nml 
        filtered_terrain = .true.
-       ncep_plevels = .false.
        levp = 64
        gfs_dwinds = .true.
        checker_tr = .F.

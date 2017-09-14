@@ -71,7 +71,7 @@ fi
 #----------------------------------------------------------------
 home_dir=$HOMEfv3href
 script_dir=$home_dir/ush
-topo=$FIXfv3href/topo
+topo=$FIXfv3href/fix_orog
 export exec_dir=$home_dir/exec
 
 out_dir=$home_dir/fix/fix_fv3/C${res}

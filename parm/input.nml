@@ -1,40 +1,41 @@
- &amip_interp_nml
-     interp_oi_sst = .true.
-     use_ncep_sst = .true.
-     use_ncep_ice = .false.
-     no_anom_sst = .false.
-     data_set = 'reynolds_oi',
-     date_out_of_range = 'climo',
+&amip_interp_nml
+       interp_oi_sst = .true.
+       use_ncep_sst = .true.
+       use_ncep_ice = .false.
+       no_anom_sst = .false.
+       data_set = 'reynolds_oi',
+       date_out_of_range = 'climo',
 /
 
- &atmos_model_nml
-     blocksize = 32
-     chksum_debug = .false.
-     dycore_only = .false.
+&atmos_model_nml
+       blocksize = 7
+!     surface_debug = .false.
+       chksum_debug = .false.
+       dycore_only = .false.
 /
 
 &diag_manager_nml
 !conserve_water = .false.
-           prepend_date = .F.
+       prepend_date = .F.
 /
 
- &fms_io_nml
+&fms_io_nml
        checksum_required   = .false.
        max_files_r = 100,
        max_files_w = 100,
 /
 
- &fms_nml
+&fms_nml
        clock_grain = 'ROUTINE',
        domains_stack_size = 4000000,
        print_memory_usage = .false.
 /
 
- &fv_grid_nml
-!        grid_file = 'INPUT/grid_spec.nc'
+&fv_grid_nml
+!       grid_file = 'INPUT/grid_spec.nc'
 /
 
- &fv_core_nml
+&fv_core_nml
        layout   =  8,12
        io_layout = 1,1
        npx      = 769
@@ -76,6 +77,7 @@
        ke_bg = 0.
        do_vort_damp = .true.
        external_ic = .T.
+       external_eta = .F.
        gfs_phil = .false.
        nggps_ic = .T.
        mountain = .F.
@@ -87,8 +89,8 @@
        hord_dp = -5
        hord_tr = -8
        adjust_dry_mass = .F.
-       consv_te = 0.
-       do_sat_adj = .T.
+       consv_te = 1.
+       do_sat_adj = .F.
        consv_am = .F.
        fill = .T.
        dwind_2d = .F.
@@ -109,16 +111,15 @@
     p_split = 1
 /
 
- &external_ic_nml
+&external_ic_nml
        filtered_terrain = .true.
-       ncep_plevels = .false.
        levp = 64
        gfs_dwinds = .true.
        checker_tr = .F.
        nt_checker = 0
 /
 
- &gfs_physics_nml
+&gfs_physics_nml
        fhzero         = 6.
        ldiag3d        = .false.
        fhcyc          = 24.
@@ -165,7 +166,7 @@
        fdiag = 3
 /
 
-  &interpolator_nml
+&interpolator_nml
        interp_method = 'conserve_great_circle'
 /
 
@@ -174,8 +175,7 @@
        FNMXIC   = "/gpfs/hps/emc/global/noscrub/emc.glopara/svn/fv3gfs/fix/fix_am/global_maxice.2x2.grb",
        FNTSFC   = "/gpfs/hps/emc/global/noscrub/emc.glopara/svn/fv3gfs/fix/fix_am/RTGSST.1982.2012.monthly.clim.grb",
        FNSNOC   = "/gpfs/hps/emc/global/noscrub/emc.glopara/svn/fv3gfs/fix/fix_am/global_snoclim.1.875.grb",
-       FNZORC   = "igbp"
-!       FNZORC   = "/gpfs/hps/emc/global/noscrub/emc.glopara/svn/fv3gfs/fix/fix_am/global_zorclim.1x1.grb",
+       FNZORC   = "igbp",
        FNALBC   = "/gpfs/hps/emc/global/noscrub/emc.glopara/svn/fv3gfs/fix/fix_am/global_snowfree_albedo.bosu.t126.384.190.rg.grb",
        FNALBC2  = "/gpfs/hps/emc/global/noscrub/emc.glopara/svn/fv3gfs/fix/fix_am/global_albedo4.1x1.grb",
        FNAISC   = "/gpfs/hps/emc/global/noscrub/emc.glopara/svn/fv3gfs/fix/fix_am/CFSR.SEAICE.1982.2012.monthly.clim.grb",

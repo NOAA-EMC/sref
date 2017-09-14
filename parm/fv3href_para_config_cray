@@ -10,7 +10,7 @@
 #  export COMROOT=/gpfs/gp2/nco/ops/com
   export COMROOTp1=/gpfs/tp1/nco/ops/com
 
-  export HOMEfv3href=/gpfs/hps/emc/meso/save/${USER}/fv3href/fv3href_trunk
+  export HOMEfv3href=/gpfs/hps/emc/meso/save/${USER}/fv3refs
   export EXECfv3href=$HOMEfv3href/exec
   export FIXfv3href=$HOMEfv3href/fix
   export PARMfv3href=$HOMEfv3href/parm

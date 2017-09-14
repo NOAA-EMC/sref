@@ -2,14 +2,14 @@
 
 set -eux
 
-FV3HREFDIR=/gpfs/hps/emc/meso/save/${LOGNAME}/fv3href/fv3href_trunk
+FV3HREFDIR=/gpfs/hps/emc/meso/save/${LOGNAME}/fv3refs
 cd $FV3HREFDIR/run
 
 cyc=$1
 FLENGTH=48
 ##ymdh=`cat /gpfs/gp2/nco/ops/com/date/t${cyc}z | cut -c7-16`
 
-ymdh=20170704${cyc}
+ymdh=20170914${cyc}
 
 PDY=`echo $ymdh | cut -c1-8`
 CYC=`echo $ymdh | cut -c9-10`
@@ -22,6 +22,7 @@ export MACHINE=wcoss_cray
 
 #for MEMBER in ctl mem1 mem2 mem3 mem4 mem5 mem6 mem7 mem8 mem9 ; do
 for MEMBER in ctl mem1 mem2 ; do
+#for MEMBER in ctl ; do
 
 cat FV3HREF_PREP.bsub.in | \
     sed s:_PDY_:$PDY:g | \
