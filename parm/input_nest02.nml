@@ -8,7 +8,7 @@
 /
 
  &atmos_model_nml
-     blocksize = 7
+     blocksize = 8
      chksum_debug = .false.
      dycore_only = .false.
 /
@@ -206,28 +206,28 @@
 /
 
 &namsfc
-       FNGLAC   = "/gpfs/hps/emc/global/noscrub/emc.glopara/svn/fv3gfs/fix/fix_am/global_glacier.2x2.grb",
-       FNMXIC   = "/gpfs/hps/emc/global/noscrub/emc.glopara/svn/fv3gfs/fix/fix_am/global_maxice.2x2.grb",
-       FNTSFC   = "/gpfs/hps/emc/global/noscrub/emc.glopara/svn/fv3gfs/fix/fix_am/RTGSST.1982.2012.monthly.clim.grb",
-       FNSNOC   = "/gpfs/hps/emc/global/noscrub/emc.glopara/svn/fv3gfs/fix/fix_am/global_snoclim.1.875.grb",
+       FNGLAC   = "/gpfs/hps3/emc/global/noscrub/emc.glopara/svn/fv3gfs/fix/fix_am/global_glacier.2x2.grb",
+       FNMXIC   = "/gpfs/hps3/emc/global/noscrub/emc.glopara/svn/fv3gfs/fix/fix_am/global_maxice.2x2.grb",
+       FNTSFC   = "/gpfs/hps3/emc/global/noscrub/emc.glopara/svn/fv3gfs/fix/fix_am/RTGSST.1982.2012.monthly.clim.grb",
+       FNSNOC   = "/gpfs/hps3/emc/global/noscrub/emc.glopara/svn/fv3gfs/fix/fix_am/global_snoclim.1.875.grb",
        FNZORC   = "igbp"
-!       FNZORC   = "/gpfs/hps/emc/global/noscrub/emc.glopara/svn/fv3gfs/fix/fix_am/global_zorclim.1x1.grb",
-       FNALBC   = "/gpfs/hps/emc/global/noscrub/emc.glopara/svn/fv3gfs/fix/fix_am/global_snowfree_albedo.bosu.t126.384.190.rg.grb",
-       FNALBC2  = "/gpfs/hps/emc/global/noscrub/emc.glopara/svn/fv3gfs/fix/fix_am/global_albedo4.1x1.grb",
-       FNAISC   = "/gpfs/hps/emc/global/noscrub/emc.glopara/svn/fv3gfs/fix/fix_am/CFSR.SEAICE.1982.2012.monthly.clim.grb",
-       FNTG3C   = "/gpfs/hps/emc/global/noscrub/emc.glopara/svn/fv3gfs/fix/fix_am/global_tg3clim.2.6x1.5.grb",
-       FNVEGC   = "/gpfs/hps/emc/global/noscrub/emc.glopara/svn/fv3gfs/fix/fix_am/global_vegfrac.0.144.decpercent.grb",
-       FNVETC   = "/gpfs/hps/emc/global/noscrub/emc.glopara/svn/fv3gfs/fix/fix_am/global_vegtype.igbp.t126.384.190.rg.grb",
-       FNSOTC   = "/gpfs/hps/emc/global/noscrub/emc.glopara/svn/fv3gfs/fix/fix_am/global_soiltype.statsgo.t126.384.190.rg.grb",
-       FNSMCC   = "/gpfs/hps/emc/global/noscrub/emc.glopara/svn/fv3gfs/fix/fix_am/global_soilmgldas.t126.384.190.grb",
-       FNMSKH   = "/gpfs/hps/emc/global/noscrub/emc.glopara/svn/fv3gfs/fix/fix_am/seaice_newland.grb",
+!      FNZORC   = "/gpfs/hps3/emc/global/noscrub/emc.glopara/svn/fv3gfs/fix/fix_am/global_zorclim.1x1.grb",
+       FNALBC   = "/gpfs/hps3/emc/global/noscrub/emc.glopara/svn/fv3gfs/fix/fix_am/global_snowfree_albedo.bosu.t126.384.190.rg.grb",
+       FNALBC2  = "/gpfs/hps3/emc/global/noscrub/emc.glopara/svn/fv3gfs/fix/fix_am/global_albedo4.1x1.grb",
+       FNAISC   = "/gpfs/hps3/emc/global/noscrub/emc.glopara/svn/fv3gfs/fix/fix_am/CFSR.SEAICE.1982.2012.monthly.clim.grb",
+       FNTG3C   = "/gpfs/hps3/emc/global/noscrub/emc.glopara/svn/fv3gfs/fix/fix_am/global_tg3clim.2.6x1.5.grb",
+       FNVEGC   = "/gpfs/hps3/emc/global/noscrub/emc.glopara/svn/fv3gfs/fix/fix_am/global_vegfrac.0.144.decpercent.grb",
+       FNVETC   = "/gpfs/hps3/emc/global/noscrub/emc.glopara/svn/fv3gfs/fix/fix_am/global_vegtype.igbp.t126.384.190.rg.grb",
+       FNSOTC   = "/gpfs/hps3/emc/global/noscrub/emc.glopara/svn/fv3gfs/fix/fix_am/global_soiltype.statsgo.t126.384.190.rg.grb",
+       FNSMCC   = "/gpfs/hps3/emc/global/noscrub/emc.glopara/svn/fv3gfs/fix/fix_am/global_soilmgldas.t126.384.190.grb",
+       FNMSKH   = "/gpfs/hps3/emc/global/noscrub/emc.glopara/svn/fv3gfs/fix/fix_am/seaice_newland.grb",
        FNTSFA   = "",
        FNACNA   = "",
        FNSNOA   = "",
-       FNVMNC   = "/gpfs/hps/emc/global/noscrub/emc.glopara/svn/fv3gfs/fix/fix_am/global_shdmin.0.144x0.144.grb",
-       FNVMXC   = "/gpfs/hps/emc/global/noscrub/emc.glopara/svn/fv3gfs/fix/fix_am/global_shdmax.0.144x0.144.grb",
-       FNSLPC   = "/gpfs/hps/emc/global/noscrub/emc.glopara/svn/fv3gfs/fix/fix_am/global_slope.1x1.grb",
-       FNABSC   = "/gpfs/hps/emc/global/noscrub/emc.glopara/svn/fv3gfs/fix/fix_am/global_mxsnoalb.uariz.t126.384.190.rg.grb",
+       FNVMNC   = "/gpfs/hps3/emc/global/noscrub/emc.glopara/svn/fv3gfs/fix/fix_am/global_shdmin.0.144x0.144.grb",
+       FNVMXC   = "/gpfs/hps3/emc/global/noscrub/emc.glopara/svn/fv3gfs/fix/fix_am/global_shdmax.0.144x0.144.grb",
+       FNSLPC   = "/gpfs/hps3/emc/global/noscrub/emc.glopara/svn/fv3gfs/fix/fix_am/global_slope.1x1.grb",
+       FNABSC   = "/gpfs/hps3/emc/global/noscrub/emc.glopara/svn/fv3gfs/fix/fix_am/global_mxsnoalb.uariz.t126.384.190.rg.grb",
        LDEBUG   =.false.,
        FSMCL(2) = 99999
        FSMCL(3) = 99999
@@ -246,4 +246,6 @@
        FABSL    = 99999,
        FSNOS    = 99999,
        FSICS    = 99999,
+/
+&nam_stochy
 /

@@ -10,7 +10,7 @@
 #  export COMROOT=/gpfs/gp2/nco/ops/com
   export COMROOTp1=/gpfs/tp1/nco/ops/com
 
-  export HOMEfv3href=/gpfs/hps/emc/meso/save/${USER}/fv3refs
+  export HOMEfv3href=/gpfs/hps3/emc/meso/save/${USER}/fv3refs
   export EXECfv3href=$HOMEfv3href/exec
   export FIXfv3href=$HOMEfv3href/fix
   export PARMfv3href=$HOMEfv3href/parm
@@ -24,16 +24,16 @@
   export SENDSMS=NO
   export DBNROOT=DBNROOT_OFF
 
-  export TMPDIR=/gpfs/hps/ptmp/$LOGNAME/fv3href/tmpnwprd
-  export DATA_IN=/gpfs/hps/ptmp/$LOGNAME/fv3href/tmpnwprd
+  export TMPDIR=/gpfs/hps3/ptmp/$LOGNAME/fv3href/tmpnwprd
+  export DATA_IN=/gpfs/hps3/ptmp/$LOGNAME/fv3href/tmpnwprd
   export jlogfile=$DATA_IN/jlogfile
 
-  export com=/gpfs/hps/ptmp/$LOGNAME/com/fv3href/${envir}
-  export COM=/gpfs/hps/ptmp/$LOGNAME/com/fv3href/${envir}
+  export com=/gpfs/hps3/ptmp/$LOGNAME/com/fv3href/${envir}
+  export COM=/gpfs/hps3/ptmp/$LOGNAME/com/fv3href/${envir}
 # export com=/com/fv3href/${envir}
 # export COM=/com/fv3href/${envir}
 
-  export COM_IN=/gpfs/hps/ptmp/$LOGNAME/com/fv3href/${envir}
+  export COM_IN=/gpfs/hps3/ptmp/$LOGNAME/com/fv3href/${envir}
 #  export COM_IN=/gpfs/gp2/nco/ops/com/gefs/${envir}
 
-  export COM_OUT=/gpfs/hps/ptmp/$LOGNAME/com/fv3href/${envir}
+  export COM_OUT=/gpfs/hps3/ptmp/$LOGNAME/com/fv3href/${envir}

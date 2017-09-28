@@ -11,8 +11,9 @@
 
 set -eux
 
-trap 'echo "FV3HREF error _MEMBER_ FCST" >> /gpfs/hps/ptmp/$LOGNAME/fv3href/jlogfile_sref' INT TERM ERR
-echo "FV3HREF started _MEMBER_ FCST" >> /gpfs/hps/ptmp/$LOGNAME/fv3href/jlogfile_sref
+MY_PTMP=/gpfs/hps3/ptmp/$LOGNAME
+trap 'echo "FV3HREF error _MEMBER_ FCST" >> $MY_PTMP/fv3href/jlogfile_sref' INT TERM ERR
+echo "FV3HREF started _MEMBER_ FCST" >> $MY_PTMP/fv3href/jlogfile_sref
 
 . /opt/modules/default/init/bash
 module load PrgEnv-intel
@@ -52,4 +53,4 @@ export APRUN="aprun -n 1728 -N 12 -j 1 -d 2 -cc depth"
 
 _FV3HREFDIR_/jobs/JFV3HREF_FCST
 
-echo "FV3HREF finished _MEMBER_ FCST" >> /gpfs/hps/ptmp/$LOGNAME/fv3href/jlogfile_sref
+echo "FV3HREF finished _MEMBER_ FCST" >> $MY_PTMP/fv3href/jlogfile_sref
