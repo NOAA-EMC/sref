@@ -88,7 +88,7 @@ C              BUFR IN THIS PROGRAM.
 C
 C--------------------------------------------------------------------
       INCLUDE "parm.nmmb"
-      PARAMETER (LM=LM1,NPNT=88,NSTAT=1733
+      PARAMETER (LM=LM1,NPNT=88,NSTAT=1790
      &, SPVAL=-99999.0,SMISS=1.E10
      &, LCL1ML=15,LCL1SL=52,LCL1SOIL=2
      &, LCL1ML1=14,LCL1SL1=58 
