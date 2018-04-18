@@ -3828,6 +3828,7 @@ CONTAINS
             WPLUS = 0.
          END IF
          SMC (K) = MAX ( MIN (STOT,SMCMAX),0.02 )
+         if(SMC(K).ge.SMCMAX) SMC(K)=SMCMAX-0.001
          SH2OOUT (K) = MAX ( (SMC (K) - SICE (K)),0.0)
       END DO
 #ifdef WRF_HYDRO
@@ -3859,7 +3860,8 @@ CONTAINS
                  END IF
                END IF
 
-!             SMC (K) = MAX ( MIN (STOT,SMCMAX),0.02 )
+              SMC (K) = MAX ( MIN (STOT,SMCMAX),0.02 )
+         if(SMC(K).ge.SMCMAX) SMC(K)=SMCMAX-0.001
              SH2OOUT (K) = MAX ( (SMC (K) - SICE (K)),0.0)
 
            END DO
