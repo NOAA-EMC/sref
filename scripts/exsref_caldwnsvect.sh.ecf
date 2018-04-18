@@ -33,10 +33,10 @@ anlhr="00 03 06 09 12 15 18 21"
 for anlcyc in $anlhr ; do 
 if [ $anlcyc -gt $cyc ];then
 #RTMAdata=${COMROOT}/rtma/prod/rtma.$PDYm1
- RTMAdata=$COMRTMA/rtma2p5.$PDYm1
+ RTMAdata=$COMINrtma/rtma2p5.$PDYm1
 else
 #RTMAdata=${COMROOT}/rtma/prod/rtma.$PDY
- RTMAdata=$COMRTMA/rtma2p5.$PDY
+ RTMAdata=$COMINrtma/rtma2p5.$PDY
 fi
 afile=rtma.t${anlcyc}z.2dvaranl_ndfd.grb1
 ln -fs $RTMAdata/rtma.t${anlcyc}z.2dvaranl_ndfd.grb1 $afile.temp 
