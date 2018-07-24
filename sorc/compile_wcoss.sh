@@ -1,19 +1,19 @@
 #!/bin/sh
 set -aux
 
-base=`pwd`/..
+base=$(dirname $PWD)
 
 module purge
-module load /nwpara2/modulefiles/SREF/v7.0.0
-#module load $base/modulefiles/SREF/v7.0.0
+module use ${base}/modulefiles
+module load SREF/v7.0
 module list
 
 date
 
 #######################################
 
-SORCsref=`pwd`
-EXECsref=`pwd`/../exec
+SORCsref=${base}/sorc
+EXECsref=${base}/exec
 mkdir -m 775 -p $EXECsref
 
 if [ 1 == 1 ]; then
