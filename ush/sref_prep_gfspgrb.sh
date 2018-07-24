@@ -65,14 +65,8 @@ if [ $model = GFS ]; then
      fi
 
 #convert from grib2 to grib1 here
-       if [ $newfhr -lt 100 ];then
-cat ${COMIN_SIG}/gfs.t${newCYC}z.pgrb2.0p25.f0${newfhr} ${COMIN_SIG}/gfs.t${newCYC}z.pgrb2b.0p25.f0$newfhr > temp_grib2
-       else
-cat ${COMIN_SIG}/gfs.t${newCYC}z.pgrb2.0p25.f${newfhr} ${COMIN_SIG}/gfs.t${newCYC}z.pgrb2b.0p25.f$newfhr > temp_grib2
-       fi
-$CNVGRIB -g21 temp_grib2 $GFSOUT/gfs.t${newCYC}z.master.grbf$newfhr
 #$CNVGRIB -g21 ${COMIN_SIG}/gfs.t${newCYC}z.master.grb2f${newfhr} $GFSOUT/gfs.t${newCYC}z.master.grbf$newfhr
-#cp ${COMIN_SIG}/gfs.t${newCYC}z.pgrbf${newfhr} $GFSOUT/gfs.t${newCYC}z.master.grbf$newfhr
+cp ${COMIN_SIG}/gfs.t${newCYC}z.pgrbf${newfhr} $GFSOUT/gfs.t${newCYC}z.master.grbf$newfhr
 
 fi
 
