@@ -142,7 +142,7 @@ rm -f rsl.*
 #if [ $MODEL == NMM ] && [ $PAIR == 02 ] ; then
 if [ $MODEL == NMM ] && [ $PAIR == 99 ] ; then
    export pgm=sref_wrf_${model}_hwrf
-   prep_step
+   . prep_step
    startmsg
    if [ $MACHINE == zeus ]; then
    mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_wrf_${model}_hwrf >> $pgmout 2>errfile
@@ -152,7 +152,7 @@ if [ $MODEL == NMM ] && [ $PAIR == 99 ] ; then
    export err=$?; err_chk
 else
    export pgm=sref_wrf_${model}
-   prep_step
+   . prep_step
    startmsg
 
    if [ $MODEL == NMB ] ; then

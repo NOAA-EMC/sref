@@ -329,7 +329,7 @@ cat <<paramEOF >input
 paramEOF
 
 export pgm=sref_com_grib.${grid}
-prep_step
+. prep_step
 
 startmsg
 cp $PARMsref/sref_product_variable_BC.tbl.${grid} variable.tbl

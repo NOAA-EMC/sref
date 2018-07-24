@@ -156,7 +156,7 @@ fi
    ln -sf griddef.out fort.110
 
    export pgm=sref_post
-   prep_step
+   . prep_step
    startmsg
    if [ $MACHINE == zeus ]; then
    mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_post < itag >> $pgmout 2>errfile

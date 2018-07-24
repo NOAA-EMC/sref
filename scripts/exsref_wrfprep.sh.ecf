@@ -122,7 +122,7 @@ if [ $MEMBER == ctl -o $MEMBER == n01 -o $MEMBER == p01 -o $MEMBER == n02 -o $ME
                                                      sed s/IOFORM/$IOFORM/ | \
                                                      sed s/FILEPREFIX/FILE_GFS/ > namelist.wps
   export pgm=sref_ungrib
-  prep_step
+  . prep_step
   startmsg
   $EXECsref/sref_ungrib >> $pgmout 2>errfile
   export err=$?; err_chk
@@ -137,7 +137,7 @@ if [ $MEMBER == ctl -o $MEMBER == n01 -o $MEMBER == p01 -o $MEMBER == n02 -o $ME
                                                      sed s/IOFORM/$IOFORM/ | \
                                                      sed s/FILEPREFIX/FILE_RUC/ > namelist.wps
   export pgm=sref_ungrib
-  prep_step
+  . prep_step
   startmsg
   $EXECsref/sref_ungrib >> $pgmout 2>errfile
   export err=$?; err_chk
@@ -150,7 +150,7 @@ if [ $MEMBER == ctl -o $MEMBER == n01 -o $MEMBER == p01 -o $MEMBER == n02 -o $ME
                                                      sed s/FGNAME/"'.\/FILE_GFS'","'.\/FILE_RUC'"/ > namelist.wps
 
   export pgm=sref_metgrid
-  prep_step
+  . prep_step
   startmsg
   if [ $MACHINE == zeus ]; then
   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_metgrid >> $pgmout 2>errfile
@@ -176,14 +176,14 @@ if [ $MEMBER == c00 -o $MEMBER == n03 -o $MEMBER == p03 -o $MEMBER == n04 -o $ME
                                                      sed s/FILEPREFIX/FILE_GFS/ | \
                                                      sed s/FGNAME/"'.\/FILE_GFS'"/ > namelist.wps
   export pgm=sref_ungrib
-  prep_step
+  . prep_step
   startmsg
   $EXECsref/sref_ungrib >> $pgmout 2>errfile
   export err=$?; err_chk
 
   cp $PARMsref/sref_METGRID.TBL.$MODEL METGRID.TBL
   export pgm=sref_metgrid
-  prep_step
+  . prep_step
   startmsg
   if [ $MACHINE == zeus ]; then
   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_metgrid >> $pgmout 2>errfile
@@ -211,7 +211,7 @@ if [ $MEMBER == n05 -o $MEMBER == p05 -o $MEMBER == n06 -o $MEMBER == p06 ]; the
                                                      sed s/FILEPREFIX/FILE_GFS/ | \
                                                      sed s/FGNAME/"'.\/FILE_GFS'"/ > namelist.wps
   export pgm=sref_ungrib
-  prep_step
+  . prep_step
   startmsg
   $EXECsref/sref_ungrib >> $pgmout 2>errfile
 # if [ $MACHINE == zeus ]; then
@@ -240,7 +240,7 @@ if [ $MEMBER == n05 -o $MEMBER == p05 -o $MEMBER == n06 -o $MEMBER == p06 ]; the
 #                                                    sed s/FGNAME/"'.\/FILE_NDAS'"/ > namelist.wps
 #
   export pgm=sref_ungrib_nems
-  prep_step
+  . prep_step
   startmsg
   if [ $MACHINE == zeus ]; then
   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
@@ -252,7 +252,7 @@ if [ $MEMBER == n05 -o $MEMBER == p05 -o $MEMBER == n06 -o $MEMBER == p06 ]; the
   export err=$?;err_chk
 
 # export pgm=sref_ungrib
-# prep_step
+# . prep_step
 # startmsg
 # $EXECsref/sref_ungrib >> $pgmout 2>errfile
 # export err=$?;err_chk
@@ -269,7 +269,7 @@ if [ $MEMBER == n05 -o $MEMBER == p05 -o $MEMBER == n06 -o $MEMBER == p06 ]; the
                                                      sed s/FGNAME/"'.\/FILE_GFS'","'.\/FILE_NDAS'"/ > namelist.wps
   cp namelist.wps namelist.wps_${MEMBER}4metgrid
   export pgm=sref_metgrid
-  prep_step
+  . prep_step
   startmsg
   if [ $MACHINE == zeus ]; then
   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_metgrid >> $pgmout 2>errfile
@@ -311,14 +311,14 @@ fi
                                                      sed s/FILEPREFIX/FILE_GFS/ | \
                                                      sed s/FGNAME/"'.\/FILE_GFS'"/ > namelist.wps
   export pgm=sref_ungrib
-  prep_step
+  . prep_step
   startmsg
   $EXECsref/sref_ungrib >> $pgmout 2>errfile
   export err=$?; err_chk
 
   cp $PARMsref/sref_METGRID.TBL.$MODEL METGRID.TBL
   export pgm=sref_metgrid
-  prep_step
+  . prep_step
   startmsg
   if [ $MACHINE == zeus ]; then
   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_metgrid >> $pgmout 2>errfile
@@ -359,14 +359,14 @@ NMM)
                                                      sed s/FGNAME/"'.\/FILE_GFS'"/ > namelist.wps
 
   export pgm=sref_ungrib
-  prep_step
+  . prep_step
   startmsg
   $EXECsref/sref_ungrib >> $pgmout 2>errfile
   export err=$?; err_chk
 
   cp $PARMsref/sref_METGRID.TBL.$MODEL METGRID.TBL
   export pgm=sref_metgrid
-  prep_step
+  . prep_step
   startmsg
   if [ $MACHINE == zeus ]; then
   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_metgrid >> $pgmout 2>errfile
@@ -406,7 +406,7 @@ if [ $MEMBER == ctl -o $MEMBER == n01 -o $MEMBER == p01 -o $MEMBER == n02 -o $ME
                                                      sed s/WPS_END_DATE/$WPS_START_DATE/ | \
                                                      sed s/FILEPREFIX/FILE_GFS/ > namelist.nps
   export pgm=sref_ungrib_nems
-  prep_step
+  . prep_step
   startmsg
   if [ $MACHINE == zeus ]; then
   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
@@ -429,7 +429,7 @@ if [ $MEMBER == ctl -o $MEMBER == n01 -o $MEMBER == p01 -o $MEMBER == n02 -o $ME
                                                      sed s/FILEPREFIX/FILE_NDAS/ | \
                                                      sed s/FGNAME/"'.\/FILE_NDAS'"/ > namelist.nps
   export pgm=sref_ungrib_nems
-  prep_step
+  . prep_step
   startmsg
   if [ $MACHINE == zeus ]; then
   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
@@ -468,7 +468,7 @@ if [ $MEMBER == c00 -o $MEMBER == n03 -o $MEMBER == p03 -o $MEMBER == n04 -o $ME
                                                      sed s/FILEPREFIX/FILE_GFS/ | \
                                                      sed s/FGNAME/"'.\/FILE_GFS'"/ > namelist.nps
   export pgm=sref_ungrib_nems
-  prep_step
+  . prep_step
   startmsg
   if [ $MACHINE == zeus ]; then
   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
@@ -501,7 +501,7 @@ if [ $MEMBER == n05 -o $MEMBER == p05 -o $MEMBER == n06 -o $MEMBER == p06 ]; the
                                                      sed s/WPS_END_DATE/$WPS_START_DATE/ | \
                                                      sed s/FILEPREFIX/FILE_GFS/ > namelist.nps
   export pgm=sref_ungrib_nems
-  prep_step
+  . prep_step
   startmsg
   if [ $MACHINE == zeus ]; then
   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
@@ -521,7 +521,7 @@ if [ $MEMBER == n05 -o $MEMBER == p05 -o $MEMBER == n06 -o $MEMBER == p06 ]; the
                                                      sed s/WPS_END_DATE/$WPS_START_DATE/ | \
                                                      sed s/FILEPREFIX/FILE_RUC/ > namelist.nps
   export pgm=sref_ungrib_nems
-  prep_step
+  . prep_step
   startmsg
   if [ $MACHINE == zeus ]; then
   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
@@ -539,7 +539,7 @@ if [ $MEMBER == n05 -o $MEMBER == p05 -o $MEMBER == n06 -o $MEMBER == p06 ]; the
 fi
 
   export pgm=sref_metgrid_nems
-  prep_step
+  . prep_step
   startmsg
   if [ $MACHINE == zeus ]; then
   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_metgrid_nems >> $pgmout 2>errfile
@@ -578,7 +578,7 @@ mv met_nmb.d01.${WPS_START_DATE}.dio met_nmb.d01.${WPS_START_DATE}.dio_IC
                                                      sed s/FILEPREFIX/FILE_GFS/ | \
                                                      sed s/FGNAME/"'.\/FILE_GFS'"/ > namelist.nps
   export pgm=sref_ungrib_nems
-  prep_step
+  . prep_step
   startmsg
   if [ $MACHINE == zeus ]; then
   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
@@ -607,7 +607,7 @@ cat $PARMsref/sref_namelist.wps.in.${MODEL}_$RES | sed s/WPS_START_DATE/$WPS_DAT
                                                    sed s/FILEPREFIX/FILE_GFS/ | \
                                                    sed s/FGNAME/"'.\/FILE_GFS'"/ > namelist.nps
   export pgm=sref_metgrid_nems
-  prep_step
+  . prep_step
   startmsg
   if [ $MACHINE == zeus ]; then
   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_metgrid_nems >> $pgmout 2>errfile

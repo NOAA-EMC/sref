@@ -381,7 +381,7 @@ paramEOF
 # for FVS verification system
 ###############################################
 export pgm=sref_com_grib_fvs.$grid
-prep_step
+. prep_step
 
 #startmsg
 rm -f variable.tbl
