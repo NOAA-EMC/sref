@@ -71,7 +71,7 @@ export PS4='$SECONDS + '
 export pid=$$
 export DATA_IN=${DATA_IN:-${DATAROOT}}
 
-export DATA=$DATA_IN/${job}.${pid}
+export DATA=$DATA_IN/${jobid:?}
 rm -rf $DATA
 mkdir -p $DATA
 
@@ -119,11 +119,8 @@ export USHsref=${USHsref:-$HOMEsref/ush}
 export HOMEspc=${HOMEspc:-${NWROOT}/spcsref.${spcsref_ver}}
 export SPCfix=${SPCfix:-$HOMEspc/fix}
 
-###################################
-# Load the GRIB Utilities module
-####################################
-. /usrx/local/Modules/default/init/ksh
-module load grib_util
+# The grib_util module should be loaded prior to running this J-job
+#module load grib_util
  
 
 ###################################

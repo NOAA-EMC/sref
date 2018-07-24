@@ -15,8 +15,8 @@ export PS4='$SECONDS + '
 export OMP_NUM_THREADS=1
 export MP_MPILIB=mpich2
 
-. /usrx/local/Modules/default/init/ksh
-module load grib_util
+# The grib_util module should be loaded prior to running this J-job
+#module load grib_util
 
 #
 # Specify whether the run is production or development
@@ -144,14 +144,11 @@ export gespath=${gespath:-${GESROOT}/${envir}}
 
 export GESDIR=$gespath/${NET}.${PDY}
 
-#export COMNAM=${COMNAM:-${COMROOT}/nam/prod}
-export COMINnam=${COMINnam:-${COMROOTp1}/nam/prod}
-
-##export GES_IN=/nwges_p6/prod #XXW 
+export COMINnam=${COMINnam:-$(compath.py nam/prod)}
 export GES_IN=${GES_IN:-$gespath}
 
-export GESNAM=${GESNAM:-${GESROOTp1}/prod}
-export GESNDAS=${GESNDAS:-${GESROOTp1}/prod}
+export GESNAM=${GESNAM:-${GESROOT}/prod}
+export GESNDAS=${GESNDAS:-${GESROOT}/prod}
 
 #The following variables are turned off now
 export GESnam=$GESNAM/nam.${PDY}

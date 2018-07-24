@@ -63,7 +63,7 @@ fi
 export pid=$$
 export DATA_IN=${DATA_IN:-${DATAROOT}}
 
-export DATA=$DATA_IN/${job}.${pid}
+export DATA=$DATA_IN/${jobid:?}
 # Remove old directory if it exists
 rm -rf $DATA
 mkdir -p $DATA

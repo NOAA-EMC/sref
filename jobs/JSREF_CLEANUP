@@ -14,10 +14,6 @@ set -xa
 #
 export RUN_ENVIR=${RUN_ENVIR:-nco}
 
-. /usrx/local/Modules/default/init/ksh
-module load grib_util
- 
-
 #####################################################################################
 # Run config file to get input parameters
 # This config file should define the following variables
@@ -59,7 +55,7 @@ date
 export pid=$$
 export DATA_IN=${DATA_IN:-${DATAROOT}}
 
-export DATA=$DATA_IN/${job}.${pid}
+export DATA=$DATA_IN/${jobid:?}
 rm -rf $DATA
 mkdir -p $DATA
 

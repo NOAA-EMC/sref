@@ -69,7 +69,7 @@ fi
 export pid=$$
 export pid=$$
 export DATA_IN=${DATA_IN:-${DATAROOT}}
-export DATA=$DATA_IN/${job}.${pid}
+export DATA=$DATA_IN/${jobid:?}
 
 mkdir -p $DATA
 cd $DATA

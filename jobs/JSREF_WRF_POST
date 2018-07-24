@@ -21,11 +21,8 @@ export OMP_NUM_THREADS=1
 export MP_MPILIB=mpich2
 export MP_I_BINDPROC=NO
 
-###################################
-# Load the GRIB Utilities module
-####################################
-. /usrx/local/Modules/default/init/ksh
-module load grib_util
+# The grib_util module should be loaded prior to running this J-job
+#module load grib_util
 
 #
 # Specify whether the run is production or development

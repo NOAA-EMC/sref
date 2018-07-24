@@ -60,7 +60,7 @@ echo `date` $0 `date -u` begin
 export pid=$$
 export DATA_IN=${DATA_IN:-${DATAROOT}}
 
-export DATA=$DATA_IN/${job}.${pid}
+export DATA=$DATA_IN/${jobid:?}
 rm -rf $DATA
 mkdir -p $DATA
 
@@ -132,8 +132,7 @@ export COMOUT=$COM_OUT/${RUN}.${PDYm4}/${cyc}/misc
 
 export COMOUT_MISC=${COMOUT_MISC:-$COM_OUT/${RUN}.${PDY}/${cyc}/misc}
 
-#export COMNAM=${COMNAM:-${COMROOT}/nam/prod}
-export COMINnam=${COMINnam:-${COMROOTp1}/nam/prod}
+export COMINnam=${COMINnam:-$(compath.py nam/prod)}
 
 mkdir -p -m 775 $COMOUT $COMOUT_MISC
  

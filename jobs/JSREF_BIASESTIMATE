@@ -66,7 +66,7 @@ export PS4='$SECONDS + '
 export pid=$$
 export DATA_IN=${DATA_IN:-${DATAROOT}}
 
-export DATA=$DATA_IN/${job}.${pid}
+export DATA=$DATA_IN/${jobid:?}
 rm -rf $DATA
 mkdir -p $DATA
 
@@ -119,8 +119,8 @@ export USHglobal=$HOMEglobal/ush
 ###################################
 # Load the GRIB Utilities module
 ####################################
-. /usrx/local/Modules/default/init/ksh
-module load grib_util
+# The grib_util module should be loaded prior to running this J-job
+#module load grib_util
 
 ###################################
 # Set up the UTILITIES
@@ -149,8 +149,6 @@ export COMOUT_NDGD=$COM_OUT/${RUN}.${PDY}/${cyc}/ensprod_ndgd
 
 export COMOUT_MISC=${COMOUT_MISC:-$COM_OUT/${RUN}.${PDY}/${cyc}/misc}
 export COM_NDGD=$COM_IN/${RUN}.${PDY}/${cyc}/pgrb_ndgd
-
-#XXW export COMNAM=${COMNAM:-${COMROOT}/nam/prod}
 
 mkdir -p -m 775 $COMOUT $COMOUT_BC $COMOUT_NDGD $COM_NDGD
  

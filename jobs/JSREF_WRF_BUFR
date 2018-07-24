@@ -21,8 +21,8 @@ export PS4='$SECONDS + '
 export OMP_NUM_THREADS=1
 export MP_MPILIB=mpich2
 
-. /usrx/local/Modules/default/init/ksh
-module load grib_util
+# The grib_util module should be loaded prior to running this J-job
+#module load grib_util
 
 #
 # Specify whether the run is production or development
@@ -73,7 +73,7 @@ export runflag=${runflag:-3hrly}
 export pid=$$
 export DATA_IN=${DATA_IN:-${DATAROOT}}
 
-export DATA=$DATA_IN/${job}.${pid}
+export DATA=$DATA_IN/${jobid:?}
 rm -rf $DATA
 mkdir -p $DATA
 

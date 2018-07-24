@@ -54,7 +54,7 @@ fi
 export pid=$$
 export DATA_IN=${DATA_IN:-${DATAROOT}}
 
-export DATA=$DATA_IN/${job}.${pid}
+export DATA=$DATA_IN/${jobid:?}
 mkdir $DATA
 cd $DATA 
 
@@ -101,8 +101,8 @@ export GEMPAKsref=${GEMPAKsref:-$HOMEsref/gempak}
 ###################################
 # Load the GRIB Utilities module
 ####################################
-. /usrx/local/Modules/default/init/ksh
-module load grib_util
+# The grib_util module should be loaded prior to running this J-job
+#module load grib_util
 
 ###################################
 # Set up the UTILITIES

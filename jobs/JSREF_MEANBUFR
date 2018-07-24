@@ -31,8 +31,8 @@ export MP_EUILIB=us
 export MP_MPILIB=mpich2
 export MP_TASK_AFFINITY=core:1
 
-. /usrx/local/Modules/default/init/ksh
-module load grib_util
+# The grib_util module should be loaded prior to running this J-job
+#module load grib_util
 
 export RUN_ENVIR=${RUN_ENVIR:-nco}
 
@@ -93,7 +93,7 @@ fi
 export pid=$$
 export DATA_IN=${DATA_IN:-${DATAROOT}}
 
-export DATA=$DATA_IN/${job}.${pid}
+export DATA=$DATA_IN/${jobid:?}
 
 rm -rf $DATA
 mkdir -p $DATA

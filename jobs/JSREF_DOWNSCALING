@@ -55,7 +55,7 @@ echo `date` $0 `date -u` begin
 export pid=$$
 export DATA_IN=${DATA_IN:-${DATAROOT}}
 
-export DATA=$DATA_IN/${job}.${pid}
+export DATA=$DATA_IN/${jobid:?}
 rm -rf $DATA
 mkdir -p $DATA
 
@@ -106,11 +106,8 @@ export FIXglobal=$HOMEglobal/fix
 export PARMglobal=$HOMEglobal/parm
 export USHglobal=$HOMEglobal/ush
 
-###################################
-# Load the GRIB Utilities module
-####################################
-. /usrx/local/Modules/default/init/ksh
-module load grib_util
+# The grib_util module should be loaded prior to running this J-job
+#module load grib_util
 
 ###################################
 # Set up the UTILITIES
@@ -128,10 +125,6 @@ setpdy.sh
 export COM_IN=${COM_IN:-${COMROOT}/${NET}/${envir}}
 export COM_OUT=${COM_OUT:-${COMROOT}/${NET}/${envir}}
 
-#export com=${com:-$COM_IN}
-
-#XXW export GESDIR=$GES_IN/${NET}.${PDY}
-
 export COMIN=$COM_IN/${RUN}.${PDY}/${cyc}/pgrb
 export COM_NDGD=${COMOUT_NDGD:-$COM_IN/${RUN}.${PDY}/${cyc}/pgrb_ndgd}
 export COMOUT_MISC=${COMOUT_MISC:-$COM_IN/${RUN}.${PDY}/${cyc}/misc}
@@ -141,7 +134,7 @@ export COMOUT=$COM_OUT/${RUN}.${PDY}/$cyc/pgrb_biasc
 export COMOUT_BC=$COM_OUT/${RUN}.${PDY}/${cyc}/ensprod_biasc
 export COMOUT_NDGD=$COM_OUT/${RUN}.${PDY}/${cyc}/ensprod_ndgd
 
-export COMINnam=${COMINnam:-${COMROOTp1}/nam/prod}
+export COMINnam=${COMINnam:-$(compath.py nam/prod)}
 
 mkdir -p -m 775 ${COMOUT_NDGD} ${COM_NDGD} ${COMOUT_BC}
  
@@ -159,7 +152,7 @@ export VERBOSE=YES
 # Execute the Script
 ###################################################
 # 1. Downscaling vector calculation
-export COMRTMA=${COMRTMA:-${COMROOT}/rtma/prod}
+export COMINrtma=${COMINrtma:-$(compath.py rtma/prod)}
 mkdir -m 775 $DATA/downscalevector
 cd $DATA/downscalevector
 ## setup.sh  # no need, since using module load prod_util 
