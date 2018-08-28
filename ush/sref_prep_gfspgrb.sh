@@ -13,6 +13,7 @@
 #                                                                                    #
 # Script history log:                                                                #
 # 2017-01-10  Jun Du  - Initial script                                               #
+# 2018-08-28  Jun Du  - Use fv3gfs data
 #                                                                                    #
 ######################################################################################
 
@@ -34,39 +35,42 @@ cd $DATA/${GLBPAIR}_$fhr
 #
 if [ $model = GFS ]; then
 
- str=`ls -s $COMINgfs/gfs.$DATE/gfs.t${CYC}z.pgrbf90`  #get file size in block (1024 bytes)
+ str=`ls -s $COMINgfs/gfs.$DATE/$CYC/gfs.t${CYC}z.pgrb2.1p00.f090`  #get file size in block (1024 bytes)
      set -A fsize $str
-     if [ -s ${COMINgfs}/gfs.$DATE/gfs.t${CYC}z.master.grb2f90 ] && [ ${fsize[0]} -gt 800 ] ; then # fcst file is finished?
-       echo  ${COMINgfs}/gfs.$DATE/gfs.t${CYC}z.master.grb2f90 " exist"
-       export COMIN_SIG=$COMINgfs/gfs.$DATE
+     if [ -s ${COMINgfs}/gfs.$DATE/$CYC/gfs.t${CYC}z.pgrb2.1p00.f090 ] && [ ${fsize[0]} -gt 800 ] ; then # fcst file is finished?
+       echo  ${COMINgfs}/gfs.$DATE/$CYC/gfs.t${CYC}z.pgrb2.1p00.f090 " exist"
+       export COMIN_SIG=$COMINgfs/gfs.$DATE/$CYC
        newCYC=$CYC
        newfhr=$fhr
        echo 'using the most current GFS data'
      else
        if [ $CYC -eq 00 ]; then
         newCYC=18
-        export COMIN_SIG=$COMINgfs/gfs.$PDYm1
+        export COMIN_SIG=$COMINgfs/gfs.$PDYm1/$newCYC
        fi
        if [ $CYC -eq 06 ]; then
         newCYC=00
-        export COMIN_SIG=$COMINgfs/gfs.$DATE
+        export COMIN_SIG=$COMINgfs/gfs.$DATE/$newCYC
        fi
        if [ $CYC -eq 12 ]; then
         newCYC=06
-        export COMIN_SIG=$COMINgfs/gfs.$DATE
+        export COMIN_SIG=$COMINgfs/gfs.$DATE/$newCYC
        fi
        if [ $CYC -eq 18 ]; then
         newCYC=12
-        export COMIN_SIG=$COMINgfs/gfs.$DATE
+        export COMIN_SIG=$COMINgfs/gfs.$DATE/$newCYC
        fi
        newfhr=`expr $fhr + 6`
        if [ $newfhr -lt 10 ];then newfhr=0$newfhr;fi
        echo 'using an older cycle GFS data'
      fi
 
-#convert from grib2 to grib1 here
-#$CNVGRIB -g21 ${COMIN_SIG}/gfs.t${newCYC}z.master.grb2f${newfhr} $GFSOUT/gfs.t${newCYC}z.master.grbf$newfhr
-cp ${COMIN_SIG}/gfs.t${newCYC}z.pgrbf${newfhr} $GFSOUT/gfs.t${newCYC}z.master.grbf$newfhr
+       if [ $newfhr -lt 100 ];then
+cp ${COMIN_SIG}/gfs.t${newCYC}z.pgrb2.1p00.f0${newfhr} temp_grib2
+       else
+cp ${COMIN_SIG}/gfs.t${newCYC}z.pgrb2.1p00.f${newfhr} temp_grib2
+       fi
+$CNVGRIB -g21 temp_grib2 $GFSOUT/gfs.t${newCYC}z.master.grbf$newfhr
 
 fi
 
