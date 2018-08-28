@@ -17,11 +17,14 @@ cat <<- END_OF_JOB > job.$n
 #!/bin/sh
 set -eux
 echo "$0: filtering ${GRIBFILE}"
-${WGRIB:?} -s ${GRIBFILE} | grep -v ":1 mb:" \\
+${WGRIB:?} -s ${GRIBFILE} | grep -v ":0 mb:" \\
+                               | grep -v ":1 mb:" \\
                                | grep -v ":2 mb:" \\
                                | grep -v ":3 mb:" \\
                                | grep -v ":5 mb:" \\
                                | grep -v ":7 mb:" \\
+                               | grep -v ":15 mb:" \\
+                               | grep -v ":40 mb:" \\
                                | grep -v ":75 mb:" \\
                                | grep -v ":125 mb:" \\
                                | grep -v ":175 mb:" \\
@@ -56,11 +59,14 @@ else
 
   echo "$0: filtering ${GRIBFILE}"
    
-  ${WGRIB} -s ${GRIBFILE} | grep -v ":1 mb:" \
+  ${WGRIB} -s ${GRIBFILE} | grep -v ":0 mb:" \
+                                 | grep -v ":1 mb:" \
                                  | grep -v ":2 mb:" \
                                  | grep -v ":3 mb:" \
                                  | grep -v ":5 mb:" \
                                  | grep -v ":7 mb:" \
+                                 | grep -v ":15 mb:" \
+                                 | grep -v ":40 mb:" \
                                  | grep -v ":75 mb:" \
                                  | grep -v ":125 mb:" \
                                  | grep -v ":175 mb:" \
