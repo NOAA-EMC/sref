@@ -17,6 +17,7 @@
 #                      2m q, tested and implemented for the operational SREF
 #  03/13/2015: Jun Du, modified to the 2-model and 6-member SREF.v7.0.0
 #  10/19/2016: Jun Du, modified to read in new NAM.v4 ndas data
+#  07/25/2018: Jun Du, replaced grib1 data with grib2 data for rtma file
 #
 ################################################################
 set -x
@@ -39,7 +40,8 @@ else
  RTMAdata=$COMINrtma/rtma2p5.$PDY
 fi
 afile=rtma.t${anlcyc}z.2dvaranl_ndfd.grb1
-ln -fs $RTMAdata/rtma.t${anlcyc}z.2dvaranl_ndfd.grb1 $afile.temp 
+#ln -fs rtma.t${anlcyc}z.2dvaranl_ndfd.grb1 $afile.temp 
+$CNVGRIB -g21 $RTMAdata/rtma.t${anlcyc}z.2dvaranl_ndfd.grb2 $afile.temp
 
 infile=$afile.temp
 outfile=$afile
