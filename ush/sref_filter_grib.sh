@@ -59,7 +59,7 @@ else
 
   echo "$0: filtering ${GRIBFILE}"
    
-  ${WGRIB} -s ${GRIBFILE} | grep -v ":0 mb:" \
+  ${WGRIB:?} -s ${GRIBFILE} | grep -v ":0 mb:" \
                                  | grep -v ":1 mb:" \
                                  | grep -v ":2 mb:" \
                                  | grep -v ":3 mb:" \
