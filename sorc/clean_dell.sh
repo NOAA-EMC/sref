@@ -41,12 +41,12 @@ cd ..
 
 fi
 
-if [ 0 == 1 ]; then
+if [ 1 == 1 ]; then
 ###
 ### NMMB
 ###
 cd ${SORCsref}/sref_nmmb.fd/src
-cp conf/configure.nems.Wcoss.intel conf/configure.nems
+cp conf/configure.nems.dell.intel conf/configure.nems
 gmake clean
 cd ..
 

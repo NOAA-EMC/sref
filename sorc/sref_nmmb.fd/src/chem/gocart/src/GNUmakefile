@@ -5,7 +5,7 @@
 # Make sure ESMADIR is defined
 # ----------------------------
 ifndef ESMADIR
-       ESMADIR := $(PWD)/..
+       ESMADIR := $(PWD)
 endif
 
 
@@ -87,7 +87,7 @@ clean: esma_clean
 	-@$(RM) *~ *.[aox] *.[Mm][Oo][Dd] 
 
 binclean: 
-	-$(RM) -r $(ESMADIR)/Config 
+#	-$(RM) -r $(ESMADIR)/Config 
 	-$(RM) -r $(ESMADIR)/$(ARCH)
 
 

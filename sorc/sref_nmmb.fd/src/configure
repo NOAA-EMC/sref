@@ -62,6 +62,14 @@ elif [[ $1 = 6_gsm_zeus ]]; then
      set +x
      echo "Use an ESMF 6.3.0r series library on zeus"
 
+elif [[ $1 = dell ]]; then
+     set -x
+     cp conf/configure.nems.dell.intel conf/configure.nems
+     cp conf/modules.nems.dell.intel conf/modules.nems
+     cp ESMFVersionDefine_ESMF_630rAPI.h ESMFVersionDefine.h
+     set +x
+     echo "Use an ESMF 7.1.0r series library on dell"
+
 
 #
 # NUOPC
@@ -130,10 +138,11 @@ else
      echo;
      echo " 'configure 6.3r_nmm_wcoss'     : ESMF 6.3.0r library on wcoss for nmm"
      echo " 'configure 6.3r_gsm_wcoss'     : ESMF 6.3.0r library on wcoss for gsm"
+     echo " 'configure dell'               : ESMF 7.1.0r library on dell"
      echo " 'configure 6_nmm_zeus'         : ESMF 6.3.0r series library on zeus nmm"
      echo " 'configure 6_gsm_zeus'         : ESMF 6.3.0r series library on zeus gsm"
      echo;
      echo " 'configure nuopc_zeus'         : ESMF library with reference NUOPC Layer (currently ESMF 7.0.0 beta snapshot) on zeus"
      echo " 'configure nuopc_gaea'         : ESMF library with reference NUOPC Layer (currently ESMF 7.0.0 beta snapshot) on gaea"
      echo;
-fi     
+fi
