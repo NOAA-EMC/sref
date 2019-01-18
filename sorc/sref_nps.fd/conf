@@ -7,6 +7,7 @@ echo " NEED TO ENTER AN OPTION:                   "
 echo "                                            "
 echo " conf zeus (for R&D Machine zeus)           "
 echo " conf wcoss (for tide/gyre)                 "
+echo " conf dell  (for mars/venus)                "
 echo " conf yellowstone (for NCAR machine)        "
 echo " conf linux (for generic linux)             "
 echo "                                            "
@@ -15,7 +16,7 @@ fi
 
 set -x
 
-if [ $1 == "zeus" -o $1 == "wcoss" -o $1 == "yellowstone"  -o $1 == "linux" ]
+if [ $1 == "zeus" -o $1 == "wcoss" -o $1 == "dell" -o $1 == "yellowstone"  -o $1 == "linux" ]
 then
 cp arch/preamble.${1} arch/preamble
 else

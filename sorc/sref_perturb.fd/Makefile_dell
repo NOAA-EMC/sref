@@ -1,0 +1,52 @@
+CPPFLAGS = -I. -C -P -DNETCDF
+
+FC      = ifort
+SFC     = ifort
+FCDEBUG = -g -traceback -debug all -check all -O0 -ftrapuv -fpe0
+FCDEBUG = -O3
+FCFLAGS = $(FCDEBUG) -I dio -I${NETCDF}/include -I${NEMSIO_INC}
+CPP     = /lib/cpp
+RM      = rm -f
+
+DIOLIBS = dio/dio.o dio/fbioc.o
+
+NETCDF_LIBS = ${NETCDF_LDFLAGS_F}
+LIBS    = ${NEMSIO_LIB} ${W3NCO_LIB4} ${W3EMC_LIB4} ${BACIO_LIB4} ${SP_LIB4} ${NETCDF_LIBS}
+
+.SUFFIXES: .f .f90 .F90
+
+.f.o:
+	$(FC) -c $(FCFLAGS) $*.f
+
+.f90.o:
+	$(FC) -c $(FCFLAGS) $*.f90
+
+.F90.o :
+	$(FC) -c $(FCFLAGS) $*.F90
+
+
+all: breeding_nmb.exe lbc_perturb_nmb.exe \
+     breeding_nmm.exe breeding_arw.exe lbc_perturb_wrf.exe
+
+
+breeding_dio.exe: breeding_dio.o
+	$(SFC) $(FCFLAGS) breeding_dio.o  -o $@ $(DIOLIBS)
+
+breeding_nmb.exe: breeding_nmb.o
+	$(SFC) $(FCFLAGS) breeding_nmb.o  -o $@ ${LIBS}
+
+lbc_perturb_nmb.exe: lbc_perturb_nmb.f90
+	$(SFC) $(FCFLAGS) lbc_perturb_nmb.f90  -o $@ $(DIOLIBS)
+
+breeding_nmm.exe: breeding_nmm.f90
+	$(SFC) $(FCFLAGS) breeding_nmm.f90  -o $@ $(NETCDF_LIBS)
+
+breeding_arw.exe: breeding_arw.f90
+	$(SFC) $(FCFLAGS) breeding_arw.f90  -o $@ $(NETCDF_LIBS)
+
+lbc_perturb_wrf.exe: lbc_perturb_wrf.f90
+	$(SFC) $(FCFLAGS) lbc_perturb_wrf.f90  -o $@ $(NETCDF_LIBS)
+
+
+clean:
+	$(RM) *.exe *.o *.mod

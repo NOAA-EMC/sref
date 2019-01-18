@@ -14,12 +14,12 @@ AR		=	ar ru
 
 .c.o:
 	$(RM) $@
-	$(CC) $(CPPFLAGS) $(CFLAGS) -c $<	
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c $<
 
 .f90.o:
 	$(RM) $@ $*.mod
 	$(CP) $< $*.f
-	$(FC) $(FFLAGS) $(DIO_INC) $(NEMSIO_INC) $(G2_INCMOD) $(NETCDF_INC) -c $*.f
+	$(FC) $(FFLAGS) $(DIO_INC) -I$(NEMSIO_INC) $(G2_INCMOD) -I$(NETCDF_INC) -c $*.f
 	$(RM) $*.f
 
 .f.o:
@@ -29,11 +29,11 @@ AR		=	ar ru
 .F90.o:
 	$(RM) $@ $*.mod
 	$(CPP) $(CPPFLAGS) $(FDEFS) $< > $*.f
-	$(FC) $(FFLAGS) $(DIO_INC) $(NEMSIO_INC) $(G2_INCMOD) $(NETCDF_INC) -c $*.f
+	$(FC) $(FFLAGS) $(DIO_INC) -I$(NEMSIO_INC) $(G2_INCMOD) -I$(NETCDF_INC) -c $*.f
 	$(RM) $*.f
 
 .F.o:
 	$(RM) $@ $*.mod
 	$(CPP) $(CPPFLAGS) $(FDEFS) $< > $*.f
-	$(FC) $(F77FLAGS) $(DIO_INC) $(NEMSIO_INC) $(G2_INCMOD) $(NETCDF_INC) -c $*.f
+	$(FC) $(F77FLAGS) $(DIO_INC) -I$(NEMSIO_INC) $(G2_INCMOD) -I$(NETCDF_INC) -c $*.f
 	$(RM) $*.f

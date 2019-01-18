@@ -2,7 +2,7 @@ include ../../../configure.nps
 
 LIBS    = ${LANDSFCUTIL_LIBS} ${W3_LIBS} ${IP_LIBS}
 
-FLAGS = ${FFLAGS} ${R8} ${LANDSFCUTIL_INC} ${G2_INCMOD}
+FLAGS = ${FFLAGS} ${R8} ${LANDSFCUTIL_INC} ${G2_INCMOD} ${IP_INCMOD}
 
 TARGETLIB = libgridgen_sfc.a
 

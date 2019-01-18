@@ -1250,6 +1250,8 @@
  use native_endianness, only : to_native_endianness, &
                                is_little_endian
 
+ use gdswzd04_mod
+
  implicit none
 
  include 'mpif.h'
@@ -1399,8 +1401,8 @@
    enddo
    allocate (ypts(jstart_src:jend_src))
    allocate (dum(jstart_src:jend_src))
-   call gdswiz04(kgds_mdl,-1,jsrc_task,-999.9,dum,ypts,lons_src,lats_src, &
-               nret, 0, dum, dum)
+   call gdswzd04(kgds_mdl,-1,jsrc_task,-999.9,dum,ypts,lons_src,lats_src, &
+               nret)
    deallocate (dum, lons_src, lats_src)
    do j = jstart_src,jend_src
      nearest_j = nint(ypts(j))
@@ -2105,6 +2107,8 @@
                               imdl, jmdl, domain_type, &
                               lsmask_tiles, lsmask_tile_threshold
 
+ use gdswzd04_mod
+
  implicit none
 
  include 'mpif.h'
@@ -2179,8 +2183,8 @@
    enddo
    allocate (ypts(jstart_src:jend_src))
    allocate (dum(jstart_src:jend_src))
-   call gdswiz04(kgds_mdl,-1,jsrc_task,-999.9,dum,ypts,lons_src,lats_src, &
-               nret, 0, dum, dum)
+   call gdswzd04(kgds_mdl,-1,jsrc_task,-999.9,dum,ypts,lons_src,lats_src, &
+               nret)
    deallocate (dum, lons_src, lats_src)
    do j = jstart_src,jend_src
      nearest_j = nint(ypts(j))

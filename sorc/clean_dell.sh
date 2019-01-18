@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -aeux
+set -eux
 
 date
 
@@ -15,6 +15,7 @@ if [ 1 == 1 ]; then
 
 cd ${SORCsref}/sref_wrf_v3.5.1.fd
 ./clean -a
+./clean -aa
 cd ..
 
 fi
@@ -26,6 +27,7 @@ if [ 1 == 1 ]; then
 
 cd ${SORCsref}/sref_wps_v3.5.1.fd
 ./clean -a
+./clean -aa
 cd ..
 
 fi
@@ -37,6 +39,7 @@ if [ 1 == 1 ]; then
 ###
 cd ${SORCsref}/sref_nps.fd
 ./clean -a
+./clean -aa
 cd ..
 
 fi
@@ -61,7 +64,7 @@ cd ${SORCsref}/sref_perturb.fd
 cd dio
 rm -f *.o *.mod
 cd ..
-make -f Makefile clean
+make -f Makefile_dell clean
 cd ..
 
 fi

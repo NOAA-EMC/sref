@@ -31,6 +31,8 @@
 
  use init_grib1, only        : kgds_mdl
              
+ use gdswzd04_mod
+
  implicit none
 
  include 'mpif.h'
@@ -158,8 +160,8 @@
    allocate (dum(jstart_src:jend_src))
    allocate (ypts(jstart_src:jend_src))
    jsrc = jend_src - jstart_src + 1
-   call gdswiz04(kgds_mdl,-1,jsrc,-999.9,dum,ypts,lons_src,lats_src, &
-                 nret, 0, dum, dum)
+   call gdswzd04(kgds_mdl,-1,jsrc,-999.9,dum,ypts,lons_src,lats_src, &
+                 nret)
    deallocate (dum, lons_src, lats_src)
    do j = jstart_src, jend_src
      nearest_j = nint(ypts(j))
