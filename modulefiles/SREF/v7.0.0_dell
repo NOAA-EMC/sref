@@ -1,0 +1,69 @@
+#%Module#########################################################
+##                                                Jun.Du@noaa.gov
+##                                               NOAA/NWS/NCEP/EMC
+##  Change Log
+##  04/16/2015: Jun Du, initial setting
+##
+## SREF v7.0.0
+## Check available modules: module avail
+## Check path names: module load xxx
+##                   env > output
+##___________________________________________________
+proc ModulesHelp { } {
+puts stderr "Set environment veriables for SREF"
+puts stderr "This module initializes the environment "
+puts stderr "for the Intel Compiler Suite $version\n"
+}
+module-whatis " SREF whatis description"
+
+set ver v7.0.0
+
+set sys [uname sysname]
+set SREF /gpfs/dell1/nco/ops/nwprod/modulefiles/SREF
+set lname SREF
+
+setenv COMP ifort
+setenv COMP_MP mpifort
+setenv COMP_MPI mpiifort
+
+setenv C_COMP icc
+setenv C_COMP_MP mpcc
+
+# Loading Intel Compiler Suite
+module load ips/18.0.1.163
+
+module load impi/18.0.1
+
+module load grib_util/1.1.0
+
+# Loading nceplibs modules
+#setenv WRFPATH /nwprod/sorc/wrf_shared.v1.1.0
+
+# Third Party Compiled Libraries and Tools
+module load NetCDF/4.5.0
+module load jasper/1.900.1
+module load zlib/1.2.11
+module load libpng/1.2.59
+module load xmlparse/2.0.0
+
+# NCO Production Compiled Libraries and Tools
+module load w3nco/2.0.6
+module load bacio/2.0.2
+module load ip/3.0.1
+module load sp/2.0.2
+module load sigio/2.0.1
+module load sfcio/1.0.0
+module load gfsio/1.1.0
+module load g2/3.1.0
+module load g2tmpl/1.5.0
+module load landsfcutil/2.1.0
+module load crtm/2.2.5
+module load bufr/11.2.0
+# module load transutil/v1.0.0
+
+# Third Party Compiled MPI Libraries and Tools
+module load ESMF/7_1_0r
+
+# NCO Production Compiled MPI Libraries and Tools
+module load nemsio/2.2.3
+module load w3emc/2.3.0
