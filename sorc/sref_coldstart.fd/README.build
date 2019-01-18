@@ -11,4 +11,4 @@ invokes the makefile.
 If the program is successfully built, it will be installed
 in the ../../exec directory.
 
-Only tested on Zeus and the NCEP WCOSS machine.
+Only tested the NCEP WCOSS-Dell machine.

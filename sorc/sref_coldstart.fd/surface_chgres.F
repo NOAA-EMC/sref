@@ -456,7 +456,6 @@
 !     output                 land data on output grid
 !
 ! subprograms called:
-!   ll2xy_gaussian_1d      - convert from lat/lon to x/y on a gaussian grid
 !   ll2xy_egrid            - convert from lat/lon to x/y on an e-grid grid
 !   find_nn_new            - finds nearest neighbor input point for each
 !                            output point that is the same type (land,
@@ -471,8 +470,7 @@
 ! attributes:
 !   langauge: fortran 90
 !
-!cbgrids  use ll2xy_utils, only       : ll2xy_gaussian_1d, ll2xy_egrid
- use ll2xy_utils, only       : ll2xy_gaussian_1d, ll2xy_egrid, ll2xy_bgrid
+ use ll2xy_utils, only       : ll2xy_egrid, ll2xy_bgrid
 
 ! use consts, only            : frz_ice,    &
 !                               frz_h20
@@ -483,6 +481,8 @@
                                adjust_soilt_for_orog, &
                                calc_liq_soilm, &
                                calc_albedo
+
+ use gdswzd_mod
 
  implicit none
 
@@ -507,7 +507,7 @@
  integer                           :: kgds_output_tmp(200), kgdso1 
  integer, allocatable              :: mask_input(:,:)
  integer, allocatable              :: mask_output(:)
- integer                           :: nsoil
+ integer                           :: nsoil, nret
  integer, intent(in)               :: nsoil_input
  integer, intent(in)               :: nsoil_output
  integer, allocatable              :: nn_iindx_wrt_input_grid(:)
@@ -612,10 +612,10 @@
 
  print*,"- DETERMINE CORRESPONDING X/Y ON INPUT GRID" 
  if(kgds_input(1) == 4) then
-   call ll2xy_gaussian_1d(kgds_input, ijmdl_output,    &
-                          output%lats, output%lons,    &
-                          xindx_wrt_input_grid,        &
-                          yindx_wrt_input_grid)
+   call gdswzd(kgds_input, -1, ijmdl_output, -999.9, &
+                      xindx_wrt_input_grid,        &
+                      yindx_wrt_input_grid,  &
+                      output%lons, output%lats, nret)
    grid_type="global"
  elseif(kgds_input(1) == 203 .or. kgds_input(1) == 205) then
    lat_11_input = float(kgds_input(4)) * 0.001

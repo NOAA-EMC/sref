@@ -40,7 +40,7 @@ machine.o: machine.f
 	${FCOMP} ${FFLAGS} -c machine.f
 
 surface_chgres.o: machine.o surface_chgres.F
-	${FCOMP} ${FFLAGS} ${FPPFLAGS} -I$(LANDSFCUTIL_INCd) -I$(G2_INCd) -c surface_chgres.F
+	${FCOMP} ${FFLAGS} ${FPPFLAGS} -I$(IP_INCd) -I$(LANDSFCUTIL_INCd) -I$(G2_INCd) -c surface_chgres.F
 
 read_data.o: program_setup.o surface_chgres.o read_data.f
 	${FCOMP} ${FFLAGS} -I$(NEMSIO_INC) -I$(LANDSFCUTIL_INCd) -I$(SFCIO_INC4) -c read_data.f
