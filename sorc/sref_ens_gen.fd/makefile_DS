@@ -34,14 +34,11 @@ SRC=	util.f \
 
 OBJ=${SRC:.f=.o}
 
-LIBS= $(ESSL) $(MASS) $(OPTS) $(LIST) $(TRAPS) $(PROFILE) $(DEBUG) ${W3NCO_LIB4} ${W3EMC_LIB4} ${BACIO_LIB4} ${IP_LIB4} ${SP_LIB4}
+LIBS= $(ESSL) $(MASS) $(OPTS) $(LIST) $(TRAPS) $(PROFILE) $(DEBUG) ${W3NCO_LIB4} ${BACIO_LIB4} ${IP_LIB4}
 
 sref_ens_gen_DS: $(OBJ)
 	$(FC)  -o $(@) sref_ens_gen_DS.f $(OBJ) $(LIBS)
-#	@cp sref_ens_gen.x ../exe
 clean:
 	/bin/rm -f sref_ens_gen_DS *.o
 clear:
 	/bin/rm  *.o
-#
-
