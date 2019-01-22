@@ -23,7 +23,7 @@ OBJS=	ADD_WMO.o PRDGEN.o CTL_RDR.o \
 # CMD		Name of the executable
 # PROFLIB	Library needed for profiling
 #
-FC =		ifort -openmp -convert big_endian -g -traceback
+FC =		ifort -qopenmp -convert big_endian -g -traceback
 LDFLAGS =	    
 
 LIBS =          ${IP_LIB4} ${W3NCO_LIB4} ${W3EMC_LIB4} ${SP_LIB4} \
