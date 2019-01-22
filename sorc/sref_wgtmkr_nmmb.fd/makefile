@@ -15,10 +15,9 @@ OBJS=	WGTMKR.o POLATWGT.o makgds.o w3fi63_g218_12km.o w3fi71_g218_12km.o
 
 FC =		ifort -convert big_endian -g -traceback
 LDFLAGS =
-LIBS =          -L/nwprod/lib \
-                -lip_4 -lw3nco_v2.0.3_4 -lw3emc_v2.0.3_4 -lsp_4 -lbacio_4
+LIBS = ${IP_LIB4} ${W3NCO_LIB4} ${SP_LIB4}
 
-CMD =		wgtmkr.x
+CMD =		wgtmkr_nmmb.x
 PROFLIB =	
 
 # To perform the default compilation, use the first line
@@ -26,7 +25,7 @@ PROFLIB =
 # To compile giving profile additonal information, use the third line
 # WARNING:  SIMULTANEOUSLY PROFILING AND FLOWTRACING IS NOT RECOMMENDED 
 #FFLAGS =  -qrealsize=4 -qmaxmem=-1 -qsource -qnosave -qspillsize=548
-FFLAGS =  -O2
+FFLAGS =  -O2 -I${IP_INC4}
 
 # Lines from here on down should not need to be changed.  They are the
 # actual rules which make uses to build awprgn.xc.
