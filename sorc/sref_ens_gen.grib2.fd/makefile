@@ -8,12 +8,10 @@
 
 
 FC=     ifort -convert big_endian
-#INC= /nwprod/lib/incmod/g2_4
-#LIBS=   -L/nwprod/lib -lip_4 -lw3nco_4 -lw3emc_4  -lbacio_4 -lsp_4 -lg2_4 -ljasper -lpng -lz
-INC= ${G2_INCMOD4}
-LIBS=   ${W3NCO_LIB4} ${W3EMC_LIB4} ${IP_LIB4} ${BACIO_LIB4} ${SP_LIB4} ${G2_LIB4} ${JASPERLIB} ${PNG_LIB} ${Z_LIB}
-#FFLAGS = -O2 -g -convert big_endian -openmp -auto  -I $(INC)
-FFLAGS = -O3 -openmp -auto -I $(INC)
+INC= ${G2_INC4}
+LIBS=   ${G2_LIB4} ${IP_LIB4} ${W3NCO_LIB4} ${BACIO_LIB4} ${JASPER_LIB} ${PNG_LIB} ${Z_LIB}
+#FFLAGS = -O2 -g -convert big_endian -qopenmp -auto  -I$(INC)
+FFLAGS = -O3 -qopenmp -auto -I$(INC)
 
 SRCS=	char_process.f util.f readGB2.f print_gfld.f Zputgb2.f \
 	packGB2_mean.f packGB2_prob.f packGB2_mean_derv.f packGB2_prob_derv.f \
@@ -27,10 +25,5 @@ OBJ=${SRCS:.f=.o}
 
 sref: $(OBJ)
 	$(FC) $(FFLAGS) -o sref_ensprod  sref_ens_gen.f $(OBJ)  $(LIBS)
-clear:
-	/bin/rm  *.o
-#copy:
-#	/bin/mv sref_ensprod /u/Jun.Du/sref.v7.0.0/exec/.
-
-#
-
+clean:
+	/bin/rm -f  *.o  sref_ensprod
