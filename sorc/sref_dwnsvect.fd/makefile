@@ -1,5 +1,5 @@
 SHELL=	/bin/sh
-LIBS=  ${W3NCO_LIB4} ${W3EMC_LIB4}  ${BACIO_LIB4}
+LIBS=  ${W3NCO_LIB4} ${BACIO_LIB4}
 SRCS=	sref_dvrtma_bias.f90
 CMD=	sref_dvrtma_bias 
 FC=	ifort
@@ -10,4 +10,4 @@ $(CMD):	$(SRCS)
 	$(FC) $(SRCS) $(FFLAGS) -o $(@) $(OBJS) $(LIBS)
 
 clean:
-	rm -f *.o
+	rm -f *.o $(CMD)
