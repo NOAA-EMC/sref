@@ -5,7 +5,6 @@ SRCSP	=postgp_module.f90 funcphys.f90 mptran.f90 physcons_v.f90 machine.f90
 OBJSP	=postgp_module.o funcphys.o mptran.o physcons_v.o machine.o
 SRCSS	=postgp_module.f90 funcphys.f90 mptran.std.f90 physcons_v.f90 machine.f90
 OBJSS	=postgp_module.o funcphys.o mptran.std.o physcons_v.o machine.o
-MODS	=postgp_module.mod funcphys.mod
 FCP	=ifort
 FCS	=ifort
 OPTS	= -O -fp-model strict
@@ -13,8 +12,8 @@ FREE	= -FR
 TRAPS	= 
 DEBUG	= -g -traceback
 FFLAGS	= $(OPTS) $(FREE) $(TRAPS) $(DEBUG)
-LDFLAGS	= -openmp
-LIBS = ${SIGIO_LIB4} ${BACIO_LIB4} ${W3NCO_LIB4} ${W3EMC_LIB4} ${IP_LIB4} ${SP_LIB4}
+LDFLAGS	= -qopenmp
+LIBS =  ${SIGIO_LIB4} ${BACIO_LIB4} ${W3NCO_LIB4} ${IP_LIB4} ${SP_LIB4}
 CMDP	=global_postgp
 CMDS	=global_postgs
 both:	$(CMDP) $(CMDS)
@@ -35,7 +34,7 @@ mptran.o:	mptran.f90 machine.o
 mptran.std.o:	mptran.std.f90 machine.o
 	$(FCS) $(FFLAGS) -c mptran.std.f90
 clean:
-	-rm -f $(OBJS) $(MODS)
+	-rm -f $(OBJSS) $(OBJSP) *.mod
 clobber:        clean
 	-rm -f $(CMD)
 void:   clobber
