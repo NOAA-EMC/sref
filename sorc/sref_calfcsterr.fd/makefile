@@ -3,7 +3,7 @@ SRCS 	= cal_fcsterr.f
 OBJS	= cal_fcsterr.o
 FC 	= ifort
 LDFLAGS =
-LIBS 	= ${W3NCO_LIB4} ${W3EMC_LIB4} ${BACIO_LIB4}
+LIBS 	= ${W3NCO_LIB4} ${BACIO_LIB4}
 CMD 	= sref_calfcsterr
 
 all:	$(CMD)
@@ -12,4 +12,4 @@ $(CMD):	 ${OBJS}
 	$(FC) $(LDFLAGS) -o $(@) $(OBJS) $(LIBS)
 
 clean:
-	rm -f *.o
+	rm -f *.o $(CMD)
