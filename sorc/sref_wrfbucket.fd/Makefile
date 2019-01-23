@@ -3,7 +3,7 @@ SHELL=/bin/sh
 SRCS = WRFBUCKET.F
 
 FC =   ifort
-LIBS = ${W3NCO_LIB4} ${W3EMC_LIB4} ${BACIO_LIB4}
+LIBS = ${W3NCO_LIB4} ${BACIO_LIB4}
 
 TARGETS =  sref_pcpbucket_g212 sref_pcpbucket_g216 sref_pcpbucket_g221 sref_pcpbucket_g243 sref_pcpbucket_g132
 
