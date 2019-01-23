@@ -1,5 +1,5 @@
 Page 1           Source Listing                  ENSADD
-2015-06-03 22:07                                 ENSADD.f
+2019-01-23 13:16                                 ENSADD.f
 
       1 C$$$  MAIN PROGRAM DOCUMENTATION BLOCK
       2 C
@@ -60,7 +60,7 @@ Page 1           Source Listing                  ENSADD
      57 
 
 Page 2           Source Listing                  ENSADD
-2015-06-03 22:07                                 ENSADD.f
+2019-01-23 13:16                                 ENSADD.f
 
      58       j=0
      59       jpds=-1
@@ -121,7 +121,7 @@ Page 2           Source Listing                  ENSADD
     114         if(kpds(5).eq.52) f=f+0.1
 
 Page 3           Source Listing                  ENSADD
-2015-06-03 22:07                                 ENSADD.f
+2019-01-23 13:16                                 ENSADD.f
 
     115         if(kpds(5).eq.51) f=f+0.00001
     116 
@@ -154,7 +154,7 @@ ENTRY POINTS
  MAIN__             
 
 Page 4           Source Listing                  ENSADD
-2015-06-03 22:07 Symbol Table                    ENSADD.f
+2019-01-23 13:16 Symbol Table                    ENSADD.f
 
 
 
@@ -162,41 +162,44 @@ SYMBOL CROSS REFERENCE
 
  Name                       Object Declared Type            Bytes Dimen Elements Attributes       References                        
                                                                                                                                     
- BACLOSE                    Subr   81                                                             81,82,83                          
+ BACLOSE                    Subr   128                                                            128,129,130                       
  BAOPEN                     Subr   56                                                             56                                
  BAOPENR                    Subr   54                                                             54,55                             
  CPGB                       Local  41       CHAR            80          scalar                    43,50,53,54                       
  CPGE                       Local  41       CHAR            80          scalar                    43,52,53,56                       
  CPGI                       Local  41       CHAR            80          scalar                    43,51,53,55                       
  ENSADD                     Prog   34                                                                                               
- F                          Local  40       R(4)            4     1     385441                    60,68,69,77,78                    
- GETGB                      Subr   60                                                             60,78                             
- IENSI                      Local  39       I(4)            4           scalar                    43,72                             
- IENST                      Local  39       I(4)            4           scalar                    43,71                             
- IRET                       Local  60       I(4)            4           scalar                    60,61,77,78                       
- IRETB                      Local  54       I(4)            4           scalar                    54,81                             
- IRETE                      Local  56       I(4)            4           scalar                    56,83                             
- IRETI                      Local  55       I(4)            4           scalar                    55,82                             
- J                          Local  58       I(4)            4           scalar                    58,60,78                          
- JF                         Param  36       I(4)            4           scalar                    40,42,60,78                       
- JGDS                       Local  38       I(4)            4     1     22                        60,78                             
- JPDS                       Local  38       I(4)            4     1     25                        59,60,78                          
- KENS                       Local  38       I(4)            4     1     20                        70,71,72,73,74,76,77              
- KF                         Local  60       I(4)            4           scalar                    60,77,78                          
- KGDS                       Local  38       I(4)            4     1     22                        60,76,77,78                       
- KPDS                       Local  38       I(4)            4     1     25                        60,62,64,65,66,67,68,69,75,77,78  
- LB                         Local  42       L(1)            1     1     385441                    60,77,78                          
+ F                          Local  40       R(4)            4     1     385441                    60,114,115,124,125                
+ GETGB                      Subr   60                                                             60,125                            
+ IENSI                      Local  39       I(4)            4           scalar                    43,119                            
+ IENST                      Local  39       I(4)            4           scalar                    43,118                            
+ IRET                       Local  60       I(4)            4           scalar                    60,61,124,125                     
+ IRETB                      Local  54       I(4)            4           scalar                    54,128                            
+ IRETE                      Local  56       I(4)            4           scalar                    56,130                            
+ IRETI                      Local  55       I(4)            4           scalar                    55,129                            
+ J                          Local  58       I(4)            4           scalar                    58,60,125                         
+ JF                         Param  36       I(4)            4           scalar                    40,42,60,125                      
+ JGDS                       Local  38       I(4)            4     1     22                        60,125                            
+ JPDS                       Local  38       I(4)            4     1     25                        59,60,125                         
+ KENS                       Local  38       I(4)            4     1     20                        117,118,119,120,121,123,124       
+ KF                         Local  60       I(4)            4           scalar                    60,124,125                        
+ KGDS                       Local  38       I(4)            4     1     22                        60,123,124,125                    
+ KPDS                       Local  38       I(4)            4     1     25                        60,62,64,67,68,70,71,73,75,77,79,8
+                                                                                                  2,84,86,88,90,92,94,96,99,101,103,
+                                                                                                  105,107,109,111,114,115,122,124,12
+                                                                                                  5                                 
+ LB                         Local  42       L(1)            1     1     385441                    60,124,125                        
  LEN_TRIM                   Func   50                                   scalar                    50,51,52                          
  LPGB                       Local  50       I(4)            4           scalar                    50,53,54                          
  LPGE                       Local  52       I(4)            4           scalar                    52,53,56                          
  LPGI                       Local  51       I(4)            4           scalar                    51,53,55                          
  NAMIN                      Local  43                                   scalar                    49                                
- PUTGBE                     Subr   77                                                             77                                
+ PUTGBE                     Subr   124                                                            124                               
  W3TAGB                     Subr   47                                                             47                                
- W3TAGE                     Subr   86                                                             86                                
+ W3TAGE                     Subr   133                                                            133                               
 
 Page 5           Source Listing                  ENSADD
-2015-06-03 22:07 Subprograms/Common Blocks       ENSADD.f
+2019-01-23 13:16 Subprograms/Common Blocks       ENSADD.f
 
 
 
@@ -208,45 +211,61 @@ SUBPROGRAMS/COMMON BLOCKS
 
 COMPILER OPTIONS BEING USED
 
+       -align noall                          -align nonone
        -align nocommons                      -align nodcommons
-       -align noqcommons                     -align records
-       -align nosequence                     -align norec1byte
-       -align norec2byte                     -align norec4byte
-       -align norec8byte                     -align norec16byte
-       -altparam                             -assume accuracy_sensitive
-       -assume nobscc                        -assume nobuffered_io
-       -assume nobyterecl                    -assume nocc_omp
+       -align noqcommons                     -align nozcommons
+       -align records                        -align nosequence
+       -align norec1byte                     -align norec2byte
+       -align norec4byte                     -align norec8byte
+       -align norec16byte                    -align norec32byte
+       -align norec64byte                    -align noarray8byte
+       -align noarray16byte                  -align noarray32byte
+       -align noarray64byte                  -align noarray128byte
+       -align noarray256byte                 -altparam
+       -assume accuracy_sensitive            -assume nobscc
+       -assume nobuffered_io                 -assume nobuffered_stdout
+       -assume nobyterecl                    -assume nocontiguous_assumed_shape
+       -assume nocontiguous_pointer          -assume nocc_omp
        -assume nocstring                     -assume nodummy_aliases
        -assume nofpe_summary                 -assume noieee_fpe_flags
        -assume nominus0                      -assume noold_boz
-       -assume old_unit_star                 -assume old_ldout_format
+       -assume old_complex_align             -assume old_unit_star
+       -assume old_ldout_format              -assume noold_logical_assign
        -assume noold_logical_ldio            -assume old_maxminloc
-       -assume old_xor                       -assume protect_constants
-       -assume noprotect_parens              -assume split_common
-       -assume source_include                -assume nostd_intent_in
-       -assume nostd_mod_proc_name           -assume norealloc_lhs
-       -assume underscore                    -assume no2underscores
-  no   -auto                                 -auto_scalar
-  no   -bintext                              -ccdefault default
-       -check noargs                         -check noarg_temp_created
-       -check nobounds                       -check noformat
+       -assume old_xor                       -assume noprotect_allocates
+       -assume protect_constants             -assume noprotect_parens
+       -assume split_common                  -assume source_include
+       -assume nostd_intent_in               -assume std_minus0_rounding
+       -assume nostd_mod_proc_name           -assume std_value
+       -assume realloc_lhs                   -assume underscore
+       -assume no2underscores           no   -auto
+       -auto_scalar                     no   -bintext
+       -ccdefault default                    -check noarg_temp_created
+       -check noassume                       -check nobounds
+       -check nocontiguous                   -check noformat
        -check nooutput_conversion            -check nooverflow
-       -check nopointers                     -check power
-       -check noshape                        -check nounderflow
-       -check nouninitialized                -coarray-num-procs 0
-  no   -coarray-config-file                  -convert native
-       -cross_reference                      -D __INTEL_COMPILER=1210
+       -check nopointers                     -check noshape
+       -check nostack                        -check nouninitialized
+       -coarray-num-procs 0             no   -coarray-config-file
+       -convert native                       -cross_reference
+       -D __INTEL_COMPILER=1800              -D __INTEL_COMPILER_UPDATE=1
        -D __unix__                           -D __unix
        -D __linux__                          -D __linux
        -D __gnu_linux__                      -D unix
        -D linux                              -D __ELF__
        -D __x86_64                           -D __x86_64__
-       -D _MT                                -D __INTEL_COMPILER_BUILD_DATE=20120612
+       -D __amd64                            -D __amd64__
+       -D __INTEL_COMPILER_BUILD_DATE=20171018       -D __INTEL_OFFLOAD
        -D __i686                             -D __i686__
        -D __pentiumpro                       -D __pentiumpro__
+
+Page 6           Source Listing                  ENSADD
+2019-01-23 13:16                                 ENSADD.f
+
        -D __pentium4                         -D __pentium4__
        -D __tune_pentium4__                  -D __SSE2__
-       -D __SSE__                            -D __MMX__
+       -D __SSE2_MATH__                      -D __SSE__
+       -D __SSE_MATH__                       -D __MMX__
        -double_size 64                  no   -d_lines
   no   -Qdyncom                              -error_limit 30
   no   -f66                             no   -f77rtl
@@ -255,10 +274,6 @@ COMPILER OPTIONS BEING USED
        -fpscomp noldio_spacing               -fpscomp nologicals
        -fixed                           no   -fpconstant
        -fpe3                                 -fprm nearest
-
-Page 6           Source Listing                  ENSADD
-2015-06-03 22:07                                 ENSADD.f
-
   no   -ftz                                  -fp_model noprecise
        -fp_model fast                        -fp_model nostrict
        -fp_model nosource                    -fp_model nodouble
@@ -266,30 +281,40 @@ Page 6           Source Listing                  ENSADD
        -fp_model noexcept                    -fp_model nono_except
        -heap_arrays 0                   no   -threadprivate_compat
        -g0                                   -iface nomixed_str_len_arg
-       -iface nono_mixed_str_len_arg    no   -intconstant
+       -iface nono_mixed_str_len_arg         -init noarrays
+       -init nohuge                          -init noinfinity
+       -init nominus_huge                    -init nominus_infinity
+       -init nominus_tiny                    -init nonan
+       -init nosnan                          -init notiny
+       -init nozero                     no   -intconstant
        -integer_size 32                 no   -mixed_str_len_arg
   no   -module                               -names lowercase
-  no   -noinclude                            -O2
-  no   -pad_source                           -real_size 32
-  no   -recursive                            -reentrancy none
-  no   -sharable_localsaves                  -vec=simd
+  no   -noinclude                            -offload-build=host
+       -O2                              no   -pad_source
+       -real_size 32                    no   -recursive
+       -reentrancy threaded             no   -sharable_localsaves
+       -vec=simd                             -show nofullpath
        -show noinclude                       -show map
        -show options                    no   -syntax_only
   no   -threadcom                       no   -U
   no   -vms                                  -w noall
        -w nonone                             -w alignments
-       -w noargument_checking                -w nodeclarations
-       -w general                            -w noignore_bounds
-       -w noignore_loc                       -w nointerfaces
-       -w notruncated_source                 -w uncalled
-       -w uninitialized                      -w nounused
-       -w usage
+       -w nodeclarations                     -w general
+       -w noignore_bounds                    -w noignore_loc
+       -w nointerfaces                       -w notruncated_source
+       -w uncalled                           -w uninitialized
+       -w nounused                           -w usage
+  no   -wrap-margins
 
-       -includepath : /gpfs/gp1/usrx/local/intel/composer_xe_2011_sp1.11.339/compiler/include/,.f,./.f,/usrx/local/intel/composerxe/mkl/include/.f,
-           /usrx/local/intel/composerxe/tbb/include/.f,/gpfs/gp1/usrx/local/intel/composer_xe_2011_sp1.11.339/compiler/include/intel64/.f,
-           /gpfs/gp1/usrx/local/intel/composer_xe_2011_sp1.11.339/compiler/include/.f,/usr/local/include/.f,/usr/lib/gcc/x86_64-redhat-linux/4.4.7/include/.f,
-           /usr/include/.f,/usr/include/.f
+       -includepath : /usrx/local/prod/intel/2018UP01/compilers_and_libraries/linux/tbb/include/,/usr/local/include/,
+           .f,./.f,/usrx/local/prod/intel/2018UP01/compilers_and_libraries/linux/ipp/include/.f,/usrx/local/prod/intel/2018UP01/compilers_and_libraries/linux/mkl/include/.f,
+           /usrx/local/prod/intel/2018UP01/compilers_and_libraries/linux/pstl/include/.f,/usrx/local/prod/intel/2018UP01/compilers_and_libraries/linux/tbb/include/.f,
+           /usrx/local/prod/intel/2018UP01/compilers_and_libraries/linux/daal/include/.f,/gpfs/dell1/usrx/local/prod/intel/2018UP01/compilers_and_libraries_2018.1.163/linux/compiler/include/intel64/.f,
+           /gpfs/dell1/usrx/local/prod/intel/2018UP01/compilers_and_libraries_2018.1.163/linux/compiler/include/icc/.f,
+           /gpfs/dell1/usrx/local/prod/intel/2018UP01/compilers_and_libraries_2018.1.163/linux/compiler/include/.f,
+           /usr/local/include/.f,/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include/.f,/usr/include/.f,/usr/include/.f,
+           /usr/include/.f
        -list filename : ENSADD.lst
        -o    filename : none
 
-COMPILER: Intel(R) Fortran 12.1-2100
+COMPILER: Intel(R) Fortran 18.0-1599
