@@ -95,7 +95,7 @@ if [ 1 == 1 ]; then
 ### WGTMKR
 ###
 cd ${SORCsref}/sref_wgtmkr.fd
-make -f Makefile_wcoss clean
+make -f Makefile_dell clean
 cd ..
 
 fi

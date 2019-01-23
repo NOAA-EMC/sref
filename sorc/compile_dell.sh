@@ -23,6 +23,109 @@ SORCsref=${base}/sorc
 EXECsref=${base}/exec
 mkdir -m 775 -p $EXECsref
 
+# sref_cluster_NCEP.fd
+cd ${SORCsref}/sref_cluster_NCEP.fd
+make -f makefile_cluster clean
+make -f makefile_cluster
+mv sref_cluster_NCEP ${EXECsref}/.
+make -f makefile_cluster clean
+make -f makefile_weight clean
+make -f makefile_weight
+mv sref_clusterweight ${EXECsref}/.
+make -f makefile_weight clean
+
+exit
+
+# sref_calfcsterr.fd
+cd ${SORCsref}/sref_calfcsterr.fd
+gmake clean
+gmake
+mv sref_calfcsterr ${EXECsref}/.
+gmake clean
+
+# sref_biasestimate.fd
+cd ${SORCsref}/sref_biasestimate.fd
+gmake clean
+gmake
+mv sref_estimate_bias ${EXECsref}/.
+gmake clean
+
+# ENSADD
+if [ 1 == 1 ]; then
+  cd ${SORCsref}/global_ensadd.fd
+  gmake clobber
+  gmake
+  mv global_ensadd ${EXECsref}/.
+  gmake clean
+fi
+
+if [ 1 == 1 ]; then
+###
+### WRFBUCKET
+###
+cd ${SORCsref}/sref_wrfbucket.fd
+gmake -f Makefile clean
+gmake -f Makefile
+mv sref_pcpbucket_g212 ${EXECsref}/.
+mv sref_pcpbucket_g216 ${EXECsref}/.
+mv sref_pcpbucket_g221 ${EXECsref}/.
+mv sref_pcpbucket_g243 ${EXECsref}/.
+mv sref_pcpbucket_g132 ${EXECsref}/.
+gmake -f Makefile clean
+fi
+
+# sref_ens_gen.grib2.fd
+cd ${SORCsref}/sref_ens_gen.grib2.fd
+gmake clean
+gmake
+mv sref_ensprod ${EXECsref}/.
+gmake clean
+
+# sref_ens_gen.fd
+cd ${SORCsref}/sref_ens_gen.fd
+gmake -f makefile_REG clean
+gmake -f makefile_REG
+mv sref_ens_gen ${EXECsref}/.
+gmake -f makefile_REG clean
+gmake -f makefile_DS clean
+make -f makefile_DS
+mv sref_ens_gen_DS ${EXECsref}/.
+gmake -f makefile_DS clean
+
+# sref_dwnsfcst.fd
+cd ${SORCsref}/sref_dwnsfcst.fd
+gmake clean
+gmake
+mv sref_dvrtma_debias ${EXECsref}/.
+gmake clean
+
+# global_postgp.fd
+cd ${SORCsref}/global_postgp.fd
+gmake clean
+make.sh
+mv global_postgs ${EXECsref}/.
+gmake clean
+
+# sref_fastcopygb.fd
+cd ${SORCsref}/sref_fastcopygb.fd
+gmake clean
+gmake 
+mv fastcopygb ${EXECsref}/.
+gmake clean
+
+cd ${SORCsref}/sref_wgtmkr_nmmb.fd
+gmake clean
+gmake
+mv wgtmkr_nmmb.x ${EXECsref}/.
+gmake clean
+
+cd ${SORCsref}/sref_wgtmkr.fd
+make -f Makefile_dell clean
+make -f Makefile_dell
+mv wgtmkr.x ${EXECsref}/.
+make -f Makefile_dell clean
+
+exit
 
 if ${BUILD_NMMB}; then
 ###
@@ -38,6 +141,7 @@ gmake clean
 gmake nmm
 cd ../exe
 cp NEMS.x        ${EXECsref}/sref_wrf_nmb_driersoil
+
 
 cd ${SORCsref}/sref_nmmb.fd/src
 cp ${SORCsref}/sref_nmmb.fd/src/atmos/phys/module_LS_NOAHLSM.F90_normalsoil ${SORCsref}/sref_nmmb.fd/src/atmos/phys/module_LS_NOAHLSM.F90
