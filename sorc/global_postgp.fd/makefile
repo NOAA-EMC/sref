@@ -36,6 +36,6 @@ mptran.std.o:	mptran.std.f90 machine.o
 clean:
 	-rm -f $(OBJSS) $(OBJSP) *.mod
 clobber:        clean
-	-rm -f $(CMD)
+	-rm -f $(CMDS) $(CMDP)
 void:   clobber
 	-rm -f $(SRCS) $(SRCM) $(INCM) makefile
