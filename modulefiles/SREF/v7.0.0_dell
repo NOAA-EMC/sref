@@ -37,7 +37,8 @@ module load impi/18.0.1
 module load grib_util/1.1.0
 
 # Loading nceplibs modules
-#setenv WRFPATH /nwprod/sorc/wrf_shared.v1.1.0
+#setenv WRFPATH /gpfs/dell1/nco/ops/nwtest/wrf_shared.v1.1.0
+setenv WRFPATH /gpfs/dell2/emc/modeling/noscrub/George.Gayno/sref2dell/wrf_shared.v1.1.0
 
 # Third Party Compiled Libraries and Tools
 module load NetCDF/4.5.0
@@ -60,6 +61,9 @@ module load landsfcutil/2.1.0
 module load crtm/2.2.5
 module load bufr/11.2.0
 # module load transutil/v1.0.0
+setenv TRANSUTIL_LIB4 ../transutil.fd/v1.0.0/libtransutil_4.a
+setenv TRANSUTIL_LIB8 ../transutil.fd/v1.0.0/libtransutil_8.a
+setenv TRANSUTIL_LIBd ../transutil.fd/v1.0.0/libtransutil_d.a
 
 # Third Party Compiled MPI Libraries and Tools
 module load ESMF/7_1_0r
