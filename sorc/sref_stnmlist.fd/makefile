@@ -35,7 +35,7 @@ OBJS=	stnmlist.o
 #
 FC =		ifort
 LDFLAGS =	
-LIBS = -L/nwprod/lib -lw3nco_4 -lw3emc_4 -lbufr_4_64
+LIBS = $(W3NCO_LIB4) $(BUFR_LIB4)
 CMD =	        sref_stnmlist	
 PROFLIB =
 
