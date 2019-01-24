@@ -5,8 +5,7 @@ TARGET  = sref_bufr
 #
 # CPP, Compiler, and Linker Options
 #
-#FC       = mpfort
-FC       = mpiifort
+FC       = $(COMP_MPI)
 CPP      = /lib/cpp -P
 ARCH     =
 CPPFLAGS = 
@@ -23,12 +22,11 @@ MAP      =
 ESSL     =
 MASS     =
 
-W3FLAGS = -I/nwprod/lib
+#W3FLAGS = -I/nwprod/lib
 
-NEMSIOFLAG = -I/nwprod/lib/incmod/nemsio
+NEMSIOFLAG = -I$(NEMSIO_INC)
 NETCDF_LIB = ${NETCDF}/lib/libnetcdf.a
 
-WRFPATH  = /nwprod/sorc/wrf_shared.fd
 WRFFLAGS = -I$(WRFPATH)/frame
 WRFLIB   = $(WRFPATH)/frame/pack_utils.o  \
            $(WRFPATH)/frame/module_internal_header_util.o \
