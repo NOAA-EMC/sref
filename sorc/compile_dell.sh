@@ -1,12 +1,13 @@
 #!/bin/bash
 set -eux
 
-BUILD_NMMB=false
+BUILD_NMMB=true
 BUILD_NPS=true
-BUILD_WRF_ARW=false
-BUILD_WPS=false
-
-BUILD_PERTURB=false
+BUILD_WRF_ARW=true
+BUILD_WPS=true
+BUILD_PERTURB=true
+BUILD_COLDSTART=true
+BUILD_POST=true
 
 base=$(dirname $PWD)
 
@@ -23,6 +24,7 @@ SORCsref=${base}/sorc
 EXECsref=${base}/exec
 mkdir -m 775 -p $EXECsref
 
+if [ 0 == 1 ]; then
 # sref_cluster_NCEP.fd
 cd ${SORCsref}/sref_cluster_NCEP.fd
 make -f makefile_cluster clean
@@ -107,7 +109,7 @@ gmake clean
 # sref_fastcopygb.fd
 cd ${SORCsref}/sref_fastcopygb.fd
 gmake clean
-gmake 
+gmake
 mv fastcopygb ${EXECsref}/.
 gmake clean
 
@@ -122,6 +124,8 @@ make -f Makefile_dell clean
 make -f Makefile_dell
 mv wgtmkr.x ${EXECsref}/.
 make -f Makefile_dell clean
+
+fi
 
 if ${BUILD_NMMB}; then
 ###
@@ -166,7 +170,7 @@ cd ${SORCsref}/sref_nps.fd
 ./configure <<EOF
 5
 EOF
-./compile nps > compile_nps.log 2>&1
+./compile nps
 
 cp ungrib.exe     ${EXECsref}/sref_ungrib_nems
 cp ungribp.exe    ${EXECsref}/sref_ungribp_nems
@@ -210,7 +214,7 @@ cd ${SORCsref}/sref_wps_v3.5.1.fd
 ./configure <<EOF
 23
 EOF
-./compile wps > compile_wps.log 2>&1
+./compile wps
 
 cp ungrib.exe  ${EXECsref}/sref_ungrib
 cp geogrid.exe ${EXECsref}/sref_geogrid
@@ -240,5 +244,27 @@ cp lbc_perturb_nmb.exe ${EXECsref}/sref_lbc_perturb_nmb
 
 fi
 
+if ${BUILD_COLDSTART}; then
+###
+### COLDSTART
+###
+cd ${SORCsref}/sref_coldstart.fd
+./make.sh
+
+mv sref_coldstart_wrf     ${EXECsref}/.
+
+fi
+
+if ${BUILD_POST}; then
+###
+### POST
+###
+cd ${SORCsref}/sref_post.fd
+make -f makefile_dell clean
+make -f makefile_dell
+mv sref_post     ${EXECsref}/.
+make -f makefile_dell clean
+
+fi
 
 date

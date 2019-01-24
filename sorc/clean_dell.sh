@@ -27,7 +27,7 @@ if [ 1 == 1 ]; then
 
 cd ${SORCsref}/sref_wps_v3.5.1.fd
 ./clean -a
-./clean -aa
+rm -f configure.wps.backup
 cd ..
 
 fi
@@ -39,7 +39,7 @@ if [ 1 == 1 ]; then
 ###
 cd ${SORCsref}/sref_nps.fd
 ./clean -a
-./clean -aa
+rm -f configure.nps.backup
 cd ..
 
 fi
