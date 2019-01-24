@@ -26,8 +26,7 @@ OBJS=	ADD_WMO.o PRDGEN.o CTL_RDR.o \
 FC =		ifort -qopenmp -convert big_endian -g -traceback
 LDFLAGS =	    
 
-LIBS =          ${IP_LIB4} ${W3NCO_LIB4} ${W3EMC_LIB4} ${SP_LIB4} \
-                ${BACIO_LIB4} ${TRANSUTIL_LIB4}
+LIBS =          ${W3NCO_LIB4} ${BACIO_LIB4} ${TRANSUTIL_LIB4}
 
 CMD =		sref_prdgen
 PROFLIB =
