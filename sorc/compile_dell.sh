@@ -1,13 +1,13 @@
 #!/bin/bash
 set -eux
 
-BUILD_NMMB=false
-BUILD_NPS=false
-BUILD_WRF_ARW=false
-BUILD_WPS=false
-BUILD_PERTURB=false
-BUILD_COLDSTART=false
-BUILD_POST=false
+BUILD_NMMB=true
+BUILD_NPS=true
+BUILD_WRF_ARW=true
+BUILD_WPS=true
+BUILD_PERTURB=true
+BUILD_COLDSTART=true
+BUILD_POST=true
 BUILD_PRDGEN=true
 
 base=$(dirname $PWD)
@@ -124,8 +124,6 @@ make -f Makefile_dell clean
 make -f Makefile_dell
 mv wgtmkr.x ${EXECsref}/.
 make -f Makefile_dell clean
-
-fi
 
 
 if ${BUILD_NMMB}; then
