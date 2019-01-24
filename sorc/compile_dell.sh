@@ -24,7 +24,6 @@ SORCsref=${base}/sorc
 EXECsref=${base}/exec
 mkdir -m 775 -p $EXECsref
 
-if [ 0 == 1 ]; then
 # sref_cluster_NCEP.fd
 cd ${SORCsref}/sref_cluster_NCEP.fd
 make -f makefile_cluster clean
@@ -125,7 +124,6 @@ make -f Makefile_dell
 mv wgtmkr.x ${EXECsref}/.
 make -f Makefile_dell clean
 
-fi
 
 if ${BUILD_NMMB}; then
 ###
