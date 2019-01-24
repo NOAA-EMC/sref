@@ -34,8 +34,6 @@ make -f makefile_weight
 mv sref_clusterweight ${EXECsref}/.
 make -f makefile_weight clean
 
-exit
-
 # sref_calfcsterr.fd
 cd ${SORCsref}/sref_calfcsterr.fd
 gmake clean
@@ -102,7 +100,7 @@ gmake clean
 # global_postgp.fd
 cd ${SORCsref}/global_postgp.fd
 gmake clean
-make.sh
+./make.sh
 mv global_postgs ${EXECsref}/.
 gmake clean
 
@@ -124,8 +122,6 @@ make -f Makefile_dell clean
 make -f Makefile_dell
 mv wgtmkr.x ${EXECsref}/.
 make -f Makefile_dell clean
-
-exit
 
 if ${BUILD_NMMB}; then
 ###
