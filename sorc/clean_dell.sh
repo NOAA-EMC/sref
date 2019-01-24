@@ -16,6 +16,7 @@ if [ 1 == 1 ]; then
 cd ${SORCsref}/sref_wrf_v3.5.1.fd
 ./clean -a
 ./clean -aa
+rm -f compile_arw.sc.log
 cd ..
 
 fi
@@ -119,6 +120,16 @@ if [ 1 == 1 ]; then
 cd ${SORCsref}/sref_wrfbucket.fd
 make -f Makefile clean
 cd ..
+
+fi
+
+if [ 1 == 1 ]; then
+###
+### TRANSUTIL
+###
+cd ${SORCsref}/transutil.fd/v1.0.0/
+rm -f libtransutil_4.a  libtransutil_8.a  libtransutil_d.a
+cd ../..
 
 fi
 

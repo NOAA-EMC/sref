@@ -30,7 +30,7 @@ $(OBJS):        makefile
 allclean:       clean all
 
 clean:
-	-rm -f $(OBJS)
+	-rm -f $(OBJS) *.lst
 
 clobber:        clean
 	-rm -f $(CMD)

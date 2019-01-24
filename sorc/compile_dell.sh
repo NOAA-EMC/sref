@@ -1,13 +1,14 @@
 #!/bin/bash
 set -eux
 
-BUILD_NMMB=true
-BUILD_NPS=true
-BUILD_WRF_ARW=true
-BUILD_WPS=true
-BUILD_PERTURB=true
-BUILD_COLDSTART=true
-BUILD_POST=true
+BUILD_NMMB=false
+BUILD_NPS=false
+BUILD_WRF_ARW=false
+BUILD_WPS=false
+BUILD_PERTURB=false
+BUILD_COLDSTART=false
+BUILD_POST=false
+BUILD_PRDGEN=true
 
 base=$(dirname $PWD)
 
@@ -23,6 +24,10 @@ date
 SORCsref=${base}/sorc
 EXECsref=${base}/exec
 mkdir -m 775 -p $EXECsref
+
+# transutil.fd
+cd ${SORCsref}/transutil.fd/v1.0.0/src
+./makelibtransutil.sh
 
 # sref_cluster_NCEP.fd
 cd ${SORCsref}/sref_cluster_NCEP.fd
@@ -50,15 +55,12 @@ mv sref_estimate_bias ${EXECsref}/.
 gmake clean
 
 # ENSADD
-if [ 1 == 1 ]; then
-  cd ${SORCsref}/global_ensadd.fd
-  gmake clobber
-  gmake
-  mv global_ensadd ${EXECsref}/.
-  gmake clean
-fi
+cd ${SORCsref}/global_ensadd.fd
+gmake clobber
+gmake
+mv global_ensadd ${EXECsref}/.
+gmake clean
 
-if [ 1 == 1 ]; then
 ###
 ### WRFBUCKET
 ###
@@ -71,7 +73,6 @@ mv sref_pcpbucket_g221 ${EXECsref}/.
 mv sref_pcpbucket_g243 ${EXECsref}/.
 mv sref_pcpbucket_g132 ${EXECsref}/.
 gmake -f Makefile clean
-fi
 
 # sref_ens_gen.grib2.fd
 cd ${SORCsref}/sref_ens_gen.grib2.fd
@@ -123,6 +124,8 @@ make -f Makefile_dell clean
 make -f Makefile_dell
 mv wgtmkr.x ${EXECsref}/.
 make -f Makefile_dell clean
+
+fi
 
 
 if ${BUILD_NMMB}; then
@@ -264,5 +267,16 @@ mv sref_post     ${EXECsref}/.
 make -f makefile_dell clean
 
 fi
+
+if ${BUILD_PRDGEN}; then
+###
+### PRDGEN
+###
+cd ${SORCsref}/sref_prdgen.fd
+make -f Makefile_dell
+mv sref_prdgen     ${EXECsref}/.
+
+fi
+
 
 date
