@@ -3,10 +3,12 @@ SRCS 	= sref_cal_meanqpffcsterr.f
 OBJS	= sref_cal_meanqpffcsterr.o
 FC 	= ifort -O3 -convert big_endian
 LDFLAGS =
-LIBS 	= ${W3NCO_LIB4} ${W3EMC_LIB4} ${BACIO_LIB4}
+LIBS 	= ${W3NCO_LIB4} ${BACIO_LIB4}
 CMD 	= sref_cal_meanqpffcsterr
 
 all:	$(CMD)
 
 $(CMD):	 ${OBJS}
 	$(FC) $(LDFLAGS) -o $(@) $(OBJS) $(LIBS)
+clean:
+	rm -f $(OBJS) $(CMD)
