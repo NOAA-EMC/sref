@@ -47,7 +47,7 @@ FFLAGST  = $(OPTS) $(LIST) $(FREE) $(TRAPS) $(PROFILE) $(DEBUG) $(WRFFLAGS) $(W3
 LDFLAGS  = $(MEM) $(MAP) $(SMP) $(PROFILE)
 LIBS     = $(ESSL) $(MASS) $(SEARCH) $(WRFLIB) \
            ${NEMSIO_LIB} ${W3EMC_LIB4} ${W3NCO_LIB4} \
-           ${BACIO_LIB4} ${NETCDF_LIB}
+           ${BACIO_LIB4} $(NETCDF_LDFLAGS_F) $(NETCDF_LDFLAGS_C)
   
 #
 # free-format object files
