@@ -107,7 +107,7 @@ if [ 1 == 1 ]; then
 ### PRDGEN
 ###
 cd ${SORCsref}/sref_prdgen.fd
-make -f Makefile_wcoss clean
+make -f Makefile_dell clean
 cd ..
 
 fi

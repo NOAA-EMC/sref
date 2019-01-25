@@ -26,7 +26,9 @@ EXECsref=${base}/exec
 mkdir -m 775 -p $EXECsref
 
 # transutil.fd
-cd ${SORCsref}/transutil.fd/v1.0.0/src
+cd ${SORCsref}/transutil.fd/v1.0.0
+rm -f libtransutil_?.a
+cd src
 ./makelibtransutil.sh
 
 # sref_cluster_NCEP.fd
