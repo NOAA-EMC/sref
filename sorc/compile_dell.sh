@@ -33,14 +33,21 @@ cd src
 
 # sref_cluster_NCEP.fd
 cd ${SORCsref}/sref_cluster_NCEP.fd
-make -f makefile_cluster clean
-make -f makefile_cluster
+gmake -f makefile_cluster clean
+gmake -f makefile_cluster
 mv sref_cluster_NCEP ${EXECsref}/.
-make -f makefile_cluster clean
-make -f makefile_weight clean
-make -f makefile_weight
+gmake -f makefile_cluster clean
+gmake -f makefile_weight clean
+gmake -f makefile_weight
 mv sref_clusterweight ${EXECsref}/.
-make -f makefile_weight clean
+gmake -f makefile_weight clean
+
+# sref_cluster_OU.fd
+cd ${SORCsref}/sref_cluster_OU.fd
+gmake clean
+gmake
+mv sref_cluster_OU ${EXECsref}/.
+gmake clean
 
 # sref_calfcsterr.fd
 cd ${SORCsref}/sref_calfcsterr.fd
@@ -56,12 +63,26 @@ gmake
 mv sref_estimate_bias ${EXECsref}/.
 gmake clean
 
+# sref_bufr.fd
+cd ${SORCsref}/sref_bufr.fd
+gmake clean
+gmake
+mv sref_bufr ${EXECsref}/.
+gmake clean
+
 # ENSADD
 cd ${SORCsref}/global_ensadd.fd
 gmake clobber
 gmake
 mv global_ensadd ${EXECsref}/.
 gmake clean
+
+# POSTGP
+cd ${SORCsref}/global_postgp.fd
+gmake clobber
+./make.sh
+mv global_postgs ${EXECsref}/.
+gmake clobber
 
 ###
 ### WRFBUCKET
@@ -90,7 +111,7 @@ gmake -f makefile_REG
 mv sref_ens_gen ${EXECsref}/.
 gmake -f makefile_REG clean
 gmake -f makefile_DS clean
-make -f makefile_DS
+gmake -f makefile_DS
 mv sref_ens_gen_DS ${EXECsref}/.
 gmake -f makefile_DS clean
 
@@ -99,6 +120,13 @@ cd ${SORCsref}/sref_dwnsfcst.fd
 gmake clean
 gmake
 mv sref_dvrtma_debias ${EXECsref}/.
+gmake clean
+
+# sref_dwnsvect.fd
+cd ${SORCsref}/sref_dwnsvect.fd
+gmake clean
+gmake
+mv sref_dvrtma_bias ${EXECsref}/.
 gmake clean
 
 # global_postgp.fd
@@ -115,6 +143,55 @@ gmake
 mv fastcopygb ${EXECsref}/.
 gmake clean
 
+# sref_meansndp.fd
+cd ${SORCsref}/sref_meansndp.fd
+gmake clobber
+gmake
+mv sref_meansndp ${EXECsref}/.
+gmake clean
+
+# sref_sndp.fd
+cd ${SORCsref}/sref_sndp.fd
+rm -f *.o
+./make_all
+mv sref_*sndp ${EXECsref}/.
+rm -f *.o
+
+cd ${SORCsref}/sref_stnmlist.fd
+gmake clean
+gmake
+mv sref_stnmlist ${EXECsref}/.
+gmake clean
+
+# sref_memberranking.fd
+cd ${SORCsref}/sref_memberranking.fd
+gmake clean
+gmake
+mv sref_ranking ${EXECsref}/.
+gmake clean
+
+# sref_qpfbiasestimate.fd
+cd ${SORCsref}/sref_qpfbiasestimate.fd
+gmake -f makefile_meanqpf clean
+gmake -f makefile_meanqpf
+mv sref_estimate_meanqpfbias ${EXECsref}/.
+gmake -f makefile_meanqpf clean
+gmake -f makefile_qpf clean
+gmake -f makefile_qpf
+mv sref_estimate_qpfbias ${EXECsref}/.
+gmake -f makefile_qpf clean
+
+# sref_qpfcalfcsterr.fd
+cd ${SORCsref}/sref_qpfcalfcsterr.fd
+gmake -f makefile_meanqpf clean
+gmake -f makefile_meanqpf
+mv sref_cal_meanqpffcsterr ${EXECsref}/.
+gmake -f makefile_meanqpf clean
+gmake -f makefile_qpf clean
+gmake -f makefile_qpf
+mv sref_cal_qpffcsterr ${EXECsref}/.
+gmake -f makefile_qpf clean
+
 cd ${SORCsref}/sref_wgtmkr_nmmb.fd
 gmake clean
 gmake
@@ -122,11 +199,10 @@ mv wgtmkr_nmmb.x ${EXECsref}/.
 gmake clean
 
 cd ${SORCsref}/sref_wgtmkr.fd
-make -f Makefile_dell clean
-make -f Makefile_dell
+gmake -f Makefile_dell clean
+gmake -f Makefile_dell
 mv wgtmkr.x ${EXECsref}/.
-make -f Makefile_dell clean
-
+gmake -f Makefile_dell clean
 
 if ${BUILD_NMMB}; then
 ###
@@ -249,11 +325,10 @@ if ${BUILD_COLDSTART}; then
 ###
 ### COLDSTART
 ###
-cd ${SORCsref}/sref_coldstart.fd
-./make.sh
-
-mv sref_coldstart_wrf     ${EXECsref}/.
-
+  cd ${SORCsref}/sref_coldstart.fd
+  gmake clean
+  ./make.sh
+  mv sref_coldstart_wrf     ${EXECsref}/.
 fi
 
 if ${BUILD_POST}; then
@@ -272,10 +347,11 @@ if ${BUILD_PRDGEN}; then
 ###
 ### PRDGEN
 ###
-cd ${SORCsref}/sref_prdgen.fd
-make -f Makefile_dell
-mv sref_prdgen     ${EXECsref}/.
-
+  cd ${SORCsref}/sref_prdgen.fd
+  gmake -f Makefile_dell clean
+  gmake -f Makefile_dell
+  mv sref_prdgen     ${EXECsref}/.
+  gmake -f Makefile_dell clean
 fi
 
 
