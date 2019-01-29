@@ -210,24 +210,28 @@ if ${BUILD_NMMB}; then
 ###
 cd ${SORCsref}/sref_nmmb.fd/src
 cp ${SORCsref}/sref_nmmb.fd/src/atmos/phys/module_LS_NOAHLSM.F90_driersoil ${SORCsref}/sref_nmmb.fd/src/atmos/phys/module_LS_NOAHLSM.F90
-./configure dell
-set +x
-source conf/modules.nems
-set -x
-gmake clean
-gmake nmm
+(
+  ./configure dell
+  set +x
+  source conf/modules.nems
+  set -x
+  gmake clean
+  gmake nmm
+)
 cd ../exe
 cp NEMS.x        ${EXECsref}/sref_wrf_nmb_driersoil
 
 
 cd ${SORCsref}/sref_nmmb.fd/src
 cp ${SORCsref}/sref_nmmb.fd/src/atmos/phys/module_LS_NOAHLSM.F90_normalsoil ${SORCsref}/sref_nmmb.fd/src/atmos/phys/module_LS_NOAHLSM.F90
-./configure dell
-set +x
-source conf/modules.nems
-set -x
-gmake clean
-gmake nmm
+(
+  ./configure dell
+  set +x
+  source conf/modules.nems
+  set -x
+  gmake clean
+  gmake nmm
+)
 cd ../exe
 cp NEMS.x        ${EXECsref}/sref_wrf_nmb_normalsoil
 
