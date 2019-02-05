@@ -30,10 +30,8 @@
 # 2014-08-10  Jun Du - expanded for SREF.v7.0.0
 ################################################################################
 
-set -aeux
+set -eux
 echo $PATH
-
-export XLFRTEOPTS="unit_vars=yes"
 
 MEMBER=$1
 GLBMEM=$2

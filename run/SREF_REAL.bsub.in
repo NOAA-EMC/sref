@@ -41,7 +41,6 @@ export RES=_RES_
 export MACHINE=_MACHINE_
 export N_TASK=$LSB_DJOB_NUMPROC
 
-
 _SREFDIR_/jobs/JSREF_WRF_REAL
 
 echo "SREF finished _MODEL_ _MEMBER_ REAL" >> /gpfs/dell2/ptmp/$LOGNAME/tmpnwprd/jlogfile_sref

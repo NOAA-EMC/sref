@@ -30,9 +30,7 @@
 # 2014-08-20  Jun Du - expanded for SREF.v7.0.0                                        #
 ########################################################################################
 
-set -aeux
-
-export XLFRTEOPTS="unit_vars=yes"
+set -eux
 
 START_DATE=$PDY$CYC
 

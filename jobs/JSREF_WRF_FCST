@@ -7,10 +7,10 @@
 #                     for generality
 # 9/20/2009, Julia Zhu   Scripts are modified to be sharable
 #                        between EMC and NCO
-# 9/27/2011, Jun Du: FY2012 upgrades 
+# 9/27/2011, Jun Du: FY2012 upgrades
 #
 ########################################
-set -aeux
+set -eux
 export PS4='$SECONDS + '
 
 export OMP_NUM_THREADS=1
@@ -38,10 +38,10 @@ export RUN_ENVIR=${RUN_ENVIR:-nco}
 #####################################################################################
 if [ "$RUN_ENVIR" != nco ]      ### For Developers, "group_name" is passed from the ecFflow script
 then
-  CONFIG_FILE=${CONFIG_FILE:-/meso/save/${LOGNAME}/sref${NWROOTp1}/parm/sref_para_config}
+  CONFIG_FILE=${CONFIG_FILE:-/gpfs/dell2/emc/modeling/noscrub/${LOGNAME}/sref${NWROOTp1}/parm/sref_para_config}
   . $CONFIG_FILE
   export userid=$LOGNAME
-  export DATA_IN=${DATA_IN:-/ptmpp1/$userid}
+  export DATA_IN=${DATA_IN:-/gpfs/dell2/ptmp/$userid}
 fi
 
 ###############################################################
@@ -60,9 +60,9 @@ export MEMBER=${MEMBER:-ctl}
 export MODEL=${MODEL:-ARW}
 export RES=${RES:-16km}
 
-########################################################### 
+###########################################################
 # obtain unique process id (pid) and make temp directories
-# Note: ctl member needs to be run only once and can be used 
+# Note: ctl member needs to be run only once and can be used
 # for both NMM and ARW cores!
 ###########################################################
 export pid=$$
@@ -94,7 +94,7 @@ export outid="LL$job"
 export jobid="${outid}.o${pid}"
 export pgmout="OUTPUT.${pid}"
 
-export cycle=t${cyc}z 
+export cycle=t${cyc}z
 
 ###############################
 # Specify NET and RUN name
@@ -136,7 +136,7 @@ else
 fi
 
 # Run setup to initialize working directory and utility scripts
-## setup.sh  # no need, since using module load prod_util 
+## setup.sh  # no need, since using module load prod_util
 
 # Run setpdy and initialize PDY variables
 setpdy.sh
@@ -149,8 +149,8 @@ setpdy.sh
 export gespath=${gespath:-${GESROOT}/${envir}}
 export GESDIR=$gespath/${NET}.${PDY}
 
-mkdir -p -m 775 $GESDIR 
- 
+mkdir -p -m 775 $GESDIR
+
 env
 
 export FLENGTH=${FLENGTH:-87}
