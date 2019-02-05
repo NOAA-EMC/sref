@@ -82,7 +82,7 @@ GLB_CYC=`echo ${GLB_DATE} | cut -c 9-10`
 
 
 # Run setup to initialize working directory and utility scripts
-## setup.sh  # no need, since using module load prod_util 
+## setup.sh  # no need, since using module load prod_util
 
 #
 # ungrib
@@ -156,6 +156,8 @@ if [ $MEMBER == ctl -o $MEMBER == n01 -o $MEMBER == p01 -o $MEMBER == n02 -o $ME
   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_metgrid >> $pgmout 2>errfile
   elif [ $MACHINE == wcoss ]; then
   mpirun.lsf $EXECsref/sref_metgrid >> $pgmout 2>errfile
+  elif [ $MACHINE == dell ]; then
+  mpirun -l -n $N_TASK $EXECsref/sref_metgrid >> $pgmout 2>errfile
   else
   poe $EXECsref/sref_metgrid >> $pgmout 2>errfile
   fi
@@ -189,6 +191,8 @@ if [ $MEMBER == c00 -o $MEMBER == n03 -o $MEMBER == p03 -o $MEMBER == n04 -o $ME
   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_metgrid >> $pgmout 2>errfile
   elif [ $MACHINE == wcoss ]; then
   mpirun.lsf $EXECsref/sref_metgrid >> $pgmout 2>errfile
+  elif [ $MACHINE == dell ]; then
+  mpirun -l -n $N_TASK $EXECsref/sref_metgrid >> $pgmout 2>errfile
   else
   poe $EXECsref/sref_metgrid >> $pgmout 2>errfile
   fi
@@ -246,6 +250,8 @@ if [ $MEMBER == n05 -o $MEMBER == p05 -o $MEMBER == n06 -o $MEMBER == p06 ]; the
   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   elif [ $MACHINE == wcoss ]; then
   mpirun.lsf $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
+  elif [ $MACHINE == dell ]; then
+  mpirun -l -n $N_TASK $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   else
   poe $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   fi
@@ -275,6 +281,8 @@ if [ $MEMBER == n05 -o $MEMBER == p05 -o $MEMBER == n06 -o $MEMBER == p06 ]; the
   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_metgrid >> $pgmout 2>errfile
   elif [ $MACHINE == wcoss ]; then
   mpirun.lsf $EXECsref/sref_metgrid >> $pgmout 2>errfile
+  elif [ $MACHINE == dell ]; then
+  mpirun -l -n $N_TASK $EXECsref/sref_metgrid >> $pgmout 2>errfile
   else
   poe $EXECsref/sref_metgrid >> $pgmout 2>errfile
   fi
@@ -324,6 +332,8 @@ fi
   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_metgrid >> $pgmout 2>errfile
   elif [ $MACHINE == wcoss ]; then
   mpirun.lsf $EXECsref/sref_metgrid >> $pgmout 2>errfile
+  elif [ $MACHINE == dell ]; then
+  mpirun -l -n $N_TASK $EXECsref/sref_metgrid >> $pgmout 2>errfile
   else
   poe $EXECsref/sref_metgrid >> $pgmout 2>errfile
   fi
@@ -372,6 +382,8 @@ NMM)
   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_metgrid >> $pgmout 2>errfile
   elif [ $MACHINE == wcoss ]; then
   mpirun.lsf $EXECsref/sref_metgrid >> $pgmout 2>errfile
+  elif [ $MACHINE == dell ]; then
+  mpirun -l -n $N_TASK $EXECsref/sref_metgrid >> $pgmout 2>errfile
   else
   poe $EXECsref/sref_metgrid >> $pgmout 2>errfile
   fi
@@ -412,6 +424,8 @@ if [ $MEMBER == ctl -o $MEMBER == n01 -o $MEMBER == p01 -o $MEMBER == n02 -o $ME
   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   elif [ $MACHINE == wcoss ]; then
   mpirun.lsf $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
+  elif [ $MACHINE == dell ]; then
+  mpirun -l -n $N_TASK $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   else
   poe $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   fi
@@ -435,6 +449,8 @@ if [ $MEMBER == ctl -o $MEMBER == n01 -o $MEMBER == p01 -o $MEMBER == n02 -o $ME
   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   elif [ $MACHINE == wcoss ]; then
   mpirun.lsf $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
+  elif [ $MACHINE == dell ]; then
+  mpirun -l -n $N_TASK $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   else
   poe $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   fi
@@ -474,6 +490,8 @@ if [ $MEMBER == c00 -o $MEMBER == n03 -o $MEMBER == p03 -o $MEMBER == n04 -o $ME
   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   elif [ $MACHINE == wcoss ]; then
   mpirun.lsf $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
+  elif [ $MACHINE == dell ]; then
+  mpirun -l -n $N_TASK $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   else
   poe $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   fi
@@ -507,6 +525,8 @@ if [ $MEMBER == n05 -o $MEMBER == p05 -o $MEMBER == n06 -o $MEMBER == p06 ]; the
   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   elif [ $MACHINE == wcoss ]; then
   mpirun.lsf $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
+  elif [ $MACHINE == dell ]; then
+  mpirun -l -n $N_TASK $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   else
   poe $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   fi
@@ -527,6 +547,8 @@ if [ $MEMBER == n05 -o $MEMBER == p05 -o $MEMBER == n06 -o $MEMBER == p06 ]; the
   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   elif [ $MACHINE == wcoss ]; then
   mpirun.lsf $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
+  elif [ $MACHINE == dell ]; then
+  mpirun -l -n $N_TASK $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   else
   poe $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   fi
@@ -545,6 +567,8 @@ fi
   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_metgrid_nems >> $pgmout 2>errfile
   elif [ $MACHINE == wcoss ]; then
   mpirun.lsf $EXECsref/sref_metgrid_nems >> $pgmout 2>errfile
+  elif [ $MACHINE == dell ]; then
+  mpirun -l -n $N_TASK $EXECsref/sref_metgrid_nems >> $pgmout 2>errfile
   else
   poe $EXECsref/sref_metgrid_nems >> $pgmout 2>errfile
   fi
@@ -569,7 +593,7 @@ mv met_nmb.d01.${WPS_START_DATE}.dio met_nmb.d01.${WPS_START_DATE}.dio_IC
       $USHsref/sref_filter_grib.sh gens_${GLBMEM}.t${GLB_CYC}z.pgrbf[0123456789]?
       $USHsref/sref_link_grib.csh gens_${GLBMEM}.t${GLB_CYC}z.pgrbf[0123456789]?
       cp $PARMsref/sref_Vtable.GEFS Vtable
- 
+
   fi
 
 # cat $PARMsref/sref_namelist.wps.in.${MODEL}_$RES | sed s/WPS_START_DATE/$WPS_START_DATE_P03/ | \
@@ -584,6 +608,8 @@ mv met_nmb.d01.${WPS_START_DATE}.dio met_nmb.d01.${WPS_START_DATE}.dio_IC
   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   elif [ $MACHINE == wcoss ]; then
   mpirun.lsf $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
+  elif [ $MACHINE == dell ]; then
+  mpirun -l -n $N_TASK $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   else
   poe $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   fi
@@ -613,6 +639,8 @@ cat $PARMsref/sref_namelist.wps.in.${MODEL}_$RES | sed s/WPS_START_DATE/$WPS_DAT
   mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_metgrid_nems >> $pgmout 2>errfile
   elif [ $MACHINE == wcoss ]; then
   mpirun.lsf $EXECsref/sref_metgrid_nems >> $pgmout 2>errfile
+  elif [ $MACHINE == dell ]; then
+  mpirun -l -n $N_TASK $EXECsref/sref_metgrid_nems >> $pgmout 2>errfile
   else
   poe $EXECsref/sref_metgrid_nems >> $pgmout 2>errfile
   fi

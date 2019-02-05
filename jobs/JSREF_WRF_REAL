@@ -9,11 +9,10 @@
 # 4/15/2010, Jun Du  Generalized the script to run NEMS-NMMB
 #                    ensemble (MODEL=NMB)
 ########################################
-set -aeux
+set -eux
 export PS4='$SECONDS + '
 
 export OMP_NUM_THREADS=1
-export MP_MPILIB=mpich2
 
 # The grib_util module should be loaded prior to running this J-job
 #module load grib_util
@@ -35,10 +34,10 @@ export RUN_ENVIR=${RUN_ENVIR:-nco}
 #####################################################################################
 if [ "$RUN_ENVIR" != nco ]      ### For Developers, "group_name" is passed from the ecFflow script
 then
-  CONFIG_FILE=${CONFIG_FILE:-/meso/save/${LOGNAME}/sref${NWROOTp1}/parm/sref_para_config}
+  CONFIG_FILE=${CONFIG_FILE:-/gpfs/dell2/emc/modeling/noscrub/${LOGNAME}/sref${NWROOTp1}/parm/sref_para_config}
   . $CONFIG_FILE
   export userid=$LOGNAME
-  export DATA_IN=${DATA_IN:-/ptmpp1/$userid}
+  export DATA_IN=${DATA_IN:-/gpfs/dell2/ptmp/$userid}
 fi
 
 ###############################################################
@@ -58,9 +57,9 @@ export MEMBER=${MEMBER:-ctl}
 export MODEL=${MODEL:-ARW}
 export RES=${RES:-16km}
 
-########################################################### 
+###########################################################
 # obtain unique process id (pid) and make temp directories
-# Note: ctl member needs to be run only once and can be used 
+# Note: ctl member needs to be run only once and can be used
 # for both NMM and ARW cores!
 ###########################################################
 export pid=$$
@@ -92,7 +91,7 @@ export outid="LL$job"
 export jobid="${outid}.o${pid}"
 export pgmout="OUTPUT.${pid}"
 
-export cycle=t${cyc}z 
+export cycle=t${cyc}z
 
 ###############################
 # Specify NET and RUN name
@@ -131,7 +130,7 @@ if [ $MACHINE == zeus ]; then
 fi
 
 # Run setup to initialize working directory and utility scripts
-## setup.sh  # no need, since using module load prod_util 
+## setup.sh  # no need, since using module load prod_util
 
 # Run setpdy and initialize PDY variables
 setpdy.sh
@@ -157,7 +156,7 @@ export GESndas=$GESNDAS/nam.${PDY}
 #export COMndas=$COMNAM/ndas.${PDY}
 
 mkdir -p -m 775 $GESDIR
- 
+
 env
 
 export FLENGTH=${FLENGTH:-87}
@@ -178,7 +177,7 @@ export IOFORM=2
 ########################################################
 # Execute the script.
 export WPSDIR=$DATA_IN/sref_${MODEL}_wps_${CYC}_${envir}
-$HOMEsref/scripts/exsref_wrfreal.sh.ecf 
+$HOMEsref/scripts/exsref_wrfreal.sh.ecf
 
 ########################################################
 cat $pgmout

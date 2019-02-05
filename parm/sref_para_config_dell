@@ -1,0 +1,77 @@
+#######################################################
+# This file defines the various input varibles for the
+# SREF model run
+#######################################################
+  export NWROOT=/gpfs/gp2/nco/ops/nwprod
+  export NWROOTp1=/gpfs/gp2/nco/ops/nwprod
+  export COMROOT=/gpfs/gp2/nco/ops/com
+  export COMROOTp1=/gpfs/gp2/nco/ops/com
+  export GESROOT=/gpfs/gp2/nco/ops/nwges
+  export GESROOTp1=/gpfs/gp2/nco/ops/nwges
+
+  export HOMEsref=/gpfs/dell2/emc/modeling/noscrub/${USER}/sref.v7_dell
+  export EXECsref=$HOMEsref/exec
+  export FIXsref=$HOMEsref/fix
+  export PARMsref=$HOMEsref/parm
+  export USHsref=$HOMEsref/ush
+  export SCRIPTSsref=$HOMEsref/scripts
+  export POSTGPSH=$HOMEsref/ush/global_postgp.sh
+
+  export HOMEglobal=${NWROOT}
+  export EXECglobal=$HOMEglobal/exec
+  export FIXglobal=$HOMEglobal/fix
+  export PARMglobal=$HOMEglobal/parm
+  export USHglobal=$HOMEglobal/ush
+
+  export SENDCOM=YES
+  export SENDCOM_GB2=YES
+  export SENDDBN=NO
+  export SENDDBN_GB2=NO
+  export SENDSMS=NO
+  export DBNROOT=DBNROOT_OFF
+
+  export RUN_TCTRACK=NO
+
+  PTMP=/gpfs/dell2/ptmp
+  export DATA_IN=$PTMP/$LOGNAME/tmpnwprd
+  export jlogfile=$DATA_IN/jlogfile
+
+  export com=$PTMP/$LOGNAME/com/sref/${envir}
+  export COM=$PTMP/$LOGNAME/com/sref/${envir}
+# export com=/com/sref/${envir}
+# export COM=/com/sref/${envir}
+
+  export COMglb_IN=/gpfs/gp2/nco/ops/com/sref/${envir}
+  export COM_IN=$PTMP/$LOGNAME/com/sref/${envir}
+#
+# ---------------------------------------
+  export COM_OUT=$PTMP/$LOGNAME/com/sref/${envir}
+  export gespath=$PTMP/$LOGNAME/nwges/${envir}
+# export gespath=/nwges/${envir}
+# export GESNDAS=/ptmpp1/$LOGNAME/nwges/prod
+  export GESNDAS=/gpfs/gp2/nco/ops/nwges/prod
+
+# com_canned
+# export COMGFS=/com_canned/gfs/prod
+# export COMENS=/com_canned/gens/prod
+
+# export COMRTMA=/com_canned/rtma/prod
+# export COMNAM=/com_canned/nam/prod
+# export COMRAP=/com_canned/rap/prod
+
+# com_p6
+# export COMGFS=/com_p6/gfs/prod
+# export COMENS=/com_p6/gens/prod
+
+# export COMRTMA=/com_p6/rtma/prod
+# export COMNAM=/com_p6/nam/prod
+# export COMRAP=/com_p6/rap/prod
+
+# com
+  export COMGFS=/gpfs/gp2/nco/ops/com/gfs/prod
+  export COMENS=/gpfs/gp2/nco/ops/com/gens/prod
+
+  export COMRTMA=/gpfs/gp2/nco/ops/com/rtma/prod
+  export COMINnam=/gpfs/gp2/nco/ops/com/nam/prod
+  export COMINrap=/gpfs/hps/nco/ops/com/rap/prod
+
