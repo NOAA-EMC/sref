@@ -2,15 +2,15 @@
 
 set -aeux
 
-SREFDIR=/meso/save/${LOGNAME}/sref.v7.0.0
+SREFDIR=/gpfs/dell2/emc/modeling/noscrub/${LOGNAME}/sref.v7_dell
 cd $SREFDIR/run
 
 cyc=$1
 #FLENGTH=87
 #INCR=3
-ymdh=`cat /com/date/t${cyc}z | cut -c7-16`
+ymdh=`cat /gpfs/hps/nco/ops/com/date/t${cyc}z | cut -c7-16`
 
-ymdh=20150324${1}
+#ymdh=20150324${1}
 
 export SMSBIN=${HOME}/sms
 export MACHINE=wcoss
@@ -18,9 +18,9 @@ export MACHINE=wcoss
 PDY=`echo $ymdh | cut -c1-8`
 CYC=`echo $ymdh | cut -c9-10`
 
-#rm -rf /ptmpp1/$LOGNAME/sref
-#mkdir -p /ptmpp1/$LOGNAME/tmpnwprd
-#rm -rf /ptmpp1/$LOGNAME/tmpnwprd/jlogfile_sref
+#rm -rf /gpfs/dell2/ptmp/$LOGNAME/sref
+#mkdir -p /gpfs/dell2/ptmp/$LOGNAME/tmpnwprd
+#rm -rf /gpfs/dell2/ptmp/$LOGNAME/tmpnwprd/jlogfile_sref
 
 #rm -f *.bsub *.log
 
