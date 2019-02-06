@@ -51,24 +51,8 @@
 # export GESNDAS=/ptmpp1/$LOGNAME/nwges/prod
   export GESNDAS=/gpfs/gp2/nco/ops/nwges/prod
 
-# com_canned
-# export COMGFS=/com_canned/gfs/prod
-# export COMENS=/com_canned/gens/prod
-
-# export COMRTMA=/com_canned/rtma/prod
-# export COMNAM=/com_canned/nam/prod
-# export COMRAP=/com_canned/rap/prod
-
-# com_p6
-# export COMGFS=/com_p6/gfs/prod
-# export COMENS=/com_p6/gens/prod
-
-# export COMRTMA=/com_p6/rtma/prod
-# export COMNAM=/com_p6/nam/prod
-# export COMRAP=/com_p6/rap/prod
-
 # com
-  export COMGFS=/gpfs/gp2/nco/ops/com/gfs/prod
+  export COMGFS=/gpfs/hps/nco/ops/com/gfs/prod
   export COMENS=/gpfs/gp2/nco/ops/com/gens/prod
 
   export COMRTMA=/gpfs/gp2/nco/ops/com/rtma/prod
