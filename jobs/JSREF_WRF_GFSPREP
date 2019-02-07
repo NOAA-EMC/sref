@@ -69,7 +69,7 @@ export pid=$$
 export DATA_IN=${DATA_IN:-${DATAROOT}}
 
 #export DATA=$DATA_IN/${jobid:?}
-export DATA=$DATA_IN/sref_gfsprep_${CYC}_${envir}
+export DATA=$DATA_IN/sref_gfsprep_${CYC}_${envir}/$MEMBER
 # Remove old directory if it exists
 rm -rf $DATA
 mkdir -p $DATA
@@ -175,6 +175,6 @@ postmsg "$jlogfile" "$msg"
 # Remove the Working Directory
 ################################
 cd $DATA_IN
-#if [ ${RM_TMPDIR:-YES} = YES ]; then rm -rf $DATA; fi
+if [ ${RM_TMPDIR:-YES} = YES ]; then rm -rf $DATA; fi
 
 date
