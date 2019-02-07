@@ -175,6 +175,6 @@ postmsg "$jlogfile" "$msg"
 # Remove the Working Directory
 ################################
 cd $DATA_IN
-if [ ${RM_TMPDIR:-YES} = YES ]; then rm -rf $DATA; fi
+#if [ ${RM_TMPDIR:-YES} = YES ]; then rm -rf $DATA; fi
 
 date
