@@ -41,7 +41,8 @@
 # export com=/com/sref/${envir}
 # export COM=/com/sref/${envir}
 
-  export COMglb_IN=/gpfs/gp2/nco/ops/com/sref/${envir}
+# export COMglb_IN=/gpfs/gp2/nco/ops/com/sref/${envir}
+  export COMglb_IN=$PTMP/$LOGNAME/com/sref/${envir}
   export COM_IN=$PTMP/$LOGNAME/com/sref/${envir}
 #
 # ---------------------------------------
@@ -52,8 +53,11 @@
   export GESNDAS=/gpfs/gp2/nco/ops/nwges/prod
 
 # com
-  export COMGFS=/gpfs/hps/nco/ops/com/gfs/prod
+# export COMGFS=/gpfs/hps/nco/ops/com/gfs/prod
+  export COMGFS=/gpfs/dell1/nco/ops/com/gfs/para
+  export COMINgfs=/gpfs/dell1/nco/ops/com/gfs/para
   export COMENS=/gpfs/gp2/nco/ops/com/gens/prod
+  export COMINgens=/gpfs/gp2/nco/ops/com/gens/prod
 
   export COMRTMA=/gpfs/gp2/nco/ops/com/rtma/prod
   export COMINnam=/gpfs/gp2/nco/ops/com/nam/prod
