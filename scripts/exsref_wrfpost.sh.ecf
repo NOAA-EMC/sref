@@ -14,18 +14,16 @@
 #
 # 2005-10-06  Xiaoxue Wang - Modified to operational standard
 # 2008-07-18  Jun Du - Upgraded to WRFv2.2
-# 2008-08-13  Jun Du - changed the model post-processing frequency from 3hrly to 
+# 2008-08-13  Jun Du - changed the model post-processing frequency from 3hrly to
 #                      1hrly for the 1st 39hr
 # 2010-05-07  Jun Du - Generalized the script to run NEMS ensemble (MODEL=NMB)
 ################################################################################
-set -aeux
-
-export XLFRTEOPTS="unit_vars=yes"
+set -eux
 
 cd $WORK_DIR
 
 # Run setup to initialize working directory and utility scripts
-## setup.sh  # no need, since using module load prod_util 
+## setup.sh  # no need, since using module load prod_util
 
 #
 # post
@@ -162,6 +160,8 @@ fi
    mpiexec_mpt -prefix "[%g]" -np $PBS_NP $EXECsref/sref_post < itag >> $pgmout 2>errfile
    elif [ $MACHINE == wcoss ]; then
    mpirun.lsf $EXECsref/sref_post < itag >> $pgmout 2>errfile
+   elif [ $MACHINE == dell ]; then
+   mpirun -l -n $N_TASK  $EXECsref/sref_post < itag >> $pgmout 2>errfile
    fi
    export err=$?;err_chk
 
