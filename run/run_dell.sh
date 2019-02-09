@@ -41,7 +41,7 @@ NMMB_FCST_TASKS[p04]=96
 NMMB_FCST_TASKS[p05]=112
 NMMB_FCST_TASKS[p06]=96
 
-for MODEL in ARW NMB ; do
+ for MODEL in ARW NMB ; do
 #for MODEL in ARW ; do
 #for MODEL in NMB ; do
 #for MODEL in ARW RAW NMM NMB ; do
@@ -95,7 +95,6 @@ cat SREF_FCST.bsub.in | \
     sed s:_RES_:$RES:g | \
     sed s:_MACHINE_:$MACHINE:g > SREF_FCST_${MODEL}_${MEMBER}.bsub
 
-if [ 0 == 1 ]; then
 
 # 3 hourly 212, 216, 234 grids
 export runflag=3hrly
@@ -164,8 +163,6 @@ cat SREF_POST4.bsub.in | \
     sed s:_MACHINE_:$MACHINE:g | \
     sed s:_runflag_:$runflag:g | \
     sed s:_OUTGRD_:$OUTGRD:g > SREF_POST4_${MODEL}_${MEMBER}.bsub
-
-fi
 
 #if [ ${MEMBER} == ctl ]; then
 #CTLJOB=`bsub SREF_PREP_${MODEL}_${MEMBER}.bsub`
