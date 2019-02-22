@@ -70,6 +70,9 @@ cp ${COMIN_SIG}/gfs.t${newCYC}z.pgrb2.1p00.f0${newfhr} temp_grib2
        else
 cp ${COMIN_SIG}/gfs.t${newCYC}z.pgrb2.1p00.f${newfhr} temp_grib2
        fi
+#Wait for copying to be finished
+sleep 5
+
 $CNVGRIB -g21 temp_grib2 $GFSOUT/gfs.t${newCYC}z.master.grbf$newfhr
 
 fi
