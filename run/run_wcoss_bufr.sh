@@ -2,19 +2,19 @@
 
 set -aeux
 
-SREFDIR=/meso/save/${LOGNAME}/sref.v7.0.0
+SREFDIR=/gpfs/dell2/emc/modeling/noscrub/${LOGNAME}/sref.v7_dell
 cd $SREFDIR/run
 
 cyc=$1
 FLENGTH=87
 INCR=3
 INCRBUFR=1
-ymdh=`cat /com/date/t${cyc}z | cut -c7-16`
+ymdh=`cat /gpfs/hps/nco/ops/com/date/t${cyc}z | cut -c7-16`
 
-ymdh=20150331${1}
+ymdh=20190225${1}
 
 export SMSBIN=${HOME}/sms
-export MACHINE=wcoss
+export MACHINE=dell
 export RES=16km
 export IOFORM=2
 export runflag=3hrly
@@ -25,9 +25,9 @@ export OUTGRD=255
 PDY=`echo $ymdh | cut -c1-8`
 CYC=`echo $ymdh | cut -c9-10`
 
-#rm -rf /ptmpp1/$LOGNAME/sref
-#mkdir -p /ptmpp1/$LOGNAME/tmpnwprd
-#rm -rf /ptmpp1/$LOGNAME/tmpnwprd/jlogfile_sref
+#rm -rf /gpfs/dell2/ptmp/$LOGNAME/sref
+#mkdir -p /gpfs/dell2/ptmp/$LOGNAME/tmpnwprd
+#rm -rf /gpfs/dell2/ptmp/$LOGNAME/tmpnwprd/jlogfile_sref
 
 #rm -f *.bsub *.log
 
@@ -49,7 +49,7 @@ cat SREF_BUFR.bsub.in | \
     sed s:_MACHINE_:$MACHINE:g > SREF_BUFR_${MODEL}_${MEMBER}.bsub
 
 bsub < SREF_BUFR_${MODEL}_${MEMBER}.bsub
-echo "SREF waiting ${MODEL} ${MEMBER} BUFR" >> /ptmpp1/$LOGNAME/tmpnwprd/jlogfile_sref
+echo "SREF waiting ${MODEL} ${MEMBER} BUFR" >> /gpfs/dell2/ptmp/$LOGNAME/tmpnwprd/jlogfile_sref
 
 done
 
