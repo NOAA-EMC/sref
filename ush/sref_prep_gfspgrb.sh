@@ -70,8 +70,8 @@ cp ${COMIN_SIG}/gfs.t${newCYC}z.pgrb2.1p00.f0${newfhr} temp_grib2
        else
 cp ${COMIN_SIG}/gfs.t${newCYC}z.pgrb2.1p00.f${newfhr} temp_grib2
        fi
-#Wait for copying to be finished
-sleep 5
+#Make sure that the copying has finished
+ sleep 5
 
 $CNVGRIB -g21 temp_grib2 $GFSOUT/gfs.t${newCYC}z.master.grbf$newfhr
 
@@ -116,6 +116,7 @@ if [ $model = gens ]; then
        else
   cat ${COMIN_SIG}/${newCYC}/pgrb2ap5/ge${GLBPAIR}.t${newCYC}z.pgrb2a.0p50.f$newfhr ${COMIN_SIG}/${newCYC}/pgrb2bp5/ge${GLBPAIR}.t${newCYC}z.pgrb2b.0p50.f$newfhr > tempfile_grib2
        fi
+sleep 5
 
 #convert from grib2 to grib1 here
 $CNVGRIB -g21 tempfile_grib2 $GFSOUT/${model}_${SREFMEM}.t${newCYC}z.pgrbf$newfhr
