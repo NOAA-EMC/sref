@@ -181,7 +181,7 @@ ln -sf intermed.bufr fort.79
 
 startmsg
 #$EXECsref/sref_bufr < itag > outpost.$fhr
-mpirun.lsf $EXECsref/sref_bufr < itag > outpost.$fhr
+mpirun $EXECsref/sref_bufr < itag > outpost.$fhr
 
 mv intermed.bufr intermed.bufr.$fhr
 cat intermed.bufr.$fhr >> total.bufr
@@ -212,7 +212,7 @@ export FORT66=total.bufr
 export FORT78=class1.bufr
  
 startmsg
-mpirun.lsf $EXECsref/sref_${CORE}_sndp < modtop.parm > sndp.out
+mpirun $EXECsref/sref_${CORE}_sndp < modtop.parm > sndp.out
 #$EXECsref/sref_${CORE}_sndp < modtop.parm > sndp.out
 
 if [ -e err_chk ]
@@ -236,7 +236,7 @@ export FORT20=class1.bufr
 #XXW export XLFUNIT_20=class1.bufr
 date
 #mpirun.lsf $EXECnam/nam_stnmlist < stnmlist_input > nam_stnmlist.out
-mpirun.lsf $EXECsref/sref_stnmlist < stnmlist_input > sref_stnmlist.out
+mpirun $EXECsref/sref_stnmlist < stnmlist_input > sref_stnmlist.out
 
 export UCASE_MODEL=`echo $MODEL | tr 'a-z' 'A-Z'`
 
@@ -264,14 +264,21 @@ echo "sndp done!"
 # run GEMPAK
 #------------------
 mkdir -p $COMOUT/gempak
-PARMgempak1=${NWROOTp1}/gempak/nawips1/gempak/tables/pack
+#$PARMgempak1=${NWROOTp1}/gempak/nawips1/gempak/tables/pack
 # PARMgempak is the same as PARMgempak1
 #${NWROOTp1}/ush/cwordsh unblk class1.bufr class1.bufr_unblk
-${NWROOTp1}/ush/cwordsh block class1.bufr class1.bufr_blk
-. ${NWROOTp1}/gempak/.gempak
+
+#${NWROOTp1}/ush/cwordsh block class1.bufr class1.bufr_blk
+#. ${NWROOTp1}/gempak/.gempak
+PARMgempak1=/gpfs/dell1/nco/ops/nwprod/gempak.v7.3.1/nawips/gempak/tables/pack
+NAMSND=/gpfs/dell1/nco/ops/nwprod/gempak.v7.3.1/nawips/os/linux3.10.0_x86_64/bin/namsnd 
+export EXECobsproc_shared_bufr_cword=/gpfs/hps/nco/ops/nwpara/obsproc_shared/bufr_cword.v1.0.0/exec
+/gpfs/hps/nco/ops/nwpara/obsproc_shared/bufr_cword.v1.0.0/ush/bufr_cword.sh block class1.bufr class1.bufr_blk
+. /gpfs/gp1/nco/ops/nwprod/gempak/.gempak
 /bin/rm -f *.nts
         
-namsnd << EOF > /dev/null
+#/gpfs/dell1/nco/ops/nwprod/gempak.v7.3.1/nawips/os/linux3.10.0_x86_64/bin/namsnd << EOF > /dev/null
+$NAMSND << EOF > /dev/null
  SNBUFR   = class1.bufr_blk
  SNOUTF   = bufr.snd
  SFOUTF   = bufr.sfc+
