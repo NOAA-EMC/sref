@@ -7,9 +7,11 @@
 ##BSUB -n 43
 #BSUB -n 54
 #BSUB -x
-##BSUB -R span[ptile=16]
-#BSUB -R span[ptile=4]
-#BSUB -W 01:20
+#BSUB -R span[ptile=16]
+##BSUB -R span[ptile=4]
+##BSUB -R span[ptile=1]
+#BSUB -M 600                   #MB for executable
+#BSUB -W 00:30
 #BSUB -P SREF-T2O
 #BSUB -q "dev"
 
