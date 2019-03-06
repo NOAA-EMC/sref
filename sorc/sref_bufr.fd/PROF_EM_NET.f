@@ -238,10 +238,11 @@ c	endif
 !--------------------------------------------------------------------
 !--------------------------------------------------------------------
 !--------------------------------------------------------------------
-
+       print*,'FRST=',FRST
        if ( frst ) then
          frst = .false.
-         CALL ext_ncd_ioinit(Status)
+!        CALL ext_ncd_ioinit(Status)
+         CALL ext_ncd_ioinit(SysDepInfo,Status)
           print*,'CALLed ioinit', Status
 c	write(6,*) 'filename early in PROF= ', filename
 c        CALL ext_ncd_open_for_read( trim(fileName), 0, 0, " ",
@@ -260,7 +261,7 @@ c    &  DataHandle, Status)
 c        print*,'error opening ',fileName, ' Status = ', Status ; stop
        endif
 
-!	write(6,*) 'js, je, jev: ', js,je,jev
+c	write(6,*) 'js, je, jev: ', js,je,jev
 
 C Getting start time
       CALL ext_ncd_get_dom_ti_char(DataHandle
