@@ -2,12 +2,16 @@
 # This file defines the various input varibles for the
 # SREF model run
 #######################################################
-  export NWROOT=/gpfs/gp2/nco/ops/nwprod
-  export NWROOTp1=/gpfs/gp2/nco/ops/nwprod
-  export COMROOT=/gpfs/gp2/nco/ops/com
-  export COMROOTp1=/gpfs/gp2/nco/ops/com
-  export GESROOT=/gpfs/gp2/nco/ops/nwges
-  export GESROOTp1=/gpfs/gp2/nco/ops/nwges
+#
+  machine=g
+# machine=t
+
+  export NWROOT=/gpfs/${machine}p2/nco/ops/nwprod
+  export NWROOTp1=/gpfs/${machine}p2/nco/ops/nwprod
+  export COMROOT=/gpfs/${machine}p2/nco/ops/com
+  export COMROOTp1=/gpfs/${machine}p2/nco/ops/com
+  export GESROOT=/gpfs/${machine}p2/nco/ops/nwges
+  export GESROOTp1=/gpfs/${machine}p2/nco/ops/nwges
 
   export HOMEsref=/gpfs/dell2/emc/modeling/noscrub/${USER}/sref.v7_dell
   export EXECsref=$HOMEsref/exec
@@ -41,7 +45,7 @@
 # export com=/com/sref/${envir}
 # export COM=/com/sref/${envir}
 
-# export COMglb_IN=/gpfs/gp2/nco/ops/com/sref/${envir}
+# export COMglb_IN=/gpfs/${machine}p2/nco/ops/com/sref/${envir}
   export COMglb_IN=$PTMP/$LOGNAME/com/sref/${envir}
   export COM_IN=$PTMP/$LOGNAME/com/sref/${envir}
 #
@@ -50,16 +54,16 @@
   export gespath=$PTMP/$LOGNAME/nwges/${envir}
 # export gespath=/nwges/${envir}
 # export GESNDAS=/ptmpp1/$LOGNAME/nwges/prod
-  export GESNDAS=/gpfs/gp2/nco/ops/nwges/prod
+  export GESNDAS=/gpfs/${machine}p2/nco/ops/nwges/prod
 
 # com
 # export COMGFS=/gpfs/hps/nco/ops/com/gfs/prod
   export COMGFS=/gpfs/dell1/nco/ops/com/gfs/para
   export COMINgfs=/gpfs/dell1/nco/ops/com/gfs/para
-  export COMENS=/gpfs/gp2/nco/ops/com/gens/prod
-  export COMINgens=/gpfs/gp2/nco/ops/com/gens/prod
+  export COMENS=/gpfs/${machine}p2/nco/ops/com/gens/prod
+  export COMINgens=/gpfs/${machine}p2/nco/ops/com/gens/prod
 
-  export COMRTMA=/gpfs/gp2/nco/ops/com/rtma/prod
-  export COMINnam=/gpfs/gp2/nco/ops/com/nam/prod
+  export COMRTMA=/gpfs/${machine}p2/nco/ops/com/rtma/prod
+  export COMINnam=/gpfs/${machine}p2/nco/ops/com/nam/prod
   export COMINrap=/gpfs/hps/nco/ops/com/rap/prod
 
