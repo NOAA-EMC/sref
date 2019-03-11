@@ -51,7 +51,8 @@ END_OF_JOB
 
   done
 
-  mpirun.lsf cfp $CMDFILE
+# mpirun.lsf cfp $CMDFILE
+  mpirun cfp $CMDFILE
 
 else
 
