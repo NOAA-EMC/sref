@@ -14,6 +14,7 @@
 # 9/20/2009, Julia Zhu   Scripts are modified to be sharable
 #                        between EMC and NCO
 # 3/26/2012, Geoff Manikin   adapted for meanbufr
+# 3/12/2019, Jun Du  Modified to run on Dell machine
 # 
 #         Please note that variable "RUN_ENVIR" is set and used
 #         in the development enviroment only.
@@ -45,10 +46,10 @@ export RUN=sref
 ###########################################
 if [ "$RUN_ENVIR" != nco ]      ### For Developers, "group_name" is passed from the ecFflow script
 then
-  CONFIG_FILE=${CONFIG_FILE:-/meso/save/${LOGNAME}/sref${NWROOTp1}/parm/sref_para_config}
+  CONFIG_FILE=${CONFIG_FILE:-/gpfs/dell2/emc/modeling/noscrub/${LOGNAME}/sref${NWROOTp1}/parm/sref_para_config_dell}
   . $CONFIG_FILE
   export userid=$LOGNAME
-  export DATA_IN=${DATA_IN:-/ptmpp1/$userid}
+  export DATA_IN=${DATA_IN:-/gpfs/dell2/ptmp/$userid}
   export jlogfile=${jlogfile:-$DATA_IN/jlogfile}
 
   export SENDCOM=${SENDCOM:-YES}
@@ -74,7 +75,7 @@ then
 
   export COMIN=$COM_IN/${RUN}.${PDY}/${cyc}
   export COMOUT=$COM_OUT/${RUN}.${PDY}/$cyc
-  export COMIN_PROF=/ptmpp1/$LOGNAME/${COMROOTp1}/${NET}/${envir}/${RUN}.${PDY}/$cyc/bufr
+  export COMIN_PROF=$COMOUT/bufr
 fi
 
 ###############################################################
@@ -93,7 +94,8 @@ fi
 export pid=$$
 export DATA_IN=${DATA_IN:-${DATAROOT}}
 
-export DATA=$DATA_IN/${jobid:?}
+#export DATA=$DATA_IN/${jobid:?}
+export DATA=$DATA_IN/sref_${MODEL}_meanbufr_${CYC}_${envir}
 
 rm -rf $DATA
 mkdir -p $DATA
@@ -130,15 +132,12 @@ export FIXsref=${FIXsref:-$HOMEsref/fix}
 export PARMsref=${PARMsref:-$HOMEsref/parm}
 export USHsref=${USHsref:-$HOMEsref/ush}
 
+export COMIN=${COMIN:-${COMROOT}/${NET}/${envir}/${RUN}.${PDY}/$cyc}
+export COMOUT=${COMOUT:-${COMROOT}/${NET}/${envir}/${RUN}.${PDY}/$cyc}
+export COMIN_PROF=${COMIN_PROF:-${COMROOT}/${NET}/${envir}/${RUN}.${PDY}/$cyc/bufr}
+
 msg="JOB $job HAS BEGUN"
 postmsg "$jlogfile" "$msg"
-
-#############################################
-# COMIN and COMOUT
-#############################################
-export COMIN=${COMROOT}/${NET}/${envir}/${RUN}.${PDY}/$cyc
-export COMOUT=${COMROOT}/${NET}/${envir}/${RUN}.${PDY}/$cyc
-export COMIN_PROF=${COMROOT}/${NET}/${envir}/${RUN}.${PDY}/$cyc/bufr
 
 mkdir -p $COMOUT
 
