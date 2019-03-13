@@ -17,6 +17,7 @@
 # 11/15/2011, Jun Du: modified to new 2012 version of SREF (v6.0)
 #             and added hourly output capability
 # 05/01/2012, Jun Du: added a new 16km grid (g132)
+# 03/13/2019, Jun Du: Convert to Dell version
 #
 # Instruction: This job is particularly for the 16km g132. Please submit 
 #              this job 8 times simutaneously by setting the parameter 
@@ -47,10 +48,10 @@ export RUN_ENVIR=${RUN_ENVIR:-nco}
 #####################################################################################
 if [ "$RUN_ENVIR" != nco ]      ### For Developers, "group_name" is passed from the ecFflow script
 then
-  CONFIG_FILE=${CONFIG_FILE:-/meso/save/${LOGNAME}/sref.v7.0.0/parm/sref_para_config_wcoss}
+  CONFIG_FILE=${CONFIG_FILE:-/gpfs/dell2/emc/modeling/noscrub/${LOGNAME}/sref.v7_dell/parm/sref_para_config_dell}
   . $CONFIG_FILE
   export userid=$LOGNAME
-  export DATA_IN=${DATA_IN:-/ptmpp1/$userid}
+  export DATA_IN=${DATA_IN:-/gpfs/dell2/ptmp/$userid}
 fi
 
 ###############################################################
@@ -71,7 +72,8 @@ export PS4='$SECONDS + '
 export pid=$$
 export DATA_IN=${DATA_IN:-${DATAROOT}}
 
-export DATA=$DATA_IN/${jobid:?}
+#export DATA=$DATA_IN/${jobid:?}
+export DATA=$DATA_IN/sref_enspost132_${CYC}_${envir}
 rm -rf $DATA
 mkdir -p $DATA
 
@@ -187,6 +189,6 @@ postmsg "$jlogfile" "$msg"
 # Remove the Working Directory
 ################################
 cd $DATA_IN
-if [ ${RM_TMPDIR:-YES} = YES ] ; then rm -rf $DATA ; fi
+#if [ ${RM_TMPDIR:-YES} = YES ] ; then rm -rf $DATA ; fi
 
 date

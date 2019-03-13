@@ -16,6 +16,7 @@
 #         in the development enviroment only.
 # 11/15/2011, Jun Du: modified to new 2012 version of SREF (v6.0)
 #             and added hourly output capability
+# 03/13/2019, Jun Du: Convert to Dell version
 ############################################
 set -xa
 export OMP_NUM_THREADS=1
@@ -45,10 +46,10 @@ export RUN_ENVIR=${RUN_ENVIR:-nco}
 #####################################################################################
 if [ "$RUN_ENVIR" != nco ]      ### For Developers, "group_name" is passed from the ecFflow script
 then
-  CONFIG_FILE=${CONFIG_FILE:-/meso/save/${LOGNAME}/sref.v7.0.0/parm/sref_para_config_wcoss}
+  CONFIG_FILE=${CONFIG_FILE:-/gpfs/dell2/emc/modeling/noscrub/${LOGNAME}/sref.v7.dell/parm/sref_para_config_dell}
   . $CONFIG_FILE
   export userid=$LOGNAME
-  export DATA_IN=${DATA_IN:-/ptmpp1/$userid}
+  export DATA_IN=${DATA_IN:-/gpfs/dell2/ptmp/$userid}
 fi
 
 ###############################################################
@@ -69,7 +70,8 @@ export PS4='$SECONDS + '
 export pid=$$
 export DATA_IN=${DATA_IN:-${DATAROOT}}
 
-export DATA=$DATA_IN/${jobid:?}
+#export DATA=$DATA_IN/${jobid:?}
+export DATA=$DATA_IN/sref_enspost_hrly_${CYC}_${envir}
 rm -rf $DATA
 mkdir -p $DATA
 
@@ -182,7 +184,7 @@ export MP_CMDFILE=$DATAHOLD/poescript
 #
 # Execute the script.
 #/usr/bin/poe -cmdfile $DATAHOLD/poescript -pgmmodel mpmd -ilevel 3 -labelio yes -stdoutmode ordered
-mpirun.lsf -cmdfile $DATAHOLD/poescript -pgmmodel mpmd -ilevel 3 -labelio yes -stdoutmode ordered
+mpirun -cmdfile $DATAHOLD/poescript -pgmmodel mpmd -ilevel 3 -labelio yes -stdoutmode ordered
 export err=$?; err_chk
 
 #############################################
@@ -215,6 +217,6 @@ postmsg "$jlogfile" "$msg"
 # Remove the Working Directory
 ################################
 cd $DATA_IN
-if [ ${RM_TMPDIR:-YES} = YES ] ; then rm -rf $DATAHOLD ; fi
+#if [ ${RM_TMPDIR:-YES} = YES ] ; then rm -rf $DATAHOLD ; fi
 
 date
