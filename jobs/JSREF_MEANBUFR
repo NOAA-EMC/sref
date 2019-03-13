@@ -46,7 +46,7 @@ export RUN=sref
 ###########################################
 if [ "$RUN_ENVIR" != nco ]      ### For Developers, "group_name" is passed from the ecFflow script
 then
-  CONFIG_FILE=${CONFIG_FILE:-/gpfs/dell2/emc/modeling/noscrub/${LOGNAME}/sref${NWROOTp1}/parm/sref_para_config_dell}
+  CONFIG_FILE=${CONFIG_FILE:-/gpfs/dell2/emc/modeling/noscrub/${LOGNAME}/sref.v7_dell/parm/sref_para_config_dell}
   . $CONFIG_FILE
   export userid=$LOGNAME
   export DATA_IN=${DATA_IN:-/gpfs/dell2/ptmp/$userid}
@@ -132,6 +132,9 @@ export FIXsref=${FIXsref:-$HOMEsref/fix}
 export PARMsref=${PARMsref:-$HOMEsref/parm}
 export USHsref=${USHsref:-$HOMEsref/ush}
 
+#############################################
+# COMIN and COMOUT
+#############################################
 export COMIN=${COMIN:-${COMROOT}/${NET}/${envir}/${RUN}.${PDY}/$cyc}
 export COMOUT=${COMOUT:-${COMROOT}/${NET}/${envir}/${RUN}.${PDY}/$cyc}
 export COMIN_PROF=${COMIN_PROF:-${COMROOT}/${NET}/${envir}/${RUN}.${PDY}/$cyc/bufr}
