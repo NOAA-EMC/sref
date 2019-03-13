@@ -203,7 +203,8 @@ export MP_CMDFILE=$DATA/poescript
 
 #
 # Execute the script.
-mpirun -cmdfile $DATA/poescript -pgmmodel mpmd -labelio yes -stdoutmode ordered
+#mpirun -cmdfile $DATA/poescript -pgmmodel mpmd -labelio yes -stdoutmode ordered
+mpirun $DATA/poescript
 export err=$?; err_chk
 
 #############################################
