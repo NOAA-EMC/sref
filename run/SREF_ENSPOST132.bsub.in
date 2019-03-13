@@ -4,24 +4,22 @@
 #BSUB -eo _SREFDIR_/run/sref_enspost132__ORDER_.log
 #BSUB -J SREF_ENSPOST
 #BSUB -n 1
-#BSUB -x ##not_shared
 #BSUB -R span[ptile=1]
-##BSUB -R span[ptile=1]
-##BSUB -R "rusage[mem=27648]"
 #BSUB -W 03:00
 #BSUB -P SREF-T2O
-#BSUB -q "devhigh"
-#BSUB -a poe
-##BSUB -M 110
+#BSUB -q "dev"
 
 set -aeux
 
-trap 'echo "SREF error ENSPOST132_$ORDER" >> /ptmpp1/$LOGNAME/tmpnwprd/jlogfile_sref' INT TERM ERR
-echo "SREF started ENSPOST132_$ORDER" >> /ptmpp1/$LOGNAME/tmpnwprd/jlogfile_sref
+trap 'echo "SREF error ENSPOST132_$ORDER" >> /gpfs/dell2/ptmp/$LOGNAME/tmpnwprd/jlogfile_sref' INT TERM ERR
+echo "SREF started ENSPOST132_$ORDER" >> /gpfs/dell2/ptmp/$LOGNAME/tmpnwprd/jlogfile_sref
 
-. /usrx/local/Modules/3.2.9/init/bash
-module load ibmpe
-module load ics
+. /usrx/local/prod/lmod/lmod/init/bash
+module load lsf/10.1
+module load ips/18.0.1.163
+module load prod_util/1.1.0
+module load grib_util/1.1.0
+module load NetCDF/4.5.0
 
 export OMP_NUM_THREADS=1
 export MP_EUIDEVICE=sn_all
@@ -29,14 +27,11 @@ export MP_EUILIB=us
 export MP_MPILIB=mpich2
 export MP_TASK_AFFINITY=core:1
 
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usrx/local/NetCDF/3.6.3/lib
-
-
 export RUN_ENVIR=para
 export envir=prod
 export job=$$
 
-export CONFIG_FILE=_SREFDIR_/parm/sref_para_config_wcoss
+export CONFIG_FILE=_SREFDIR_/parm/sref_para_config_dell
 
 export PDY=_PDY_
 export cyc=_CYC_
@@ -44,9 +39,9 @@ export order=_ORDER_
 
 _SREFDIR_/jobs/JSREF_ENSPOST132
 
-echo "SREF finished ENSPOST132_$ORDER" >> /ptmpp1/$LOGNAME/tmpnwprd/jlogfile_sref
+echo "SREF finished ENSPOST132_$ORDER" >> /gpfs/dell2/ptmp/$LOGNAME/tmpnwprd/jlogfile_sref
 
 # Submit next job here:
 #bsub < _SREFDIR_/run/SREF_POST__MODEL___MEMBER_.bsub
-#echo "SREF waiting _MODEL_ _MEMBER_ POST" >> /ptmpp1/$LOGNAME/tmpnwprd/jlogfile_sref
+#echo "SREF waiting _MODEL_ _MEMBER_ POST" >> /gpfs/dell2/ptmp/$LOGNAME/tmpnwprd/jlogfile_sref
 
