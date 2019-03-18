@@ -7,6 +7,7 @@
 # initial program, Jun Du, 2011
 # change log:
 # 11/14/2011, Jun Du: initial implementation
+# 03/18/2019, Jun Du: Converted to Dell machine
 #
 ###############################################################
 set -xa
@@ -33,10 +34,10 @@ export RUN_ENVIR=${RUN_ENVIR:-nco}
 #####################################################################################
 if [ "$RUN_ENVIR" != nco ]      ### For Developers, "group_name" is passed from the ecFlow script
 then
-  CONFIG_FILE=${CONFIG_FILE:-/meso/save/${LOGNAME}/sref${NWROOTp1}/parm/sref_para_config}
+  CONFIG_FILE=${CONFIG_FILE:-/gpfs/dell2/emc/modeling/noscrub/${LOGNAME}/sref.v7_dell/parm/sref_para_config_dell}
   . $CONFIG_FILE
   export userid=$LOGNAME
-  export DATA_IN=${DATA_IN:-/ptmp/$userid}
+  export DATA_IN=${DATA_IN:-/gpfs/dell2/ptmp/$userid}
 fi
 
 ###############################################################
@@ -58,7 +59,8 @@ export PS4='$SECONDS + '
 export pid=$$
 export DATA_IN=${DATA_IN:-${DATAROOT}}
 
-export DATA=$DATA_IN/${jobid:?}
+#export DATA=$DATA_IN/${jobid:?}
+export DATA=$DATA_IN/sref_cluster_${CYC}_${envir}
 rm -rf $DATA
 mkdir -p $DATA
 
