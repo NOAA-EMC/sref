@@ -66,29 +66,29 @@ if [ $model = GFS ]; then
      fi
 
        if [ $newfhr -lt 100 ];then
-cp ${COMIN_SIG}/gfs.t${newCYC}z.pgrb2.1p00.f0${newfhr} temp_grib2
+cp ${COMIN_SIG}/gfs.t${newCYC}z.pgrb2.1p00.f0${newfhr} temp_grib2.$$
        else
-cp ${COMIN_SIG}/gfs.t${newCYC}z.pgrb2.1p00.f${newfhr} temp_grib2
+cp ${COMIN_SIG}/gfs.t${newCYC}z.pgrb2.1p00.f${newfhr} temp_grib2.$$
        fi
 ## ENSURE FILE HAS BEEN TOTALLY SYNC'D
-if [[ -f temp_grib2 ]]; then
- count=0
- while :; do
-  if (( $count > 30 )); then
-   echo 'There is an error in copying data'
-   break
-  fi
-  FS1=`wc -l temp_grib2 | awk '{print $1}'`
-  sleep 5
-  FS2=`wc -l temp_grib2 | awk '{print $1}'`
-  if [ $FS1 -eq $FS2 ]; then
-   break
-  fi
-  (( count = $count + 1 ))
- done
-fi
+#if [[ -f temp_grib2.$$ ]]; then
+# count=0
+# while :; do
+#  if (( $count > 30 )); then
+#   echo 'There is an error in copying data'
+#   break
+#  fi
+#  FS1=`wc -l temp_grib2.$$ | awk '{print $1}'`
+#  sleep 5
+#  FS2=`wc -l temp_grib2.$$ | awk '{print $1}'`
+#  if [ $FS1 -eq $FS2 ]; then
+#   break
+#  fi
+#  (( count = $count + 1 ))
+# done
+#fi
 
-$CNVGRIB -g21 temp_grib2 $GFSOUT/gfs.t${newCYC}z.master.grbf$newfhr
+$CNVGRIB -g21 temp_grib2.$$ $GFSOUT/gfs.t${newCYC}z.master.grbf$newfhr
 
 fi
 
