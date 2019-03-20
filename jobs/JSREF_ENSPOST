@@ -118,7 +118,8 @@ export FIXsref=${FIXsref:-$HOMEsref/fix}
 export PARMsref=${PARMsref:-$HOMEsref/parm}
 export USHsref=${USHsref:-$HOMEsref/ush}
 
-#export SPCfix=${SPCfix:-$HOMEsref/fix}
+
+export SPCfix=${SPCfix:-$HOMEsref/fix/spcsref}
 
 export HOMEspc=${HOMEspc:-${NWROOT}/spcsref.${spcsref_ver}}
 export SPCfix=${SPCfix:-$HOMEspc/fix}
@@ -203,8 +204,10 @@ export MP_CMDFILE=$DATA/poescript
 
 #
 # Execute the script.
-#mpirun -cmdfile $DATA/poescript -pgmmodel mpmd -labelio yes -stdoutmode ordered
+#mpirun.lsf -cmdfile $DATA/poescript -pgmmodel mpmd -labelio yes -stdoutmode ordered
 mpirun $DATA/poescript
+#mpirun -np 9 $DATA/poescript
+
 export err=$?; err_chk
 
 #############################################
