@@ -1,0 +1,196 @@
+# Very first uncommented line is file containing the run file.
+# Line 1... name in Fortran code
+# Line 2... Glevel for Gempak
+# Line 3... Gvcord for Gempak
+# Line 4... Name for Gempak
+cape_wx_model.input
+#
+# dynamic trop 1.5 pvu /bottom up/
+#
+dtrop
+0
+n
+dtrop
+#
+# dynamic trop 1.5 pvu /top down/
+#
+dtropl
+0
+n
+dtropl
+#
+# moist inertial near instability mpv < .05; rh >= 85% /csi potential/ 
+#
+mistab
+0
+n
+mistab
+#
+# absolute moist unstable layers (MAULS) <= -3K for >= 100 mb
+#
+maul
+0
+n
+maul
+# winter products...dendritic layer and opwrh...
+dend
+0
+n
+dend
+#
+opwrh
+0
+n
+opwrh
+#
+# temp at top of saturated layer (tdd < 3degC and layer >= 100 mb thick)
+#
+tsat
+0
+n
+tsat
+#
+# isallobaric wind, grid relative u and v sfc, 850, 700 mb
+#
+isalu
+0
+n
+isalu
+#
+isalv
+0
+n
+isalv
+# 850 mb
+isalu
+850
+pres
+isalu
+#
+isalv
+850
+pres
+isalv
+# 700 mb
+isalu
+700
+pres
+isalu
+#
+isalv
+700
+pres
+isalv
+#
+# Cape starting at 175 mb abv surface
+# Also does pressure of the maxcape and equil temp
+hicape
+0
+n
+hicape
+#
+# hail model -> no longer necessary...called by hicape.
+#
+#hail
+#0
+#n
+#hail
+# 
+# Inversions from ground up
+#
+lids
+0
+n
+lids
+#
+# Inversion based on dtheta/dp
+#
+linv
+0
+n
+linv
+#
+# Precipitation type
+# 
+#ptype
+#0
+#n
+#spcptype
+#
+# Search for baroclinic zones aloft
+#
+cfa
+0
+n
+cfa
+#
+# 12 hour height change 
+#
+htchg
+500
+pres
+htchg
+#
+# 3-hr SCAPE trajectory
+#
+scape
+0
+none
+scape
+#
+# New sigtor parameter
+#
+sigt
+0
+none
+sigt
+# 
+# DCAPE and derecho parameter
+# call hicape first in case mucape not avbl
+dcape
+0
+none
+dcape
+#
+# Snowrate
+#
+snowrt1
+0
+none
+snowrt1
+#
+snowrt2
+0
+none
+snowrt2
+#
+snowrt3
+0
+none
+snowrt3
+#
+snowfall
+0
+none
+t03i
+#
+# Blizzard conditions
+#
+bliz
+0
+none
+bliz
+#
+# Freezing rain amount
+#
+zramt
+0
+none
+zramt
+#
+# Freezing rain change over
+delzr
+0
+none
+delzr
+#

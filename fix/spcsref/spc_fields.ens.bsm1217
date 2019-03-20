@@ -1,0 +1,2041 @@
+# Below are the data the GEMPAK program will extract.
+# The format is as follows: The first line is the name
+# of the GEMPAK file.  Begin all comment lines with the  
+# pound (#) sign!
+#
+# FORMAT THAT MUST BE FOLLOWED:
+# field (gfunc)
+# level (glevel)
+# vertical coord (gvcord)
+# min max GEMPAK_output_name Calc_mean_sd_y_n Output_indiv_members
+#
+# NOTES:
+# If min, max = -9999 then probabilistic calc is skipped.
+# For Ps levels, first two digits of Ps level are used, e.g., hght10=1000 mb.
+#
+# begin with the file name...
+sref.input_files
+#
+# MLCAPE ######################
+# This is calculated as it is not in all the output files.
+# Do this early in processing and it is available for other
+# parameters to use.
+#
+mlcape
+0
+none
+-9999 -9999 mlcape y y
+mlcape
+0
+none
+500 9999 mlcapep500 n n
+mlcape
+0
+none
+1000 9999 mlcapep1000 n n
+mlcape
+0
+none
+2000 9999 mlcapep2000 n n
+mlcape
+0
+none
+3000 9999 mlcapep3000 n n
+#
+# MLCIN ######################
+# This is calculated as it is not in all the output files.
+# Do this early in processing and it is available for other
+# parameters to use.  MLCAPE must be called first!!
+#
+mlcin
+0
+none
+-9999 -9999 mlcin y y
+mlcin
+0
+none
+-25 -.01 mlcinp25 n n
+mlcin
+0
+none
+-50 -.01 mlcinp50 n n
+mlcin
+0
+none
+-75 -.01 mlcinp75 n n
+#mlcin
+#0
+#none
+#-100 -.01 mlcinp100 n n
+# MLLCL ######################
+# This is calculated as it is not in all the output files.
+# Do this early in processing and it is available for other
+# parameters to use.  MLCAPE must be called first!!
+#
+mllcl
+0
+none
+-9999 -9999 mllcl y y
+mllcl
+0
+none
+-1 750 mllclp750 n n
+mllcl
+0
+none
+-1 1000 mllclp1000 n n
+mllcl
+0
+none
+-1 1250 mllclp1250 n n
+mllcl
+0
+none
+-1 1500 mllclp1500 n n
+#
+# Precip type (NCEP Algorithms - most likely method) ############
+#
+ptypeb
+0
+none
+-9999 -9999 ptypen y y
+ptypeb
+0
+none
+.99 1.01 ptype1 n n
+ptypeb
+0
+none
+1.99 2.01 ptype2 n n
+ptypeb
+0
+none
+2.99 3.01 ptype3 n n
+ptypeb
+0
+none
+3.99 4.01 ptype4 n n
+ptypeb
+0
+none
+1.99 4.01 ptypefz n n
+#
+# Precip type (Czys. et al algorithm)
+# This is run in the medium range ensemble only.
+#
+ptype
+0
+none
+-9999 -9999 ptypecz y n
+ptype
+0
+none
+.99 1.01 ptypec1 n n
+ptype
+0
+none
+1.99 2.01 ptypec2 n n
+ptype
+0
+none
+2.99 3.01 ptypec3 n n
+ptype
+0
+none
+3.99 4.01 ptypec4 n n
+ptype
+0
+none
+4.99 5.01 ptypec5 n n
+ptype
+0
+none
+1.99 5.01 ptypecfz n n
+#
+# PMSL #####################
+#
+pmsl
+0
+none
+-9999 -9999 pmsl y y
+#
+#pmsl
+#0
+#none
+#-1 1000 pmslp1000 n n
+#pmsl
+#0
+#none
+#-1 980 pmslp980 n n
+#pmsl
+#0
+#none
+#-1 960 pmslp960 n n
+#
+# MOIST INERTIAL STABILITY (NEAR CSI - BANDING) ############
+# 
+#mistab
+#0
+#none
+#-9999 -9999 mistab y n
+# 
+# look for banding potential in 650 to 900 mb layer...
+#
+#####mistab
+#####0
+#####none
+#####650 900 mistabplow n n
+#
+# MPV values in specified layers...
+# 
+mpvval
+850_750
+pres
+-9999 -9999 mpvval y n
+mpvval
+850_750
+pres
+-999 .25 mpvvalp25 n n
+mpvval
+850_750
+pres
+-999 .10 mpvvalp10 n n
+#
+mpvval
+700_600
+pres
+-9999 -9999 mpvval y n
+mpvval
+700_600
+pres
+-999 .25 mpvvalp25 n n
+mpvval
+700_600
+pres
+-999 .10 mpvvalp10 n n
+#
+mpvval
+900_650
+pres
+-9999 -9999 mpvval y n
+mpvval
+900_650
+pres
+-999 .25 mpvvalp25 n n
+mpvval
+900_650
+pres
+-999 .10 mpvvalp10 n n
+# FRONTOGENESIS IN THE SAME LAYER AS MISTAB
+#
+frnt(lav(thta,vlav(wind)))
+900_650
+pres
+-9999 -9999 front y n
+#
+# a probability of some frontogenesis
+#
+frnt(lav(thta,vlav(wind)))
+900_650
+pres
+.1 999 frontplow n n
+#
+#
+frnt(lav(thta,vlav(wind)))
+900_800
+pres
+-9999 -9999 front y n
+frnt(lav(thta,vlav(wind)))
+900_800
+pres
+.1 999 frontp1 n n
+#
+frnt(lav(thta,vlav(wind)))
+750_650
+pres
+-9999 -9999 front y n
+frnt(lav(thta,vlav(wind)))
+750_650
+pres
+.1 999 frontp1 n n
+#
+# POT VORTICITY ############
+# 
+#mul(pvor(thta,wind),1000000)
+#500_300
+#pres
+#-9999 -9999 pv y y
+#
+# HiCape...up to 500 mb above surface #####################
+# this one must be called first, before other hicape params ####
+# do not start with hicape...program crashes for some reason.
+#
+hicape
+0
+none
+-9999 -9999 hicape y y
+hicape
+0
+none
+50 9999 hicapep50 n n
+hicape
+0
+none
+100 9999 hicapep100 n n
+hicape
+0
+none
+250 9999 hicapep250 n n
+hicape
+0
+none
+500 9999 hicapep500 n n
+hicape
+0
+none
+1000 9999 hicapep1000 n n
+hicape
+0
+none
+2000 9999 hicapep2000 n n
+hicape
+0
+none
+3000 9999 hicapep3000 n n
+#
+#
+hicin
+0
+none
+-9999 -9999 hicin y y
+#
+teql
+0
+none
+-9999 -9999 teql y y
+teql
+0
+none
+-999 -15 teqlm15 n n
+teql
+0
+none
+-999 -20 teqlm20 n n
+#
+# cloud physics thunder parameter...
+#
+cptp
+0
+none
+-9999 -9999 cptp y y
+cptp
+0
+none
+1 99999 cptpp1 n n
+cptp
+0
+none
+10 99999 cptpp10 n n
+cptp
+0
+none
+50 99999 cptpp50 n n
+cptp
+0
+none
+100 99999 cptpp100 n n
+cptp
+0
+none
+200 99999 cptpp200 n n
+cptp
+0
+none
+300 99999 cptpp300 n n
+cptp
+0
+none
+400 99999 cptpp400 n n
+cptp
+0
+none
+500 99999 cptpp500 n n
+#
+# cloud physics thunder parameter 2 (binary)...
+#
+cptp2
+0
+none
+-9999 -9999 cptp2_ y y
+cptp2
+0
+none
+.99 99999 cptp2p1 n n
+#
+# dry thunderstorm potential...
+# (part of highcape calculation)
+#
+dryt
+0
+none
+-9999 -9999 dryt y n
+dryt
+0
+none
+.99 999 drytp1 n n
+dryt
+0
+none
+1.99 999 drytp2 n n
+#
+# Downdraft CAPE (DAPE) from LCL
+# (part of highcape calculation)
+#
+dapelcl
+0
+none
+-9999 -9999 dapelcl y n
+dapelcl
+0
+none
+500 10000 dapelclp5 n n
+dapelcl
+0
+none
+750 10000 dapelclp7 n n
+dapelcl
+0
+none
+1000 10000 dapelclp10 n n
+#
+# pressure hi lfc...
+#
+hicapep
+0
+none
+-9999 -9999 hicapep y n 
+hicapep
+0
+none
+-999 30.00 hicapeple30 n n
+hicapep
+0
+none
+30.001 10000 hicapepgt30 n n
+#
+# Effective shear...LPL to .5 EL
+# Note...hicape MUST be called first.
+#
+eshr
+0
+none
+-9999 -9999 eshr y y
+eshr
+0
+none
+20 9999 eshrp20 n n
+eshr
+0
+none
+30 9999 eshrp30 n n
+eshr
+0
+none
+40 9999 eshrp40 n n
+eshr
+0
+none
+50 9999 eshrp50 n n
+eshru
+0
+none
+-9999 -9999 eshru y y
+eshrv
+0
+none
+-9999 -9999 eshrv y y
+#
+# Aviation products...
+maxtop
+0
+none
+-9999 -9999 maxtop y y
+maxtop
+0
+none
+1 9448.8 maxtopplow n n
+maxtop
+0
+none
+9448.801 11277.6 maxtoppmid n n
+maxtop
+0
+none
+11277.601 150000 maxtopphigh n n
+sysu
+0
+none
+-9999 -9999 sysu y n
+sysv
+0
+none
+-9999 -9999 sysv y n
+#
+# Use convective and total precip
+# and LPL height as an input into
+# thunder prediction.  1-24-2008.
+lplpcp
+0
+none
+0.001 10000 lplptr n n
+#
+# Lo - Lo combined probabilities
+#
+#llcombo
+#0
+#none
+#1 999 lolo y y
+#
+# Temp at top of saturated layer (tdd < 3degC and layer >= 100 mb thick)
+#
+#tsat
+#0
+#n
+#-9999 -9999 tsat y y
+#tsat
+#0
+#n
+#-8 100 tsatpl n n
+#tsat
+#0
+#n
+#-16 -12 tsatpd n n
+#tsat
+#0
+#n
+#-100 -12 tsatpi n n
+#
+# CAPE ######################
+#
+cape
+0
+none
+-9999 -9999 cape y y
+cape
+0
+none
+250 9999 capep2 n n
+cape
+0
+none
+500 9999 capep5 n n
+cape
+0
+none
+1000 9999 capep10 n n
+cape
+0
+none
+1500 9999 capep15 n n
+cape
+0
+none
+2000 9999 capep20 n n
+cape
+0
+none
+2500 9999 capep25 n n
+cape
+0
+none
+3000 9999 capep30 n n
+cape
+0
+none
+3500 9999 capep35 n n
+cape
+0
+none
+4000 9999 capep40 n n
+#
+# CINS ######################
+#
+cins
+0
+none
+-9999 -9999 cins y y
+cins
+0
+none
+-25 -.01 cinsp25 n n
+cins
+0
+none
+-50 -.01 cinsp50 n n
+cins
+0
+none
+-75 -.01 cinsp75 n n
+#cins
+#0
+#none
+#-100 -.01 cinsp100 n n
+#
+# MUCAPE ######################
+#
+mucape
+180_0
+pdly
+-9999 -9999 mucape y y
+mucape
+180_0
+pdly
+500 9999 mucapep5 n n
+mucape
+180_0
+pdly
+1000 9999 mucapep10 n n
+mucape
+180_0
+pdly
+1500 9999 mucapep15 n n
+mucape
+180_0
+pdly
+2000 9999 mucapep20 n n
+mucape
+180_0
+pdly
+2500 9999 mucapep25 n n
+mucape
+180_0
+pdly
+3000 9999 mucapep30 n n
+mucape
+180_0
+pdly
+3500 9999 mucapep35 n n
+mucape
+180_0
+pdly
+4000 9999 mucapep40 n n
+#
+# MUCIN ######################
+#
+mucins
+180_0
+pdly
+-9999 -9999 mucins y y
+#
+# DEW POINT ######################
+#
+# 2 METER
+#
+dwpf
+2
+hght
+-9999 -9999 dwpf y y
+#
+dwpf
+2
+hght
+50 9999 dwpfp50 n n
+#
+dwpf
+2
+hght
+55 9999 dwpfp55 n n
+#
+dwpf
+2
+hght
+60 9999 dwpfp60 n n
+#
+dwpf
+2
+hght
+65 9999 dwpfp65 n n
+#
+dwpf
+2
+hght
+70 9999 dwpfp70 n n
+#
+# fire weather probs for low tds...
+#
+dwpf
+2
+hght
+-999 15 dwpfp15 n n
+dwpf
+2
+hght
+-999 25 dwpfp25 n n
+dwpf
+2
+hght
+-999 35 dwpfp35 n n
+dwpf
+2
+hght
+-999 45 dwpfp45 n n
+#
+# 850 MB 
+# 
+dwpc
+850
+pres
+8 9999 dwpcp8 n n
+# 
+dwpc
+850
+pres
+12 9999 dwpcp12 n n
+# 
+dwpc
+850
+pres
+16 9999 dwpcp16 n n
+#
+#### 850 TEMP PROB #### 
+#
+tmpc
+850
+pres
+-150 2 tmpcp2 n n
+tmpc
+850
+pres
+-150 0 tmpcp0 n n
+tmpc
+850
+pres
+-150 -2 tmpcpm2 n n
+#
+# PRECIP WATER ###################
+#
+pwtr
+0
+none
+-9999 -9999 pwtr y y
+#
+pwtr
+0
+none
+25.4 9999 pwtrp25 n n
+pwtr
+0
+none
+38.1 9999 pwtrp38 n n
+pwtr
+0
+none
+50.8 9999 pwtrp50 n n
+#
+# MOISTURE FLUX DIV ######
+#
+#mflx
+#2
+#hght
+#-9999 -9999 mflx y y
+#mflx
+#900
+#pres
+#-9999 -9999 mflx y y
+#mflx
+#850
+#pres
+#-9999 -9999 mflx y y
+#mflx
+#800
+#pres
+#-9999 -9999 mflx y y
+#
+#mflx
+#2
+#hght
+#-1000 -3 mflxp3 n n
+#mflx
+#2
+#hght
+#-1000 -6 mflxp6 n n
+#mflx
+#2
+#hght
+#-1000 -9 mflxp9 n n
+#
+#mflx
+#900
+#pres
+#-1000 -3 mflxp3 n n
+#mflx
+#900
+#pres
+#-1000 -6 mflxp6 n n
+#mflx
+#900
+#pres
+#-1000 -9 mflxp9 n n
+#
+#mflx
+#850
+#pres
+#-1000 -3 mflxp3 n n
+#mflx
+#850
+#pres
+#-1000 -6 mflxp6 n n
+#mflx
+#850
+#pres
+#-1000 -9 mflxp9 n n
+#
+#mflx
+#800
+#pres
+#-1000 -3 mflxp3 n n
+#mflx
+#800
+#pres
+#-1000 -6 mflxp6 n n
+#mflx
+#800
+#pres
+#-1000 -9 mflxp9 n n
+#
+# 2 METER TEMPS (degF) ##########
+#
+add(32,mul(tmpc,1.8))
+2
+hght
+-9999 -9999 tmpf y y
+add(32,mul(tmpc,1.8))
+2
+hght
+60 999 tmpfp60 n n
+#
+# GROUND TEMPERATURE ############
+tmpk
+0
+none
+-9999 -9999 tmpk y y
+#
+# 1000-500 MB THICKNESS ########
+#
+sub(hght@500%p,hght@1000%p)
+1000_500
+pres
+-9999 -9999 thck y y
+sub(hght@500%p,hght@1000%p)
+1000_500
+pres
+1 5400 thckp540 n n
+sub(hght@500%p,hght@1000%p)
+1000_500
+pres
+1 5340 thckp534 n n
+sub(hght@500%p,hght@1000%p)
+1000_500
+pres
+1 5280 thckp528 n n
+#
+#
+# 10 METER WINDS #################
+#
+urel
+10
+hght
+-9999 -9999 urel y y
+#
+vrel
+10
+hght
+-9999 -9999 vrel y y
+#
+# 2 METER RELH #################
+#
+relh
+2
+hght
+-9999 -9999 relh y y
+#
+relh
+2
+hght
+-9 15 relhp15 n n
+relh
+2
+hght
+-9 10 relhp10 n n
+relh
+2
+hght
+-9 20 relhp20 n n
+relh
+2
+hght
+-9 25 relhp25 n n
+relh
+2
+hght
+-9 30 relhp30 n n
+#relh
+#2
+#hght
+#15 30 relhp1530 n n
+#relh
+#2
+#hght
+#30 45 relhp3045 n n
+relh
+2
+hght
+-9 35 relhp35 n n
+#
+# 700 MB OMEGA ####################
+#
+omeg
+700
+pres
+-500 -3 omegp3 n n
+omeg
+700
+pres
+-500 -5 omegp5 n n
+omeg
+700
+pres
+-500 -6 omegp6 n n
+omeg
+700
+pres
+-500 -9 omegp9 n n
+omeg
+700
+pres
+-500 -10 omegp10 n n
+#
+# K index ########################
+#
+kind
+0
+none
+-9999 -9999 kind y n
+#
+#kind
+#0
+#none
+#25 9999 kindp25 n n
+#kind
+#0
+#none
+#30 9999 kindp30 n n
+#kind
+#0
+#none
+#35 9999 kindp35 n n
+#
+# 700-500 mb Lapse Rate ##########
+#
+75lr
+700_500
+pres
+-9999 -9999 75lr y n
+#
+75lr
+700_500
+pres
+7 9999 75lrp7 n n
+75lr
+700_500
+pres
+7.5 9999 75lrp75 n n
+75lr
+700_500
+pres
+8 9999 75lrp8 n n
+75lr
+700_500
+pres
+8.5 9999 75lrp85 n n
+#
+# 6 KM VERTICAL SHEAR #############
+#
+6kvs
+0
+none
+-9999 -9999 6kvs y y
+#
+6kvs
+0
+none
+30 9999 6kvsp30 n n
+6kvs
+0
+none
+40 9999 6kvsp40 n n
+6kvs
+0
+none
+50 9999 6kvsp50 n n
+#
+# FOSBERG FIRE WX ##########
+#
+fosb
+0
+none
+-9999 -9999 fosb y y
+#
+fosb
+0
+none
+50 9999 fosbp50 n n
+fosb
+0
+none
+60 9999 fosbp60 n n
+fosb
+0
+none
+70 9999 fosbp70 n n
+fosb
+0
+none
+75 9999 fosbp75 n n
+#
+# SPC LASI FIRE WX ############
+#
+lasi
+0
+none
+-9999 -9999 lasi y n
+lasi
+0
+none
+5 99 lasip5 n n
+lasi
+0
+none
+7 99 lasip7 n n
+lasi
+0
+none
+9 99 lasip9 n n
+#
+# HAINES FIRE WX ############
+#
+hain
+0
+none
+-9999 -9999 hain y y
+#
+hain
+0
+none
+5 9999 hainp5 n n
+hain
+0
+none
+6 9999 hainp6 n n
+#
+# BULK RICHARDSON NUMBER ##########
+#
+#brn
+#0
+#none
+#-9999 -9999 brn y y
+##
+#brn
+#0
+#none
+#35.01 9999 brnp35 n n
+#brn
+#0
+#none
+#10 50 brnp1050 n n
+#
+# BRN SHEAR #####################
+#
+brnshr
+0
+none
+-9999 -9999 brnshr y n
+#
+#brn
+#0
+#none
+#20 140 brnshrp20140 n n
+#
+# LCL HEIGHT ###############
+# 
+lclh
+0
+none
+-9999 -9999 lclh y y
+lclh
+0
+none
+-1 750 lclhp750 n n
+lclh
+0
+none
+-1 1000 lclhp1000 n n
+lclh
+0
+none
+-1 1250 lclhp1250 n n
+#
+# LIFTED INDEX #############
+# 
+lift
+0
+none
+-9999 -9999 lift y y
+lift
+0
+none
+-999 0 liftp0 n n
+lift
+0
+none
+-999 -2 liftp2 n n
+lift
+0
+none
+-999 -4 liftp4 n n
+#lift
+#0
+#none
+#-999 -6 liftp6 n n
+#
+# CRAVEN BROOKS SIG SVR ####
+# 
+cbss
+0
+none
+-9999 -9999 cbss y y
+# 
+cbss
+0
+none
+10000 99999 cbssp10 n n
+cbss
+0
+none
+20000 99999 cbssp20 n n
+cbss
+0
+none
+40000 99999 cbssp40 n n
+cbss
+0
+none
+60000 99999 cbssp60 n n
+#
+# 0 to 1 KM STM REL HEL #########
+#
+1khl
+0
+none
+-9999 -9999 1khl y y
+#
+1khl
+0
+none
+50 9999 1khlp50 n n
+1khl
+0
+none
+100 9999 1khlp100 n n
+1khl
+0
+none
+150 9999 1khlp150 n n
+#
+# SIG TOR ##################
+# Assumes the following calculations already made: mlcape, mllcl, 1khl, 6kvs
+# 
+sigt
+0
+none
+-9999 -9999 sigt y y
+# 
+#sigt
+#0
+#none
+#.5 999 sigtppt5 n n
+#
+sigt
+0
+none
+1 999 sigtp1 n n
+#sigt
+#0
+#none
+#2 999 sigtp2 n n
+sigt
+0
+none
+3 999 sigtp3 n n
+sigt
+0
+none
+4 999 sigtp4 n n
+sigt
+0
+none
+5 999 sigtp5 n n
+#sigt
+#0
+#none
+#6 999 sigtp6 n n 
+#
+# 0 to 3 KM STM REL HEL #########
+#
+3khl
+0
+none
+-9999 -9999 3khl y y
+#
+3khl
+0
+none
+100 9999 3khlp100 n n
+3khl
+0
+none
+200 9999 3khlp200 n n
+3khl
+0
+none
+300 9999 3khlp300 n n
+#
+# NCEP 0 to 3 KM STM REL HEL #########
+#
+hlcy
+3000_0
+hght
+-9999 -9999 hlcy y y
+#
+hlcy
+3000_0
+hght
+100 9999 hlcyp100 n n
+hlcy
+3000_0
+hght
+200 9999 hlcyp200 n n
+hlcy
+3000_0
+hght
+300 9999 hlcyp300 n n
+#
+# SUPERCELL COMPOSITE PARAM #######
+# This calculation needs to go AFTER:  hicape, 3khl, and brnshr
+#
+sccp
+0
+none
+-9999 -9999 sccp y y
+##
+sccp
+0
+none
+1 9999 sccpp1 n n
+#sccp
+#0
+#none
+#2 9999 sccpp2 n n
+sccp
+0
+none
+3 9999 sccpp3 n n
+#sccp
+#0
+#none
+#5 9999 sccpp5 n n
+sccp
+0
+none
+6 9999 sccpp6 n n
+sccp
+0
+none
+9 9999 sccpp9 n n
+#sccp
+#0
+#none
+#10 9999 sccpp10 n n
+#
+#
+#
+# downdraft cape
+#
+dcape
+0 
+none
+-9999 -9999 dcape y y
+dcape
+0
+none
+500 99999 dcapep500 n n
+dcape
+0
+none
+1000 99999 dcapep1000 n n
+dcape
+0
+none
+1500 99999 dcapep1500 n n
+dcape
+0
+none
+2000 99999 dcapep2000 n n
+dcape
+0
+none
+2500 99999 dcapep2500 n n
+dcape
+0
+none
+3000 99999 dcapep3000 n n
+#
+# derecho parameter...call AFTER dcape
+#
+decho
+0
+none
+-9999 -9999 decho y y
+decho
+0
+none
+1 999 dechop1 n n
+decho
+0
+none
+2 999 dechop2 n n
+decho
+0
+none
+3 999 dechop3 n n
+decho
+0
+none
+5 999 dechop5 n n
+#
+#
+# Mean 0-6km AGL mean wind...call after dcape
+meanwnd
+0
+none
+-9999 -9999 meanwnd y y
+#
+# 0 to 1 EHI #########
+#
+#1ehi
+#0
+#none
+#-9999 -9999 1ehi y y
+##
+#1ehi
+#0
+#none
+#1 9999 1ehip1 n n
+#1ehi
+#0
+#none
+#3 9999 1ehip3 n n
+#1ehi
+#0
+#none
+#5 9999 1ehip5 n n
+#
+# 0 to 3 EHI #########
+#
+#3ehi
+#0
+#none
+#-9999 -9999 3ehi y y
+#
+#3ehi
+#0
+#none
+#1 9999 3ehip1 n n
+#3ehi
+#0
+#none
+#3 9999 3ehip3 n n
+#3ehi
+#0
+#none
+#5 9999 3ehip5 n n
+#
+# VORTICITY GEN PARAM #####
+#
+#vgp
+#0
+#none
+#-9999 -9999 vgp y y
+#
+#vgp
+#0
+#none
+#.1 9999 vgpp1 n n
+#vgp
+#0
+#none
+#.2 9999 vgpp2 n n
+#vgp
+#0
+#none
+#.3 9999 vgpp3 n n
+#
+# WIND SPEED ######################
+# 
+#
+# 10 meter
+#
+wind
+10
+hght
+-9999 -9999 wskt y y
+# 10 mph
+wind
+10
+hght
+8.7 9999 wsmphp10 n n
+wind
+10
+hght
+13.05 9999 wsmphp15 n n
+# 20 mph
+wind
+10
+hght
+17.4 9999 wsmphp20 n n
+# 30 mph
+wind
+10
+hght
+26.1 9999 wsmphp30 n n
+# 850 MB
+#wind
+#850
+#pres
+#20 9999 wsktp20 n n
+wind
+850
+pres
+30 9999 wsktp30 n n
+wind
+850
+pres
+40 9999 wsktp40 n n
+#wind
+#850
+#pres
+#50 9999 wsktp50 n n
+# 500 MB
+#wind
+#500
+#pres
+#25 9999 wsktp25 n n
+wind
+500
+pres
+50 9999 wsktp50 n n
+wind
+500
+pres
+75 9999 wsktp75 n n
+wind
+500
+pres
+100 9999 wsktp100 n n
+# 250 MB
+#wind
+#250
+#pres
+#50 9999 wsktp50 n n
+wind
+250
+pres
+75 9999 wsktp75 n n
+wind
+250
+pres
+100 9999 wsktp100 n n
+wind
+250
+pres
+150 9999 wsktp150 n n
+#
+# 3 HOUR TOTAL PRECIPITATION ##########
+#
+p03m
+0
+none
+-9999 -9999 p03m y y
+#
+p03m
+0
+none
+.001 9999 p03mptr n n
+p03m
+0
+none
+.254 9999 p03mp01 n n
+p03m
+0
+none
+1.27 9999 p03mp05 n n
+p03m
+0
+none
+2.54 9999 p03mp10 n n
+p03m
+0
+none
+6.35 9999 p03mp25 n n
+p03m
+0
+none
+12.7 9999 p03mp50 n n
+#
+# 3 HOURLY CONVECTIVE PRECIPITATION #######
+#
+c03m
+0
+none
+-9999 -9999 c03m y y
+#
+c03m
+0
+none
+.254 9999 c03mp01 n n
+c03m
+0
+none
+1.27 9999 c03mp05 n n
+c03m
+0
+none
+2.54 9999 c03mp10 n n
+c03m
+0
+none
+6.35 9999 c03mp25 n n
+c03m
+0
+none
+12.7 9999 c03mp50 n n
+#
+# 6 HOUR TOTAL PRECIPITATION ##########
+#
+p06m
+0
+none
+-9999 -9999 p06m y y
+#
+p06m
+0
+none
+.254 9999 p06mp01 n n
+p06m
+0
+none
+1.27 9999 p06mp05 n n
+p06m
+0
+none
+2.54 9999 p06mp10 n n
+p06m
+0
+none
+6.35 9999 p06mp25 n n
+p06m
+0
+none
+12.7 9999 p06mp50 n n
+p06m
+0
+none
+25.4 9999 p06mp100 n n
+#
+# 6 HOURLY CONVECTIVE PRECIPITATION #######
+#
+c06m
+0
+none
+-9999 -9999 c06m y y
+#
+c06m
+0
+none
+.254 9999 c06mp01 n n
+c06m
+0
+none
+1.27 9999 c06mp05 n n
+c06m
+0
+none
+2.54 9999 c06mp10 n n
+c06m
+0
+none
+6.35 9999 c06mp25 n n
+c06m
+0
+none
+12.7 9999 c06mp50 n n
+#
+# 12 HOUR TOTAL PRECIPITATION ##########
+#
+p12m
+0
+none
+-9999 -9999 p12m y y
+#
+p12m
+0
+none
+.254 9999 p12mp01 n n
+p12m
+0
+none
+1.27 9999 p12mp05 n n
+p12m
+0
+none
+2.54 9999 p12mp10 n n
+p12m
+0
+none
+6.35 9999 p12mp25 n n
+p12m
+0
+none
+12.7 9999 p12mp50 n n
+p12m
+0
+none
+25.4 9999 p12mp100 n n
+p12m
+0
+none
+50.8 9999 p12mp200 n n
+p12m
+0
+none
+76.2 9999 p12mp300 n n
+#
+# 12 HOURLY CONVECTIVE PRECIPITATION #######
+#
+c12m
+0
+none
+-9999 -9999 c12m y y
+#
+c12m
+0
+none
+.254 9999 c12mp01 n n
+c12m
+0
+none
+1.27 9999 c12mp05 n n
+c12m
+0
+none
+2.54 9999 c12mp10 n n
+c12m
+0
+none
+6.35 9999 c12mp25 n n
+c12m
+0
+none
+12.7 9999 c12mp50 n n
+c12m
+0
+none
+25.4 9999 c12mp100 n n
+#
+# 24 HOUR TOTAL PRECIPITATION ##########
+#
+p24m
+0
+none
+-9999 -9999 p24m y y
+#
+p24m
+0
+none
+.254 9999 p24mp01 n n
+p24m
+0
+none
+2.54 9999 p24mp10 n n
+p24m
+0
+none
+6.35 9999 p24mp25 n n
+p24m
+0
+none
+12.7 9999 p24mp50 n n
+p24m
+0
+none
+25.4 9999 p24mp100 n n
+p24m
+0
+none
+50.8 9999 p24mp200 n n
+p24m
+0
+none
+76.2 9999 p24mp300 n n
+#
+# 24 HOURLY CONVECTIVE PRECIPITATION #######
+#
+c24m
+0
+none
+-9999 -9999 c24m y y
+#
+c24m
+0
+none
+.254 9999 c24mp01 n n
+c24m
+0
+none
+6.35 9999 c24mp25 n n
+c24m
+0
+none
+12.7 9999 c24mp50 n n
+c24m
+0
+none
+25.4 9999 c24mp100 n n
+c24m
+0
+none
+50.8 9999 c24mp200 n n
+#
+# DENDRITIC GROWTH #############
+# 
+dend
+0
+none
+-9999 -9999 dend y y
+# 
+dend
+0
+none
+49.9 1000 dendp50 n n
+dend
+0
+none
+99.9 1000 dendp100 n n
+dend
+0
+none
+149.9 1000 dendp150 n n
+#
+#
+# AVOR
+#
+mul(avor,100000)
+500
+pres
+-9999 -9999 avor y y
+#mul(avor,100000)
+#500
+#pres
+#8 1000 avorp8 n n
+#
+# Max wind VECTOR for fire wx (output is m/s)
+# (the only stat output is the max vector of the member
+#  with the max wind speed)
+#
+wsmaxu
+10
+hght
+-9999 -9999 wsmaxu y n
+wsmaxv
+10
+hght
+-9999 -9999 wsmaxv y n
+#
+# Experiment Road Snow Accum. Parameter
+#
+rsap
+0
+none
+-9999 -9999 rsap y y
+rsap
+0
+none
+1 9999 rsapp1 n n
+#
+# Experimental Road Snow Accum. Energy
+#
+#rsae
+#0
+#none
+#-9999 -9999 rsae y y
+#rsae
+#0
+#none
+#.99 9999 rsaep1 n n
+#rsae
+#0
+#none
+#2.0 9999 rsaep2 n n
+#rsae
+#0
+#none
+#4.0 9999 rsaep4 n n
+#rsaegrass
+#0
+#none 
+#.99 9999 rsaegp1 n n
+#rsaegrass
+#0
+#none
+#2.0 9999 rsaegp2 n n
+#rsaegrass
+#0
+#none
+#4.0 9999 rsaegp4 n n
+rsaeasphalt
+0
+none 
+.99 9999 rsaeap1 n n
+rsaeasphalt
+0
+none
+2.0 9999 rsaeap2 n n
+rsaeasphalt
+0
+none
+4.0 9999 rsaeap4 n n
+#rsaeconcrete
+#0
+#none
+#.99 9999 rsaecp1 n n
+#rsaeconcrete
+#0
+#none
+#2.0 9999 rsaecp2 n n
+#rsaeconcrete
+#0
+#none
+#4.0 9999 rsaecp4 n n
+#
+# H5 TEMPERATURE PROBS
+tmpc
+500
+pres
+-900 -25 tmpcpm25 n n
+tmpc
+500 
+pres
+-900 -20 tmpcpm20 n n
+tmpc
+500 
+pres
+-900 -15 tmpcpm15 n n
+#
+# SNOW RATE...
+snowrt1
+0
+none
+.9 999 snowrtp1 n n
+snowrt2
+0
+none
+.9 999 snowrtp2 n n
+snowrt3
+0
+none
+.9 999 snowrtp3 n n
+#
+# 3 HR SNOW FALL...
+snowfall
+0
+none
+-9999 -9999 snowfall y y
+#
+# FREEZING RAIN AMOUNT...
+zramt
+0
+none
+-9999 -9999 zramt y y
+zramt
+0
+none
+.049 999 zramtp05 n n
+#
+# BLIZZARD CONDITIONS...
+bliz
+0
+none
+-9999 -9999 bliz n y
+bliz
+0
+none
+.99 999 blizp1 n n
+#
+# CHANGE IN ZR CONDITIONS...
+delzr
+0
+none
+-9999 -9999 delzr n y
+delzr
+0
+none
+.90 1.10 delzrp1 n n
+delzr
+0
+none
+1.90 2.10 delzrp2 n n
+delzr
+0
+none
+2.90 3.10 delzrp3 n n
+# SLANTWISE CAPE and CPTP
+#scape
+#0
+#none
+#-9999 -9999 scape y y
+#scptp
+#0
+#none
+#.9 1.1 scptp2p1 n n
+#
+# 1 km shear...
+1kvs
+0 
+none
+-9999 -9999 1kvs y n
+1kvs
+0
+none
+15 9999 1kvsp15 n n
+1kvs
+0
+none
+25 9999 1kvsp25 n n
+1kvs
+0
+none
+35 9999 1kvsp35 n n
+#
+# 3 km shear...
+3kvs
+0 
+none
+-9999 -9999 3kvs y n
+3kvs
+0
+none
+15 9999 3kvsp15 n n
+3kvs
+0
+none
+25 9999 3kvsp25 n n
+3kvs
+0
+none
+35 9999 3kvsp35 n n
+#
+hght
+0
+none 
+-9999 -9999 hght y n
+#
+# VISIBILITY
+vsby
+0
+none
+-9999 -9999 vsby y y
+#
+# Proof-of-concept ceiling
+#ceiling_drb
+#0
+#none
+#-9999 -9999 ceilg y y
+hght
+0
+ceil
+-9999 -9999 hght y y
+# ALL ISOBARIC FIELDS ###############
+#
+Ps
+5
+1000
+850
+700
+500
+300
+#
+# GEOPOTENTIAL HEIGHT
+#
+hght
+Ps
+pres
+-9999 -9999 hght y y
+#
+# TEMPERATURE
+#
+tmpc
+Ps
+pres
+-9999 -9999 tmpc y y
+#
+# DEW POINT 
+#
+dwpc
+Ps
+pres
+-9999 -9999 dwpc y y
+#
+# U COMPONENT WIND
+#
+urel
+Ps
+pres
+-9999 -9999 urel y y
+#
+# V COMPONENT WIND
+# 
+vrel
+Ps
+pres
+-9999 -9999 vrel y y
+#
+# WIND SPEED
+#
+wind
+Ps
+pres
+-9999 -9999 wskt y y
+#
+# RELH
+#
+relh
+Ps
+pres
+-9999 -9999 relh y y
+#
+# OMEGA
+#
+omeg
+Ps
+pres
+-9999 -9999 omeg y y
