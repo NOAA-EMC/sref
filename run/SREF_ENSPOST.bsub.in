@@ -3,10 +3,11 @@
 #BSUB -oo _SREFDIR_/run/sref_enspost.log
 #BSUB -eo _SREFDIR_/run/sref_enspost.log
 #BSUB -J SREF_ENSPOST
-#BSUB -n 9
+#BSUB -n 1
 #BSUB -x
-#BSUB -R span[ptile=9]
+#BSUB -R span[ptile=1]
 #BSUB -W 01:30
+#BSUB -M 6000                   #MB for executable
 #BSUB -P SREF-T2O
 #BSUB -q "dev"
 
