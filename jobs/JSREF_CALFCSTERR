@@ -10,6 +10,7 @@
 #         Please note that variable "RUN_ENVIR" is set and used
 #         in the development enviroment only.
 # 11/05/2010, Jun Du, Added precipitation bias correction job
+# 03/20/2019, Jun Du, convert to Dell
 ###############################################################
 set -xa
 export PS4='$SECONDS + '
@@ -37,10 +38,10 @@ export RUN_ENVIR=${RUN_ENVIR:-nco}
 #####################################################################################
 if [ "$RUN_ENVIR" != nco ]      ### For Developers, "group_name" is passed from the ecFlow script
 then
-  CONFIG_FILE=${CONFIG_FILE:-/meso/save/${LOGNAME}/sref${NWROOTp1}/parm/sref_para_config}
+  CONFIG_FILE=${CONFIG_FILE:-/gpfs/dell2/emc/modeling/noscrub/${LOGNAME}/sref.v7_dell/parm/sref_para_config_dell}
   . $CONFIG_FILE
   export userid=$LOGNAME
-  export DATA_IN=${DATA_IN:-/ptmp/$userid}
+  export DATA_IN=${DATA_IN:-/gpfs/dell2/ptmp/$userid}
 fi
 
 ###############################################################
@@ -60,7 +61,8 @@ echo `date` $0 `date -u` begin
 export pid=$$
 export DATA_IN=${DATA_IN:-${DATAROOT}}
 
-export DATA=$DATA_IN/${jobid:?}
+#export DATA=$DATA_IN/${jobid:?}
+export DATA=$DATA_IN/sref_calfcsterr_${CYC}_${envir}
 rm -rf $DATA
 mkdir -p $DATA
 
