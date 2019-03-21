@@ -151,12 +151,14 @@ c    for derived variables
       write(*,*) mnout, spout, prout, 
      +   apcpmaxout,apcpminout 
 
+      write(*,*) 'Before baopen'
       call baopen(30,mnout,ierr)
       call baopen(40,spout,ierr)
       call baopen(50,prout,ierr)
 
       call baopen(60,apcpmaxout,ierr)
       call baopen(70,apcpminout,ierr)
+      write(*,*) 'After baopen'
  
       kpds(1)=7
       kpds(2)=113
@@ -205,6 +207,7 @@ cccccc 1: write mean and spread for direct variables into mean grib file
         kpds(14) = itime
         kpds(15) = 0
         kpds(16) = 0
+      write(*,*) 'All parameter are set 1'
 
        do nv = 1, numvar
         if (k5(nv).eq.7.and.k6(nv).eq.215) k1=nv
@@ -218,6 +221,7 @@ cccccc 1: write mean and spread for direct variables into mean grib file
         end if
        end do
 
+      write(*,*) 'All parameter are set 2'
        do 201 nv = 1, numvar
         if(trim(Msignal(nv)).eq.'M') then
            if(k5(nv).eq.24.or.k5(nv).eq.11.or.k5(nv).eq.33.or.
@@ -234,6 +238,7 @@ cccccc 1: write mean and spread for direct variables into mean grib file
            kpds(5) = k5(nv)
            kpds(6) = k6(nv)
 
+      write(*,*) 'All parameter are set 3'
            do lv = 1, Mlvl(nv)
  
              kpds(7)  = MeanLevel(nv,lv)
@@ -256,6 +261,7 @@ c              kpds(14)=itime-1
               kpds(22)= 4 
              end if
 
+      write(*,*) 'Before putgbex 30'
              call putgbex(30,jf,kpds,kgds,kens,kprob,xprob,
      &             kclust,kmembr,lb,var,iret)
 c             call print_kpds(nv,1,'_mn',kpds,kens,kprob,xprob)
@@ -264,6 +270,7 @@ c             call print_kpds(nv,1,'_mn',kpds,kens,kprob,xprob)
              var = vrbl_sp(:,nv,lv)
 
 
+      write(*,*) 'Before putgbex 40'
              call putgbex(40,jf,kpds,kgds,kens,kprob,xprob,
      &             kclust,kmembr,lb,var,iret)
 c             call print_kpds(nv,1,'_sp',kpds,kens,kprob,xprob)
@@ -369,6 +376,7 @@ c                     xprob(2) = 0.0
                 end if
 
 
+      write(*,*) 'Before putgbex 50'
                  call putgbex(50,jf,kpds,kgds,kens,kprob,xprob,
      &           kclust,kmembr,lb,var,iret)
 
