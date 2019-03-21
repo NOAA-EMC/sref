@@ -367,10 +367,12 @@ c         endif
          else
           error0(ipt)=0.0
           abserr0(ipt)=0.0
-          print *,"error is set to zero due to unavailable input files!"
+          if (ipt.eq.1) 
+      &print *,"error is set to zero due to unavailable input files!"
          endif
          spread0(ipt)=std
         enddo
+        print*,'I am here at 1'
         call correlation(fmean0,fmean0,r,lat,lon)
          corr_fcst(1)=r
         call correlation(error0,error0,r,lat,lon)
@@ -388,6 +390,7 @@ c       write(91,*) (fmean(ipt),ipt=1,lon*lat)
 c       write(92,*) nam
 c       write(92,*) (spread(ipt),ipt=1,lon*lat)
 
+        print*,'I am here at 2'
         if (nv.ge.2) then   !because the first record is misteriously bad
         call putgb(71,jf,kpds,kgds,lb,error0,iret)
         call putgb(72,jf,kpds,kgds,lb,fmean0,iret)
@@ -452,6 +455,7 @@ c write out correlations among fcst, error, spread, sprd_skill, and bias for mon
      &41h(corr in fcst, error, spread, sprd_skill))
 
         enddo    !variables
+        print*,'I am here at 3'
         if (nv.ge.2) then   !because the first record is misteriously bad
         call baclose(lugb_err,ierr)
         call baclose(lugi_err,ierr)
