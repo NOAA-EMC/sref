@@ -32,10 +32,10 @@ export RUN_ENVIR=${RUN_ENVIR:-nco}
 #####################################################################################
 if [ "$RUN_ENVIR" != nco ]      ### For Developers, "group_name" is passed from the ecFlow script
 then
-  CONFIG_FILE=${CONFIG_FILE:-/meso/save/${LOGNAME}/sref${NWROOTp1}/parm/sref_para_config}
+  CONFIG_FILE=${CONFIG_FILE:-/gpfs/dell2/emc/modeling/noscrub/${LOGNAME}/sref.v7_dell/parm/sref_para_config_dell}
   . $CONFIG_FILE
   export userid=$LOGNAME
-  export DATA_IN=${DATA_IN:-/ptmp/$userid}
+  export DATA_IN=${DATA_IN:-/gpfs/dell2/ptmp/$userid}
 fi
 
 ###############################################################
@@ -55,7 +55,8 @@ echo `date` $0 `date -u` begin
 export pid=$$
 export DATA_IN=${DATA_IN:-${DATAROOT}}
 
-export DATA=$DATA_IN/${jobid:?}
+#export DATA=$DATA_IN/${jobid:?}
+export DATA=$DATA_IN/sref_downscaling_${CYC}_${envir}
 rm -rf $DATA
 mkdir -p $DATA
 
@@ -177,7 +178,8 @@ chmod 775 $DATA/downscaleforecast/poescript
 export MP_PGMMODEL=mpmd
 export MP_CMDFILE=$DATA/downscaleforecast/poescript
 #/usr/bin/poe -cmdfile $DATA/downscaleforecast/poescript -pgmmodel mpmd -ilevel 3 -labelio yes -stdoutmode ordered
-mpirun.lsf -cmdfile $DATA/downscaleforecast/poescript -pgmmodel mpmd -ilevel 3 -labelio yes -stdoutmode ordered
+#mpirun.lsf -cmdfile $DATA/downscaleforecast/poescript -pgmmodel mpmd -ilevel 3 -labelio yes -stdoutmode ordered
+mpirun cfp $DATA/downscaleforecast/poescript
 
 # 3. Ensemble product of downscaled forecasts (note: this job has to be run after Job 2 finishes!)
 mkdir -m 775 $DATA/downscaleproduct
