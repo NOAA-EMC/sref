@@ -3,9 +3,9 @@
 #BSUB -oo _SREFDIR_/run/sref_enspost.log
 #BSUB -eo _SREFDIR_/run/sref_enspost.log
 #BSUB -J SREF_ENSPOST
-#BSUB -n 1
+#BSUB -n 9
 #BSUB -x
-#BSUB -R span[ptile=1]
+#BSUB -R span[ptile=9]
 #BSUB -W 01:30
 #BSUB -M 6000                   #MB for executable
 #BSUB -P SREF-T2O
@@ -22,6 +22,10 @@ module load ips/18.0.1.163
 module load prod_util/1.1.0
 module load grib_util/1.1.0
 module load NetCDF/4.5.0
+module load EnvVars/1.0.2 settarg/7.7 prod_envir/1.0.2
+module load impi/18.0.1
+module load CFP/2.0.1
+module list
 
 export OMP_NUM_THREADS=1
 export MP_EUIDEVICE=sn_all
