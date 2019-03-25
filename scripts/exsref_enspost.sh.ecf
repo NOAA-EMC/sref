@@ -43,6 +43,7 @@
 # 10/25/2011: J. Du and B. Zhou, added cluster mean
 # 10/26/2011: J. Du, modified for the new SREF (NMMB, NMM, ARW)
 # 12/23/2014: J. Du, modified for the new SREF (13 NMMB, 13 ARW)
+# 03/13/2019: J. Du, convert to Dell version
 # Hourly products: precip accumulation info is problematic for 2, 4, 6 ...hrs!
 # 05/18/2015: SPA SH - comment out the dbn_alert grib1 products
 #####################################################
@@ -71,6 +72,9 @@ rm -f r_gribawips.p07*
 rm -f r_gribawips.p08*
 rm -f r_gribawips.p09*
 rm -f r_gribawips.p10*
+rm -f r_gribawips.p11*
+rm -f r_gribawips.p12*
+rm -f r_gribawips.p13*
 rm -f r_gribawips.n01*
 rm -f r_gribawips.n02*
 rm -f r_gribawips.n03*
@@ -81,6 +85,9 @@ rm -f r_gribawips.n07*
 rm -f r_gribawips.n08*
 rm -f r_gribawips.n09*
 rm -f r_gribawips.n10*
+rm -f r_gribawips.n11*
+rm -f r_gribawips.n12*
+rm -f r_gribawips.n13*
 rm -f *
 
 export XLFRTEOPTS="namelist=old"
@@ -689,7 +696,7 @@ export MP_PGMMODEL=mpmd
 export MP_CMDFILE=poescript.1
 #/usr/bin/poe -cmdfile poescript.1 -pgmmodel mpmd -ilevel3 -labelio yes -stdoutmode ordered
 #mpirun.lsf -cmdfile poescript.1 -pgmmodel mpmd -ilevel3 -labelio yes -stdoutmode ordered
-mpirun.lsf -cmdfile poescript.1 -pgmmodel mpmd -labelio yes -stdoutmode ordered
+mpirun poescript.1
 
 else
 
