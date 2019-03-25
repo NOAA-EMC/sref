@@ -68,6 +68,9 @@ rm -f r_gribawips.p07*
 rm -f r_gribawips.p08*
 rm -f r_gribawips.p09*
 rm -f r_gribawips.p10*
+rm -f r_gribawips.p11*
+rm -f r_gribawips.p12*
+rm -f r_gribawips.p13*
 rm -f r_gribawips.n01*
 rm -f r_gribawips.n02*
 rm -f r_gribawips.n03*
@@ -78,6 +81,9 @@ rm -f r_gribawips.n07*
 rm -f r_gribawips.n08*
 rm -f r_gribawips.n09*
 rm -f r_gribawips.n10*
+rm -f r_gribawips.n11*
+rm -f r_gribawips.n12*
+rm -f r_gribawips.n13*
 rm -f *
 
 export XLFRTEOPTS="namelist=old"
