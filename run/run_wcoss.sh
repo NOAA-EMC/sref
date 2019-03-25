@@ -10,7 +10,7 @@ FLENGTH=87
 INCR=3
 ymdh=`cat /gpfs/hps/nco/ops/com/date/t${cyc}z | cut -c7-16`
 
-ymdh=20190225${cyc}
+ymdh=20190325${cyc}
 
 export SMSBIN=${HOME}/sms
 export MACHINE=dell
@@ -40,6 +40,21 @@ NMMB_FCST_TASKS[p03]=128
 NMMB_FCST_TASKS[p04]=96
 NMMB_FCST_TASKS[p05]=112
 NMMB_FCST_TASKS[p06]=96
+
+declare -A ARW_FCST_TASKS
+ARW_FCST_TASKS[ctl]=112
+ARW_FCST_TASKS[n01]=112
+ARW_FCST_TASKS[n02]=112
+ARW_FCST_TASKS[n03]=112
+ARW_FCST_TASKS[n04]=112
+ARW_FCST_TASKS[n05]=112
+ARW_FCST_TASKS[n06]=112
+ARW_FCST_TASKS[p01]=112
+ARW_FCST_TASKS[p02]=112
+ARW_FCST_TASKS[p03]=112
+ARW_FCST_TASKS[p04]=112
+ARW_FCST_TASKS[p05]=112
+ARW_FCST_TASKS[p06]=112
 
  for MODEL in ARW NMB ; do
 #for MODEL in ARW ; do
@@ -82,6 +97,7 @@ cat SREF_REAL.bsub.in | \
     sed s:_MACHINE_:$MACHINE:g > SREF_REAL_${MODEL}_${MEMBER}.bsub
 
 
+if [ $MODEL -eq NMB ]; then
 cat SREF_FCST.bsub.in | \
     sed s:_TASKS_:${NMMB_FCST_TASKS[$MEMBER]}:g | \
     sed s:_PDY_:$PDY:g | \
@@ -94,6 +110,20 @@ cat SREF_FCST.bsub.in | \
     sed s:_IOFORM_:$IOFORM:g | \
     sed s:_RES_:$RES:g | \
     sed s:_MACHINE_:$MACHINE:g > SREF_FCST_${MODEL}_${MEMBER}.bsub
+else
+cat SREF_FCST.bsub.in | \
+    sed s:_TASKS_:${ARW_FCST_TASKS[$MEMBER]}:g | \
+    sed s:_PDY_:$PDY:g | \
+    sed s:_CYC_:$CYC:g | \
+    sed s:_FLENGTH_:$FLENGTH:g | \
+    sed s:_INCR_:$INCR:g | \
+    sed s:_SREFDIR_:$SREFDIR:g | \
+    sed s:_MODEL_:$MODEL:g | \
+    sed s:_MEMBER_:$MEMBER:g | \
+    sed s:_IOFORM_:$IOFORM:g | \
+    sed s:_RES_:$RES:g | \
+    sed s:_MACHINE_:$MACHINE:g > SREF_FCST_${MODEL}_${MEMBER}.bsub
+fi
 
 
 # 3 hourly 212, 216, 234 grids
