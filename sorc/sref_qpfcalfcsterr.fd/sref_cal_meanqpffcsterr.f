@@ -16,6 +16,7 @@ c Log:
 c 11/05/2009, Jun Du, initial coding
 c 09/05/2010, Jun Du, refined the code
 c 11/04/2011, Jun Du, a version for ensemble mean forecast or one member
+c 03/28/2019, Jun Du, set fcsts to obs if past fcst data unavailable
 c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
  
@@ -153,6 +154,11 @@ c read in obs and fcst dates' info
 
        do 5  nf =1,nfile 
 
+      if(dataOK.eq.1.and.nf.lt.nfile) then
+       print*, 'Past forecast is not available and skip data decoding'
+       goto 888
+      endif
+
 c       lugb=9        !if nvar>1
 c       lugi=39       !if nvar>1
 c be careful of year and month when in the turn of time
@@ -281,6 +287,9 @@ c    &k,(kpds(i),i=5,11),kpds(14),kpds(15),kf,dmin,dmax
         if(nf.eq.11) print*,'zero=',zero,' at nt=',nt
 
 111   continue
+
+888   continue   !jump to here if there is no input fcst data
+
 5     continue
       print*, 'ok till here 2'
 
@@ -292,6 +301,12 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
       do 222 nv=nvar0,nvar
        do 333 nf=1,nfile
+
+        if(dataOK.eq.1.and.nf.lt.nfile) then !use obs for all if no fcst data
+         do ipt=1,lat*lon
+          data(ipt,nf,nv)=data(ipt,nfile,nv)
+         enddo
+        endif
 
         do icat=1,ncat
          do ipt=1,lat*lon
