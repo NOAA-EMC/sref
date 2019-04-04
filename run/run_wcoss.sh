@@ -10,7 +10,7 @@ FLENGTH=87
 INCR=3
 ymdh=`cat /gpfs/hps/nco/ops/com/date/t${cyc}z | cut -c7-16`
 
-ymdh=20190325${cyc}
+ymdh=20190403${cyc}
 
 export SMSBIN=${HOME}/sms
 export MACHINE=dell
@@ -97,7 +97,7 @@ cat SREF_REAL.bsub.in | \
     sed s:_MACHINE_:$MACHINE:g > SREF_REAL_${MODEL}_${MEMBER}.bsub
 
 
-if [ $MODEL -eq NMB ]; then
+if [ $MODEL = NMB ]; then
 cat SREF_FCST.bsub.in | \
     sed s:_TASKS_:${NMMB_FCST_TASKS[$MEMBER]}:g | \
     sed s:_PDY_:$PDY:g | \
