@@ -368,7 +368,7 @@ c         endif
           error0(ipt)=0.0
           abserr0(ipt)=0.0
           if (ipt.eq.1) 
-      &print *,"error is set to zero due to unavailable input files!"
+     &print *,"error is set to zero due to unavailable input files!"
          endif
          spread0(ipt)=std
         enddo
