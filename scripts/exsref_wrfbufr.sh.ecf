@@ -274,7 +274,9 @@ PARMgempak1=/gpfs/dell1/nco/ops/nwprod/gempak.v7.3.1/nawips/gempak/tables/pack
 NAMSND=/gpfs/dell1/nco/ops/nwprod/gempak.v7.3.1/nawips/os/linux3.10.0_x86_64/bin/namsnd 
 export EXECobsproc_shared_bufr_cword=/gpfs/hps/nco/ops/nwpara/obsproc_shared/bufr_cword.v1.0.0/exec
 /gpfs/hps/nco/ops/nwpara/obsproc_shared/bufr_cword.v1.0.0/ush/bufr_cword.sh block class1.bufr class1.bufr_blk
-. /gpfs/gp1/nco/ops/nwprod/gempak/.gempak
+#. /gpfs/gp1/nco/ops/nwprod/gempak/.gempak
+module load gnu/4.8.5
+module load gempak/7.3.1
 /bin/rm -f *.nts
         
 #/gpfs/dell1/nco/ops/nwprod/gempak.v7.3.1/nawips/os/linux3.10.0_x86_64/bin/namsnd << EOF > /dev/null
