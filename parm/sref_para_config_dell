@@ -58,8 +58,8 @@
 
 # com
 # export COMGFS=/gpfs/hps/nco/ops/com/gfs/prod
-  export COMGFS=/gpfs/dell1/nco/ops/com/gfs/para
-  export COMINgfs=/gpfs/dell1/nco/ops/com/gfs/para
+  export COMGFS=/gpfs/dell1/nco/ops/com/gfs/prod
+  export COMINgfs=/gpfs/dell1/nco/ops/com/gfs/prod
   export COMENS=/gpfs/${machine}p2/nco/ops/com/gens/prod
   export COMINgens=/gpfs/${machine}p2/nco/ops/com/gens/prod
 
