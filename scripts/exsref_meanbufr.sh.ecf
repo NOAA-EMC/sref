@@ -138,8 +138,8 @@ mkdir -p $COMOUT/gempak
 #. ${NWROOTp1}/gempak/.gempak
 
 PARMgempak1=/gpfs/dell1/nco/ops/nwprod/gempak.v7.3.1/nawips/gempak/tables/pack
-export EXECobsproc_shared_bufr_cword=/gpfs/hps/nco/ops/nwpara/obsproc_shared/bufr_cword.v1.0.0/exec
-/gpfs/hps/nco/ops/nwpara/obsproc_shared/bufr_cword.v1.0.0/ush/bufr_cword.sh block class1.bufr class1.bufr_blk
+export EXECobsproc_shared_bufr_cword=/gpfs/hps/nco/ops/nwprod/obsproc_shared/bufr_cword.v1.0.0/exec
+/gpfs/hps/nco/ops/nwprod/obsproc_shared/bufr_cword.v1.0.0/ush/bufr_cword.sh block class1.bufr class1.bufr_blk
 NAMSND=/gpfs/dell1/nco/ops/nwprod/gempak.v7.3.1/nawips/os/linux3.10.0_x86_64/bin/namsnd
 #. /gpfs/gp1/nco/ops/nwprod/gempak/.gempak
 #module load gnu/4.8.5
