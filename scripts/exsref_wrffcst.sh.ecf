@@ -102,6 +102,23 @@ cp $PARMsref/sref_nests.txt nests.txt
 cp $PARMsref/sref_atmos.configure atmos.configure
 cp $PARMsref/sref_ocean.configure ocean.configure
 cp $PARMsref/sref_atm_namelist atm_namelist
+cp $FIXsref/global_glacier.2x2.grb .
+cp $FIXsref/global_maxice.2x2.grb .
+cp $FIXsref/cfs_oi2sst1x1monclim19822001.grb .
+cp $FIXsref/global_snoclim.1.875.grb .
+cp $FIXsref/global_zorclim.1x1.grb .
+cp $FIXsref/global_albedo4.1x1.grb .
+cp $FIXsref/cfs_ice1x1monclim19822001.grb .
+cp $FIXsref/global_tg3clim.2.6x1.5.grb .
+cp $FIXsref/global_vegfrac.0.144.decpercent.grb .
+cp $FIXsref/global_vegtype.1x1.grb .
+cp $FIXsref/global_soiltype.1x1.grb .
+cp $FIXsref/global_soilmcpc.1x1.grb .
+cp $FIXsref/seaice_newland.grb .
+cp $FIXsref/global_shdmin.0.144x0.144.grb .
+cp $FIXsref/global_shdmax.0.144x0.144.grb .
+cp $FIXsref/global_slope.1x1.grb .
+
 cat $PARMsref/sref_configure_file.in.${MODEL}.${MEMBER}_$RES | sed s/START_YYYY/$START_YYYY/ | \
                                               sed s/START_MM/$START_MM/ | \
                                               sed s/START_DD/$START_DD/ | \
