@@ -131,22 +131,17 @@ echo "sndp done!"
 #------------------
 ls -l
 mkdir -p $COMOUT/gempak
-#PARMgempak3=${NWROOTp1}/gempak/nawips3/gempak/tables/pack
-#PARMgempak1=${NWROOTp1}/gempak/nawips1/gempak/tables/pack
-# PARMgempak is the same as PARMgempak1
-#${NWROOTp1}/ush/cwordsh block class1.bufr class1.bufr_blk
-#. ${NWROOTp1}/gempak/.gempak
-
-PARMgempak1=/gpfs/dell1/nco/ops/nwprod/gempak.v7.3.1/nawips/gempak/tables/pack
+# Need to load gempack  (loaded in the run submission job)
+#module load gempak/7.3.1
+#PARMgempak1=/gpfs/dell1/nco/ops/nwprod/gempak.v7.3.1/nawips/gempak/tables/pack
+PARMgempak1=$GEMTBL/pack
+#NAMSND=/gpfs/dell1/nco/ops/nwprod/gempak.v7.3.1/nawips/os/linux3.10.0_x86_64/bin/namsnd 
+NAMSND=$NAWIPS_EXE/namsnd 
+# Need to be replaced by loading a module in jobsubmit when the module is available
 export EXECobsproc_shared_bufr_cword=/gpfs/dell1/nco/ops/nwprod/obsproc_shared/bufr_cword.v1.1.0/exec
 /gpfs/dell1/nco/ops/nwprod/obsproc_shared/bufr_cword.v1.1.0/ush/bufr_cword.sh block class1.bufr class1.bufr_blk
-NAMSND=/gpfs/dell1/nco/ops/nwprod/gempak.v7.3.1/nawips/os/linux3.10.0_x86_64/bin/namsnd
-#. /gpfs/gp1/nco/ops/nwprod/gempak/.gempak
-#module load gnu/4.8.5
-#module load gempak/7.3.1
 
 /bin/rm -f *.nts
-        
 $NAMSND << EOF > /dev/null
  SNBUFR   = class1.bufr_blk
  SNOUTF   = bufr.snd
