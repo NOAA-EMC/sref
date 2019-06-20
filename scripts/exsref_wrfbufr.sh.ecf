@@ -272,8 +272,8 @@ PARMgempak1=$GEMTBL/pack
 #NAMSND=/gpfs/dell1/nco/ops/nwprod/gempak.v7.3.1/nawips/os/linux3.10.0_x86_64/bin/namsnd 
 NAMSND=$NAWIPS_EXE/namsnd 
 # The version number is speficifed in the job submission file
-export EXECobsproc_shared_bufr_cword=/gpfs/dell1/nco/ops/nwprod/obsproc_shared/bufr_cword.${obsproc_shared_ver}/exec
-/gpfs/dell1/nco/ops/nwprod/obsproc_shared/bufr_cword.${obsproc_shared_ver}/ush/bufr_cword.sh block class1.bufr class1.bufr_blk
+export EXECobsproc_shared_bufr_cword=/gpfs/dell1/nco/ops/nwprod/obsproc_shared/bufr_cword.${obsproc_shared_bufr_cword_ver}/exec
+/gpfs/dell1/nco/ops/nwprod/obsproc_shared/bufr_cword.${obsproc_shared_bufr_cword_ver}/ush/bufr_cword.sh block class1.bufr class1.bufr_blk
 
 /bin/rm -f *.nts
 $NAMSND << EOF > /dev/null
