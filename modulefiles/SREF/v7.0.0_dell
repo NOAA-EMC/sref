@@ -62,6 +62,7 @@ module load g2tmpl/1.5.0
 module load landsfcutil/2.1.0
 module load crtm/2.2.6
 module load bufr/11.2.0
+module load gempak/7.3.1
 # module load transutil/v1.0.0
 setenv TRANSUTIL_LIB4 ../transutil.fd/v1.0.0/libtransutil_4.a
 setenv TRANSUTIL_LIB8 ../transutil.fd/v1.0.0/libtransutil_8.a
@@ -73,4 +74,4 @@ module load ESMF/7_1_0r
 # NCO Production Compiled MPI Libraries and Tools
 module load nemsio/2.2.3
 module load w3emc/2.3.0
-
+ 
