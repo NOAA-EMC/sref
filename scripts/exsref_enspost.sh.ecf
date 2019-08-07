@@ -696,7 +696,7 @@ export MP_PGMMODEL=mpmd
 export MP_CMDFILE=poescript.1
 #/usr/bin/poe -cmdfile poescript.1 -pgmmodel mpmd -ilevel3 -labelio yes -stdoutmode ordered
 #mpirun.lsf -cmdfile poescript.1 -pgmmodel mpmd -ilevel3 -labelio yes -stdoutmode ordered
-mpirun poescript.1
+mpirun cfp poescript.1
 
 else
 
