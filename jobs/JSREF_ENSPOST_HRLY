@@ -185,7 +185,7 @@ export MP_CMDFILE=$DATAHOLD/poescript
 # Execute the script.
 #/usr/bin/poe -cmdfile $DATAHOLD/poescript -pgmmodel mpmd -ilevel 3 -labelio yes -stdoutmode ordered
 #mpirun -cmdfile $DATAHOLD/poescript -pgmmodel mpmd -ilevel 3 -labelio yes -stdoutmode ordered
-mpirun $DATAHOLD/poescript
+mpirun cfp $DATAHOLD/poescript
 export err=$?; err_chk
 
 #############################################
