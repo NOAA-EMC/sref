@@ -290,7 +290,7 @@ C   Observation (CIMO Guide):
 
           c_adv=beta*cooling_rate/3600.0 + adv/1000.0
 
-          if(c_adv.lt.0.0) then
+          if(c_adv.le.0.0) then  !lt -> le
             lwc=0.0
             return
           end if
