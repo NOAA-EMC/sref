@@ -3,8 +3,8 @@
 # SREF model run
 #######################################################
 #
-  machine=g
-# machine=t
+# machine=g
+  machine=t
 
   export NWROOT=/gpfs/${machine}p2/nco/ops/nwprod
   export NWROOTp1=/gpfs/${machine}p2/nco/ops/nwprod
@@ -45,8 +45,8 @@
 # export com=/com/sref/${envir}
 # export COM=/com/sref/${envir}
 
-# export COMglb_IN=/gpfs/${machine}p2/nco/ops/com/sref/${envir}
-  export COMglb_IN=$PTMP/$LOGNAME/com/sref/${envir}
+  export COMglb_IN=/gpfs/dell2/nco/ops/com/sref/${envir}
+# export COMglb_IN=$PTMP/$LOGNAME/com/sref/${envir}
   export COM_IN=$PTMP/$LOGNAME/com/sref/${envir}
 #
 # ---------------------------------------
@@ -54,16 +54,17 @@
   export gespath=$PTMP/$LOGNAME/nwges/${envir}
 # export gespath=/nwges/${envir}
 # export GESNDAS=/ptmpp1/$LOGNAME/nwges/prod
-  export GESNDAS=/gpfs/${machine}p2/nco/ops/nwges/prod
+  export GESNDAS=/gpfs/dell1/nco/ops/nwges/prod
 
 # com
 # export COMGFS=/gpfs/hps/nco/ops/com/gfs/prod
   export COMGFS=/gpfs/dell1/nco/ops/com/gfs/prod
   export COMINgfs=/gpfs/dell1/nco/ops/com/gfs/prod
-  export COMENS=/gpfs/${machine}p2/nco/ops/com/gens/prod
-  export COMINgens=/gpfs/${machine}p2/nco/ops/com/gens/prod
+  export COMENS=/gpfs/dell2/nco/ops/com/gens/prod
+  export COMINgens=/gpfs/dell2/nco/ops/com/gens/prod
 
-  export COMRTMA=/gpfs/${machine}p2/nco/ops/com/rtma/prod
-  export COMINnam=/gpfs/${machine}p2/nco/ops/com/nam/prod
+  export COMRTMA=/gpfs/dell2/nco/ops/com/rtma/prod
+  export COMINnam=/gpfs/dell1/nco/ops/com/nam/prod
   export COMINrap=/gpfs/hps/nco/ops/com/rap/prod
+# export COMINrap=/gpfs/hps3/ptmp/Ming.Hu/com/rap/prod
 
