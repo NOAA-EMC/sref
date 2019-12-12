@@ -10,7 +10,7 @@ cyc=$1
 #INCR=3
 ymdh=`cat /gpfs/hps/nco/ops/com/date/t${cyc}z | cut -c7-16`
 
-#ymdh=20150324${1}
+ ymdh=20191212${1}
 
 export SMSBIN=${HOME}/sms
 export MACHINE=wcoss
@@ -25,7 +25,8 @@ CYC=`echo $ymdh | cut -c9-10`
 #rm -f *.bsub *.log
 
 # In operation, ctl and others are run separately: ctl after GFS 90hr finishes; others after GEFS 90hr finishes.
-for MEMBER in ctl c00 p01 p02 p03 p04 p05 p06 p07 p08 p09 p10 p11 p12 p13 p14 p15 p16 p17 p18 p19 p20; do
+ for MEMBER in ctl c00 p01 p02 p03 p04 p05 p06 p07 p08 p09 p10 p11 p12 p13 p14 p15 p16 p17 p18 p19 p20; do
+#for MEMBER in ctl; do
 
 #cat SREF_GFSPREP.bsub.in | \
 #    sed s:_PDY_:$PDY:g | \
