@@ -60,19 +60,17 @@ if [ $cyc -eq 03 -o $cyc -eq 09 -o $cyc -eq 15 -o $cyc -eq 21 ]; then
    let "gfscyc=cyc-3"
 fi
 
+# if using global_post to convert from sig, flux files:
 fhr=$whr
 >$DATA/cmdfile_$gmdl
 while [ $fhr -le $last ]; do
   mkdir -p $DATA/${MEMBER}_$fhr
-  echo "SUBMIT sref_prep_sig2pgb or sref_prep_gfs2pgrb for" GFSCYC $gfscyc  MEMBER $MEMBER  MODEL $MODEL FHR $fhr
+  echo "SUBMIT sref_prep_sig2pgb for" GFSCYC $gfscyc  MEMBER $MEMBER  MODEL $MODEL FHR $fhr
 
 if [ $MEMBER = "ctl" ];then
   echo "$USHsref/sref_prep_gfspgrb.sh $DATE $gfscyc $MEMBER $MEMBER $fhr $res $MODEL >$DATA/postgb_${fhr}.out 2>&1" >>$DATA/cmdfile_$gmdl
 else
-# if using global_post to convert sig and flux into pgrb files:
-# echo "$USHsref/sref_prep_sig2pgb.sh $DATE $gfscyc $MEMBER $MEMBER $fhr $res $MODEL >$DATA/postgb_${fhr}.out 2>&1" >>$DATA/cmdfile_$gmdl
-# if directly use pgrb files:
-  echo "$USHsref/sref_prep_gfspgrb.sh $DATE $gfscyc $MEMBER $MEMBER $fhr $res $MODEL >$DATA/postgb_${fhr}.out 2>&1" >>$DATA/cmdfile_$gmdl
+  echo "$USHsref/sref_prep_sig2pgb.sh $DATE $gfscyc $MEMBER $MEMBER $fhr $res $MODEL >$DATA/postgb_${fhr}.out 2>&1" >>$DATA/cmdfile_$gmdl
 fi
 
   if [ $fhr -lt 126 ]; then 
