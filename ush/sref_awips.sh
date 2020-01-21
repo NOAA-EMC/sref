@@ -107,7 +107,7 @@ do
    # Post Files to PCOM
    ##############################
 
-     cp  grib2_sref_${type}.t${cyc}z.${id}_pgrb221  $pcom/grib2_sref_${type}.t${cyc}z.${id}_pgrb221
+     cp  grib2_sref_${type}.t${cyc}z.${id}_pgrb221  $COMOUTwmo/grib2_sref_${type}.t${cyc}z.${id}_pgrb221
 
   fi
 
@@ -119,7 +119,7 @@ do
 #
 #    Distribute Data to TOC (AWIPS)
 #
-     $DBNROOT/bin/dbn_alert NTC_LOW $NET $job   $pcom/grib2_sref_${type}.t${cyc}z.${id}_pgrb221
+     $DBNROOT/bin/dbn_alert NTC_LOW $NET $job   $COMOUTwmo/grib2_sref_${type}.t${cyc}z.${id}_pgrb221
      echo " "
   fi
 
