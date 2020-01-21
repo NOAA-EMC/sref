@@ -11,6 +11,7 @@
 #
 ###############################################################
 set -xa
+
 export OMP_NUM_THREADS=1
 export MP_EUIDEVICE=sn_all
 export MP_EUILIB=us
@@ -40,27 +41,15 @@ then
   export DATA_IN=${DATA_IN:-/gpfs/dell2/ptmp/$userid}
 fi
 
-###############################################################
-# This block can be modified for different test environment
-###############################################################
-if [ $RUN_ENVIR = nco -a $envir != prod ]; then
-  export SENDDBN=${SENDDBN:-YES}
-# export DBNROOT=${NWROOTp1}/spa_util/fakedbn
-# export jlogfile=${jlogfile:-${COMROOT}/logs/${envir}/jlogfile}
-# export DBN_ALERT_TYPE=${DBN_ALERT_TYPE:-SREF_CLUSTER_PARA}
-fi
-
 echo `date` $0 `date -u` begin
 export PS4='$SECONDS + '
 
 ########################################################### 
 # obtain unique process id (pid) and make temp directories
 ###########################################################
-export pid=$$
 export DATA_IN=${DATA_IN:-${DATAROOT}}
 
-#export DATA=$DATA_IN/${jobid:?}
-export DATA=$DATA_IN/sref_cluster_${CYC}_${envir}
+export DATA=$DATA_IN/${jobid:?}
 rm -rf $DATA
 mkdir -p $DATA
 
@@ -69,13 +58,11 @@ cd $DATA
 ####################################
 # File To Log Msgs
 ####################################
-export jlogfile=${jlogfile:-${COMROOT}/logs/jlogfiles/jlogfile.${job}.${pid}}
+export jlogfile=${jlogfile:-$DATA/jlogfile.${job}.$$}
 
 ####################################
 # Determine Job Output Name on System
 ####################################
-export outid="LL$job"
-export jobid="${outid}.o${pid}"
 export pgmout="OUTPUT.${pid}"
 
 export cycle=t${cyc}z 
@@ -105,13 +92,6 @@ export FIXsref=${FIXsref:-$HOMEsref/fix}
 export PARMsref=${PARMsref:-$HOMEsref/parm}
 export USHsref=${USHsref:-$HOMEsref/ush}
 
-###################################
-# Set up the UTILITIES
-###################################
-
-# Run setup to initialize working directory and utility scripts
-## setup.sh  # no need, since using module load prod_util 
-
 # Run setpdy and initialize PDY variables
 setpdy.sh
 . ./PDY
@@ -122,9 +102,9 @@ setpdy.sh
 export COM_IN=${COM_IN:-${COMROOT}/${NET}/${envir}}
 export COM_OUT=${COM_OUT:-${COMROOT}/${NET}/${envir}}
 
-export COMIN=$COM_IN/${RUN}.${PDY}/${cyc}/pgrb
-export COMOUT=$COM_OUT/${RUN}.${PDY}/${cyc}/ensprod
-export COMOUT_BC=$COM_OUT/${RUN}.${PDY}/${cyc}/ensprod_biasc
+export COMIN=${COMIN:-$COM_IN/${RUN}.${PDY}/${cyc}/pgrb}
+export COMOUT=${COMOUT:-$COM_OUT/${RUN}.${PDY}/${cyc}/ensprod}
+export COMOUT_BC=${COMOUT_BC:-$COM_OUT/${RUN}.${PDY}/${cyc}/ensprod_biasc}
 
 mkdir -p -m 775 $COMOUT $COMOUT_BC
  
@@ -170,12 +150,12 @@ $HOMEsref/scripts/exsref_enspost4cluster.sh.ecf 3hrly OU 111 > $DATA/product_OU.
 cat $pgmout
 
 msg="JOB COMPLETED NORMALLY"
-postmsg "$jlogfile" "$msg"
+postmsg $jlogfile "$msg"
 
 ################################
 # Remove the Working Directory
 ################################
 cd $DATA_IN
- if [ ${RM_TMPDIR:-YES} = YES ] ; then rm -rf $DATA ; fi
+ if [ ${KEEPDATA:-NO} != YES ] ; then rm -rf $DATA ; fi
 
 date

@@ -13,9 +13,7 @@ set -eux
 export PS4='$SECONDS + '
 
 export OMP_NUM_THREADS=1
-
-# The grib_util module should be loaded prior to running this J-job
-#module load grib_util
+export N_TASK=$LSB_DJOB_NUMPROC
 
 #
 # Specify whether the run is production or development
@@ -40,16 +38,6 @@ then
   export DATA_IN=${DATA_IN:-/gpfs/dell2/ptmp/$userid}
 fi
 
-###############################################################
-# This block can be modified for different test environment
-###############################################################
-if [ $RUN_ENVIR = nco -a $envir != prod ]; then
-  export SENDDBN=${SENDDBN:-NO}
-# export DBNROOT=${NWROOTp1}/spa_util/fakedbn
-# export jlogfile=${jlogfile:-${COMROOT}/logs/${envir}/jlogfile}
-  export RM_TMPDIR=${RM_TMPDIR:-NO}
-fi
-
 echo `date` $0 `date -u` begin
 
 export CYC=${CYC:-${cyc}}
@@ -62,7 +50,6 @@ export RES=${RES:-16km}
 # Note: ctl member needs to be run only once and can be used
 # for both NMM and ARW cores!
 ###########################################################
-export pid=$$
 export DATA_IN=${DATA_IN:-${DATAROOT}}
 
 export DATA=$DATA_IN/sref_${MODEL}_real_${CYC}_${envir}
@@ -82,14 +69,12 @@ cd $WORK_DIR
 ####################################
 # File To Log Msgs
 ####################################
-export jlogfile=${jlogfile:-${COMROOT}/logs/jlogfiles/jlogfile.${job}.${pid}}
+export jlogfile=${jlogfile:-$DATA/jlogfile.${job}.$$}
 
 ####################################
 # Determine Job Output Name on System
 ####################################
-export outid="LL$job"
-export jobid="${outid}.o${pid}"
-export pgmout="OUTPUT.${pid}"
+export pgmout="OUTPUT.$$"
 
 export cycle=t${cyc}z
 
@@ -122,11 +107,8 @@ export USHsref=${USHsref:-$HOMEsref/ush}
 machine=`hostname |cut -c1`
 if [ $machine = t -o $machine = g ]; then
   export MACHINE=wcoss
-fi
-
-if [ $MACHINE == zeus ]; then
-  export utilscript=/scratch2/portfolios/NCEPDEV/meso/save/$USER${NWROOTp1}/util/ush
-  export utilexec=/scratch2/portfolios/NCEPDEV/meso/save/$USER${NWROOTp1}/util/exec
+elif [ $machine = m -o $machine = v ]; then
+  export MACHINE=dell
 fi
 
 # Run setup to initialize working directory and utility scripts
@@ -146,14 +128,12 @@ export GESDIR=$gespath/${NET}.${PDY}
 export COMINnam=${COMINnam:-$(compath.py nam/prod)}
 export GES_IN=${GES_IN:-$gespath}
 
-export GESNAM=${GESNAM:-${GESROOT}/prod}
-export GESNDAS=${GESNDAS:-${GESROOT}/prod}
+export GESNAM=${GESNAM:-${GESROOTp3}/prod}
+export GESNDAS=${GESNDAS:-${GESROOTp3}/prod}
 
 #The following variables are turned off now
-export GESnam=$GESNAM/nam.${PDY}
-#export GESndas=$GESNDAS/ndas.${PDY}
-export GESndas=$GESNDAS/nam.${PDY}
-#export COMndas=$COMNAM/ndas.${PDY}
+#export GESnam=$GESNAM/nam.${PDY}
+export GESINndas=${GESINndas:-${GESNDAS}/nam.${PDY}}
 
 mkdir -p -m 775 $GESDIR
 
@@ -183,12 +163,13 @@ $HOMEsref/scripts/exsref_wrfreal.sh.ecf
 cat $pgmout
 
 msg="JOB COMPLETED NORMALLY"
-postmsg "$jlogfile" "$msg"
+postmsg $jlogfile "$msg"
 
+export KEEPDATA=YES
 ################################
 # Remove the Working Directory
 ################################
 cd $DATA_IN
-if [ ${RM_TMPDIR:-NO} = YES ] ; then rm -rf $DATA ; fi
+if [ ${KEEPDATA:-NO} != YES ] ; then rm -rf $DATA ; fi
 
 date

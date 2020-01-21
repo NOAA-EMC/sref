@@ -52,11 +52,6 @@ fi
 ###############################################################
 # This block can be modified for different test environment
 ###############################################################
-if [ $RUN_ENVIR = nco -a $envir != prod ]; then
-  export SENDDBN=${SENDDBN:-YES}
-# export DBNROOT=${NWROOTp1}/spa_util/fakedbn
-# export jlogfile=${jlogfile:-${COMROOT}/logs/${envir}/jlogfile}
-fi
 
 echo `date` $0 `date -u` begin
 export PS4='$SECONDS + '
@@ -64,11 +59,9 @@ export PS4='$SECONDS + '
 ########################################################### 
 # obtain unique process id (pid) and make temp directories
 ###########################################################
-export pid=$$
 export DATA_IN=${DATA_IN:-${DATAROOT}}
 
-#export DATA=$DATA_IN/${jobid:?}
-export DATA=$DATA_IN/sref_bias_${CYC}_${envir}
+export DATA=$DATA_IN/${jobid:?}
 rm -rf $DATA
 mkdir -p $DATA
 
@@ -77,14 +70,12 @@ cd $DATA
 ####################################
 # File To Log Msgs
 ####################################
-export jlogfile=${jlogfile:-${COMROOT}/logs/jlogfiles/jlogfile.${job}.${pid}}
+export jlogfile=${jlogfile:-$DATA/jlogfile.${job}.$$}
 
 ####################################
 # Determine Job Output Name on System
 ####################################
-export outid="LL$job"
-export jobid="${outid}.o${pid}"
-export pgmout="OUTPUT.${pid}"
+export pgmout="OUTPUT.$$"
 
 export cycle=t${cyc}z 
 
@@ -112,24 +103,11 @@ export FIXsref=${FIXsref:-$HOMEsref/fix}
 export PARMsref=${PARMsref:-$HOMEsref/parm}
 export USHsref=${USHsref:-$HOMEsref/ush}
 
-export HOMEglobal=${HOMEglobal:-${NWROOTp1}}
-export EXECglobal=$HOMEglobal/exec
-export FIXglobal=$HOMEglobal/fix
-export PARMglobal=$HOMEglobal/parm
-export USHglobal=$HOMEglobal/ush
-
-###################################
-# Load the GRIB Utilities module
-####################################
-# The grib_util module should be loaded prior to running this J-job
-#module load grib_util
-
-###################################
-# Set up the UTILITIES
-###################################
-
-# Run setup to initialize working directory and utility scripts
-## setup.sh  # no need, since using module load prod_util 
+#export HOMEglobal=${HOMEglobal:-${NWROOTp1}}
+#export EXECglobal=$HOMEglobal/exec
+#export FIXglobal=$HOMEglobal/fix
+#export PARMglobal=$HOMEglobal/parm
+#export USHglobal=$HOMEglobal/ush
 
 # Run setpdy and initialize PDY variables
 setpdy.sh
@@ -141,16 +119,16 @@ setpdy.sh
 export COM_IN=${COM_IN:-${COMROOT}/${NET}/${envir}}
 export COM_OUT=${COM_OUT:-${COMROOT}/${NET}/${envir}}
 
-export COMIN=$COM_IN/${RUN}.${PDY}/${cyc}/pgrb
-export COMIN_ENSPRD=${COM_IN}/${RUN}.${PDY}/${cyc}/ensprod
+export COMIN=${COMIN:-$COM_IN/${RUN}.${PDY}/${cyc}/pgrb}
+export COMIN_ENSPRD=${COMIN_ENSPRD:-${COM_IN}/${RUN}.${PDY}/${cyc}/ensprod}
 
-export COMOUT=$COM_OUT/${RUN}.${PDY}/${cyc}/pgrb_biasc
-export COMIN_BC=$COMOUT
-export COMOUT_BC=$COM_OUT/${RUN}.${PDY}/${cyc}/ensprod_biasc
-export COMOUT_NDGD=$COM_OUT/${RUN}.${PDY}/${cyc}/ensprod_ndgd
+export COMOUT=${COMOUT:-$COM_OUT/${RUN}.${PDY}/${cyc}/pgrb_biasc}
+export COMIN_BC=${COMIN_BC:-$COMOUT}
+export COMOUT_BC=${COMOUT_BC:-$COM_OUT/${RUN}.${PDY}/${cyc}/ensprod_biasc}
+export COMOUT_NDGD=${COMOUT_NDGD:-$COM_OUT/${RUN}.${PDY}/${cyc}/ensprod_ndgd}
 
 export COMOUT_MISC=${COMOUT_MISC:-$COM_OUT/${RUN}.${PDY}/${cyc}/misc}
-export COM_NDGD=$COM_IN/${RUN}.${PDY}/${cyc}/pgrb_ndgd
+export COM_NDGD=${COM_NDGD:-$COM_IN/${RUN}.${PDY}/${cyc}/pgrb_ndgd}
 
 mkdir -p -m 775 $COMOUT $COMOUT_BC $COMOUT_NDGD $COM_NDGD
  
@@ -204,12 +182,12 @@ done
 cat $DATA/pgrb_biasc/$pgmout
 
 msg="JOB COMPLETED NORMALLY"
-postmsg "$jlogfile" "$msg"
+postmsg $jlogfile "$msg"
 
 ################################
 # Remove the Working Directory
 ################################
 cd $DATA_IN
-if [ ${RM_TMPDIR:-YES} = YES ] ; then rm -rf $DATA ; fi
+if [ ${KEEPDATA:-NO} != YES ] ; then rm -rf $DATA ; fi
 
 date

@@ -21,12 +21,7 @@
 ########################################
 set -eux
 export OMP_NUM_THREADS=1
-#export MP_MPILIB=mpich2
 export N_TASK=${LSB_DJOB_NUMPROC:-1}
-#export N_TASK=${PBS_NP:-1}
-
-# The grib_util module should be loaded prior to running this J-job
-#module load grib_util
 
 #
 # Specify whether the run is production or development
@@ -51,15 +46,6 @@ then
   export DATA_IN=${DATA_IN:-/gpfs/dell2/ptmp/$userid}
 fi
 
-###############################################################
-# This block can be modified for different test environment
-###############################################################
-if [ $RUN_ENVIR = nco -a $envir != prod ]; then
-  export SENDDBN=${SENDDBN:-NO}
-# export DBNROOT=${NWROOTp1}/spa_util/fakedbn
-# export jlogfile=${jlogfile:-${COMROOT}/logs/${envir}/jlogfile}
-fi
-
 echo `date` $0 `date -u` begin
 export PS4='$SECONDS + '
 
@@ -73,7 +59,6 @@ export RES=${RES:-16km}
 # Note: ctl member needs to be run only once and can be used
 # for both NMM and ARW cores!
 ###########################################################
-export pid=$$
 export DATA_IN=${DATA_IN:-${DATAROOT}}
 
 export DATA=$DATA_IN/sref_${MODEL}_wps_${CYC}_${envir}
@@ -93,14 +78,12 @@ cd $WORK_DIR
 ####################################
 # File To Log Msgs
 ####################################
-export jlogfile=${jlogfile:-${COMROOT}/logs/jlogfiles/jlogfile.${job}.${pid}}
+export jlogfile=${jlogfile:-$DATA/jlogfile.${job}.$$}
 
 ####################################
 # Determine Job Output Name on System
 ####################################
-export outid="LL$job"
-export jobid="${outid}.o${pid}"
-export pgmout="OUTPUT.${pid}"
+export pgmout="OUTPUT.$$"
 
 export cycle=t${cyc}z
 
@@ -133,15 +116,9 @@ export USHsref=${USHsref:-$HOMEsref/ush}
 machine=`hostname |cut -c1`
 if [ $machine = t -o $machine = g ]; then
   export MACHINE=wcoss
+elif [ $machine = m -o $machine = v ]; then
+  export MACHINE=dell
 fi
-
-if [ $MACHINE == zeus ]; then
-  export utilscript=/scratch2/portfolios/NCEPDEV/meso/save/$USER${NWROOTp1}/util/ush
-  export utilexec=/scratch2/portfolios/NCEPDEV/meso/save/$USER${NWROOTp1}/util/exec
-fi
-
-# Run setup to initialize working directory and utility scripts
-## setup.sh  # no need, since using module load prod_util
 
 # Run setpdy and initialize PDY variables
 setpdy.sh
@@ -154,9 +131,9 @@ export COMglb_IN=${COMglb_IN:-${COMROOT}/${NET}/${envir}}
 export COM_IN=${COM_IN:-${COMROOT}/${NET}/${envir}}
 export COM_OUT=${COM_OUT:-${COMROOT}/${NET}/${envir}}
 
-export COMglbIN=$COMglb_IN/${RUN}.${PDY}
-export COMIN=$COM_IN/${RUN}.${PDY}
-export COMOUT=$COM_OUT/${RUN}.${PDY}/${cyc}
+export COMglbIN=${COMglbIN:-$COMglb_IN/${RUN}.${PDY}}
+export COMIN=${COMIN:-$COM_IN/${RUN}.${PDY}}
+export COMOUT=${COMOUT:-$COM_OUT/${RUN}.${PDY}/${cyc}}
 
 export COMINnam=${COMINnam:-$(compath.py nam/prod)}
 export COMINrap=${COMINrap:-$(compath.py rap/prod)}
@@ -211,6 +188,7 @@ fi
 
 
 export IOFORM=2
+export KEEPDATA=YES
 ########################################################
 # Execute the script.
 if [ $MEMBER = ctl ];then
@@ -228,12 +206,12 @@ fi
 cat $pgmout
 
 msg="JOB COMPLETED NORMALLY"
-postmsg "$jlogfile" "$msg"
+postmsg $jlogfile "$msg"
 
 ################################
 # Remove the Working Directory
 ################################
 cd $DATA_IN
-if [ ${RM_TMPDIR:-NO} = YES ] ; then rm -rf $DATA ; fi
+if [ ${KEEPDATA:-NO} != YES ] ; then rm -rf $DATA ; fi
 
 date

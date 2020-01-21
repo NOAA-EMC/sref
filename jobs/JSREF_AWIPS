@@ -31,7 +31,6 @@ if [ "$RUN_ENVIR" != nco ]    ### For Developers
 then
   . /meso/save/$LOGNAME/sref${NWROOTp1}/parm/sref_config
   export DATA_IN=${DATA_IN:-/ptmp/$LOGNAME${DATAROOT}}
-  export jlogfile=${jlogfile:-$DATA_IN/jlogfile}
 
   export SENDCOM=${SENDCOM:-YES}
   export SENDDBN=${SENDDBN:-NO}
@@ -57,16 +56,9 @@ fi
 ###############################################################
 # This block can be modified for different test environment
 ###############################################################
-if [ $RUN_ENVIR = nco -a $envir != prod ]; then
-#  export SENDDBN=${SENDDBN:-YES}
- export DBNROOT=${NWROOTp1}/spa_util/fakedbn
-# export jlogfile=${jlogfile:-${COMROOT}/logs/${envir}/jlogfile}
-fi
-
 # 
 # obtain unique process id (pid) and make temp directories
 #
-export pid=$$
 export pid=$$
 export DATA_IN=${DATA_IN:-${DATAROOT}}
 export DATA=$DATA_IN/${jobid:?}
@@ -77,14 +69,12 @@ cd $DATA
 ####################################
 # File To Log Msgs
 ####################################
-export jlogfile=${jlogfile:-${COMROOT}/logs/jlogfiles/jlogfile.${job}.${pid}}
+export jlogfile=${jlogfile:-$DATA/jlogfile.${job}.$$}
 
 ####################################
 # Determine Job Output Name on System
 ####################################
-export outid="LL$job"
-export jobid="${outid}.o${pid}"
-export pgmout="OUTPUT.${pid}"
+export pgmout="OUTPUT.$$"
 
 export cycle=t${cyc}z 
 
@@ -108,23 +98,23 @@ export EXECsref=${EXECsref:-$HOMEsref/exec}
 export FIXsref=${FIXsref:-$HOMEsref/fix}
 export PARMsref=${PARMsref:-$HOMEsref/parm}
 export USHsref=${USHsref:-$HOMEsref/ush}
-export PARMshared=${PARMsref}                 # for /nwprod2/util_shared.v?.?.?/ush/mkawpgrb.sh
+export PARMshared=${PARMsref}                 # for util_shared.v?.?.?/ush/mkawpgrb.sh
 
 ###################################
 # Set up the UTILITIES
 ###################################
 
 msg="JOB $job HAS BEGUN"
-postmsg "$jlogfile" "$msg"
+postmsg $jlogfile "$msg"
 
 export COM_IN=${COM_IN:-${COMROOT}/${NET}/${envir}}
 export COMIN=$COM_IN/${RUN}.${PDY}/${cyc}/ensprod
 
 export COM_OUT=${COM_OUT:-${COMROOT}/${NET}/${envir}}
-export COMOUT=$COM_OUT/${RUN}.${PDY}/${cyc}/misc
-export pcom=${pcom:-${PCOMROOT}/${NET}}
+export COMOUT=${COMOUT:-$COM_OUT/${RUN}.${PDY}/${cyc}/wmo}  # used for dbnlog
+export COMOUTwmo=${COMOUTwmo:-$COM_OUT/${RUN}.${PDY}/${cyc}/wmo}
 
-mkdir -p $COMOUT $pcom
+mkdir -p $COMOUT $COMOUTwmo
  
 ###################################################
 # Execute the Script
@@ -138,6 +128,6 @@ msg="JOB $job HAS COMPLETED NORMALLY."
 postmsg "$jlogfile" "$msg"
 
 cd $DATA_IN
-if [ ${RM_TMPDIR:-NO} = YES ] ; then rm -rf $DATA ; fi
+if [ ${KEEPDATA:-NO} != YES ] ; then rm -rf $DATA ; fi
 
 date
