@@ -56,7 +56,7 @@ C-----------------------------------------------------------------------
                              P A R A M E T E R
 cZhou     & (NSTAT=800,LCL1ML=13,LCL1SL=50)
 c20080701     & (NSTAT=1500,LCL1ML=13,LCL1SL=52)      
-     &     (NSTAT=1790,LCL1ML=15,LCL1SL=52)
+     &     (NSTAT=1815,LCL1ML=15,LCL1SL=52)
 C-----------------------------------------------------------------------
 C
 C    PARMS FOR HOURLY PROFILER OUTPUT
