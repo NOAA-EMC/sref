@@ -17,6 +17,7 @@
 # 2015-02-25  Jun Du -  Increased members for ARW and NMMB and rename em to arw#
 # 2016-11-07  Jun Du -  Increased bufr station from 1642 to 1733               #
 # 2018-04-10  Jun Du -  Increased bufr station from 1733 to 1790               #
+# 2020-01-22  Jun Du -  Increased bufr station from 1790 to 1815               #
 #                                                                              #
 ################################################################################
 set -x
@@ -174,7 +175,7 @@ rm -f fort.*
 export pgm=sref_${MODEL}_bufr
 . prep_step
 
-cp $PARMsref/sref_${CORE}_profdat_1790_$RES      profdat
+cp $PARMsref/sref_${CORE}_profdat_1815_$RES      profdat
 ln -sf profdat       fort.19
 ln -sf intermed.bufr fort.79
 #ln -sf itag          fort.11
@@ -282,7 +283,7 @@ $NAMSND << EOF > /dev/null
  SFOUTF   = bufr.sfc+
  SNPRMF   = $PARMgempak1/sneta.prm
  SFPRMF   = $PARMgempak1/sfeta.prm
- TIMSTN   = 88/1790
+ TIMSTN   = 88/1815
         
 l
 ru
