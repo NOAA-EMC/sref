@@ -13,6 +13,7 @@
 set -eux
 export PS4='$SECONDS + '
 
+export N_TASK=$LSB_DJOB_NUMPROC
 export OMP_NUM_THREADS=1
 export MP_SHARED_MEMORY=yes
 export MP_EAGER_LIMIT=65535
@@ -44,15 +45,6 @@ then
   export DATA_IN=${DATA_IN:-/gpfs/dell2/ptmp/$userid}
 fi
 
-###############################################################
-# This block can be modified for different test environment
-###############################################################
-if [ $RUN_ENVIR = nco -a $envir != prod ]; then
-  export SENDDBN=${SENDDBN:-NO}
-# export DBNROOT=${NWROOTp1}/spa_util/fakedbn
-# export jlogfile=${jlogfile:-${COMROOT}/logs/${envir}/jlogfile}
-fi
-
 echo `date` $0 `date -u` begin
 
 export CYC=${CYC:-${cyc}}
@@ -65,7 +57,6 @@ export RES=${RES:-16km}
 # Note: ctl member needs to be run only once and can be used
 # for both NMM and ARW cores!
 ###########################################################
-export pid=$$
 export DATA_IN=${DATA_IN:-${DATAROOT}}
 
 export DATA=$DATA_IN/sref_${MODEL}_fcst_${CYC}_${envir}
@@ -85,14 +76,12 @@ cd $WORK_DIR
 ####################################
 # File To Log Msgs
 ####################################
-export jlogfile=${jlogfile:-${COMROOT}/logs/jlogfiles/jlogfile.${job}.${pid}}
+export jlogfile=${jlogfile:-$DATA/jlogfile.${job}.$$}
 
 ####################################
 # Determine Job Output Name on System
 ####################################
-export outid="LL$job"
-export jobid="${outid}.o${pid}"
-export pgmout="OUTPUT.${pid}"
+export pgmout="OUTPUT.$$"
 
 export cycle=t${cyc}z
 
@@ -125,25 +114,15 @@ export USHsref=${USHsref:-$HOMEsref/ush}
 machine=`hostname |cut -c1`
 if [ $machine = t -o $machine = g ]; then
   export MACHINE=wcoss
+elif [ $machine = m -o $machine = v ]; then
+  export MACHINE=dell
 fi
-
-if [ $MACHINE == zeus ]; then
-  export utilscript=/scratch2/portfolios/NCEPDEV/meso/save/$USER${NWROOTp1}/util/ush
-  export utilexec=/scratch2/portfolios/NCEPDEV/meso/save/$USER${NWROOTp1}/util/exec
-else
-  export utilscript=${NWROOTp1}/util/ush
-  export utilexec=${NWROOTp1}/util/exec
-fi
-
-# Run setup to initialize working directory and utility scripts
-## setup.sh  # no need, since using module load prod_util
 
 # Run setpdy and initialize PDY variables
 setpdy.sh
 . ./PDY
 
 #############################################
-#XXW# COMIN and COMOUT
 # GESDIR
 #############################################
 export gespath=${gespath:-${GESROOT}/${envir}}
@@ -156,6 +135,7 @@ env
 export FLENGTH=${FLENGTH:-87}
 export INCR=${INCR:-3}
 export IOFORM=2
+export KEEPDATA=YES
 ########################################################
 # Execute the script.
 $HOMEsref/scripts/exsref_wrffcst.sh.ecf
@@ -163,12 +143,12 @@ $HOMEsref/scripts/exsref_wrffcst.sh.ecf
 cat $pgmout
 
 msg="JOB COMPLETED NORMALLY"
-postmsg "$jlogfile" "$msg"
+postmsg $jlogfile "$msg"
 
 ################################
 # Remove the Working Directory
 ################################
 cd $DATA_IN
-if [ ${RM_TMPDIR:-NO} = YES ] ; then rm -rf $DATA ; fi
+if [ ${KEEPDATA:-NO} != YES ] ; then rm -rf $DATA ; fi
 
 date

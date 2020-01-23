@@ -15,6 +15,7 @@
 # 2016-11-07  Jun Du - Increased bufr station from 1642 to 1733                #
 # 2018-04-11  Jun Du - Increased bufr station from 1733 to 1790                #
 # 2019-03-12  Jun Du - Modified for the Dell version
+# 2020-01-21  Jun Du - Increased bufr station from 1790 to 1815                #
 #                                                                              #
 ################################################################################
 set -x
@@ -148,7 +149,7 @@ $NAMSND << EOF > /dev/null
  SFOUTF   = bufr.sfc+
  SNPRMF   = $PARMgempak1/sneta.prm
  SFPRMF   = $PARMgempak1/sfeta.prm
- TIMSTN   = 88/1790
+ TIMSTN   = 88/1815
         
 l
 ru

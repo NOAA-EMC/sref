@@ -20,11 +20,6 @@
 #         in the development enviroment only.
 ############################################
 set -xa
-# ###################################
-# SET SHELL PROCESSING VARIABLES
-# ###################################
-export PS4='$SECONDS + ' 
-date
 
 export OMP_NUM_THREADS=1
 export MP_EUIDEVICE=sn_all
@@ -32,8 +27,11 @@ export MP_EUILIB=us
 export MP_MPILIB=mpich2
 export MP_TASK_AFFINITY=core:1
 
-# The grib_util module should be loaded prior to running this J-job
-#module load grib_util
+# ###################################
+# SET SHELL PROCESSING VARIABLES
+# ###################################
+export PS4='$SECONDS + ' 
+date
 
 export RUN_ENVIR=${RUN_ENVIR:-nco}
 
@@ -50,7 +48,6 @@ then
   . $CONFIG_FILE
   export userid=$LOGNAME
   export DATA_IN=${DATA_IN:-/gpfs/dell2/ptmp/$userid}
-  export jlogfile=${jlogfile:-$DATA_IN/jlogfile}
 
   export SENDCOM=${SENDCOM:-YES}
   export SENDDBN=${SENDDBN:-NO}
@@ -65,37 +62,18 @@ then
   export PARMsref=${PARMsref:-$HOMEsref/parm}
   export USHsref=${USHsref:-$HOMEsref/ush}
 
-# export HOMEnam=${NWROOTp1}
-# export HOMEnam=${HOMEnam:-${NWROOTp1}/nam.${nam_ver}}
-# export HOMEnam=${HOMEnam:-${HOMEsref}}
-# export EXECnam=$HOMEnam/exec
-# export FIXnam=$HOMEnam/fix
-# export PARMnam=$HOMEnam/parm
-# export USHnam=$HOMEnam/ush
-
   export COMIN=$COM_IN/${RUN}.${PDY}/${cyc}
   export COMOUT=$COM_OUT/${RUN}.${PDY}/$cyc
   export COMIN_PROF=$COMOUT/bufr
 fi
 
-###############################################################
-# This block can be modified for different test environment
-###############################################################
-if [ $RUN_ENVIR = nco -a $envir != prod ]; then
-  export SENDDBN=${SENDDBN:-NO}
-# export DBNROOT=${NWROOTp1}/spa_util/fakedbn
-# export jlogfile=${jlogfile:-${COMROOT}/logs/${envir}/jlogfile}
-  export RM_TMPDIR=${RM_TMPDIR:-NO}
-fi
-
+export jlogfile=${jlogfile:-$DATA/jlogfile.${job}.$$}
 # 
 # obtain unique process id (pid) and make temp directories
 #
-export pid=$$
 export DATA_IN=${DATA_IN:-${DATAROOT}}
 
-#export DATA=$DATA_IN/${jobid:?}
-export DATA=$DATA_IN/sref_${MODEL}_meanbufr_${CYC}_${envir}
+export DATA=$DATA_IN/${jobid:?}
 
 rm -rf $DATA
 mkdir -p $DATA
@@ -104,9 +82,7 @@ cd $DATA
 ####################################
 # Determine Job Output Name on System
 ####################################
-export outid="LL$job"
-export jobid="${outid}.o${pid}"
-export pgmout="OUTPUT.${pid}"
+export pgmout="OUTPUT.$$"
 
 export CYC=$cyc
 export cycle=t${cyc}z 
@@ -140,7 +116,7 @@ export COMOUT=${COMOUT:-${COMROOT}/${NET}/${envir}/${RUN}.${PDY}/$cyc}
 export COMIN_PROF=${COMIN_PROF:-${COMROOT}/${NET}/${envir}/${RUN}.${PDY}/$cyc/bufr}
 
 msg="JOB $job HAS BEGUN"
-postmsg "$jlogfile" "$msg"
+postmsg $jlogfile "$msg"
 
 mkdir -p $COMOUT
 
@@ -160,6 +136,6 @@ postmsg "$jlogfile" "$msg"
 # Remove the Working Directory
 ################################
 cd $DATA_IN
-if [ ${RM_TMPDIR:-YES} = YES ] ; then rm -rf $DATA ; fi
+if [ ${KEEPDATA:-NO} != YES ] ; then rm -rf $DATA ; fi
 
 date

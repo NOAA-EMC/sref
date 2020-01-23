@@ -37,31 +37,10 @@ export RUN=sref
 # COM_OUT: Directory for output file, default to ${COMROOT}/$NET/${envir}
 # gespath: Directory for the guess or restart files, default to ${GESROOT}/${envir}
 #####################################################################################
-if [ "$RUN_ENVIR" != nco ]      ### For Developers, "group_name" is passed from the ecFflow script
-then
-  CONFIG_FILE=${CONFIG_FILE:-/meso/save/${LOGNAME}/sref${NWROOTp1}/parm/sref_para_config}
-  . $CONFIG_FILE
-  export userid=$LOGNAME
-  export DATA_IN=${DATA_IN:-/ptmpp1/$userid}
-
-  export com=${com:-/meso/noscrub/$LOGNAME${COMROOT}/${NET}/${envir}}
-  export COM_IN=${COM_IN:-/meso/noscrub/$LOGNAME${COMROOT}/${NET}/${envir}}
-  export COM_AWIPS=${COM_AWIPS:-/meso/noscrub/$LOGNAME${COMROOT}/nawips/${envir}}
-fi
-
-###############################################################
-# This block can be modified for different test environment
-###############################################################
-if [ $RUN_ENVIR = nco -a $envir != prod ]; then
-  export SENDDBN=${SENDDBN:-SENDDBN:YES}
-# export DBNROOT=${NWROOTp1}/spa_util/fakedbn
-# export jlogfile=${jlogfile:-${COMROOT}/logs/${envir}/jlogfile}
-fi
 
 #
 # obtain unique process id (pid) and make temp directories
 #
-export pid=$$
 export DATA_IN=${DATA_IN:-${DATAROOT}}
 
 export DATA=$DATA_IN/${jobid:?}
@@ -71,14 +50,12 @@ cd $DATA
 ####################################
 # File To Log Msgs
 ####################################
-export jlogfile=${COMROOT}/logs/jlogfiles/jlogfile.${job}.${pid}
+export jlogfile=${jlogfile:-$DATA/jlogfile.${job}.$$}
 
 ####################################
 # Determine Job Output Name on System
 ####################################
-export outid="LL$job"
-export jobid="${outid}.o${pid}"
-export pgmout="OUTPUT.${pid}"
+export pgmout="OUTPUT.$$"
 export pgmerr=errfile
 
 export cycle=t${cyc}z
@@ -109,21 +86,9 @@ export SENDDBN=${SENDDBN:-NO}
 export HOMEsref=${HOMEsref:-${NWROOT}/${NET}.${sref_ver}}
 export GEMPAKsref=${GEMPAKsref:-$HOMEsref/gempak}
 
-###################################
-# Set up the UTILITIES
-###################################
-#export utilscript=${NWROOTp1}/util/ush
-#export utilities=${NWROOTp1}/util/ush
-#export utilexec=${NWROOTp1}/util/exec
-
-## setup.sh  # no need, since using module load prod_util 
-
 # Run setpdy and initialize PDY variables
 setpdy.sh
 . PDY
-
-# The grib_util module should be loaded prior to running this J-job
-#module load grib_util
 
 
 if [ $model = arw ]; then
@@ -135,11 +100,6 @@ elif [ $model = nmm -o $model = nmb ]; then
 else 
   export DBN_ALERT_TYPE=`echo ${RUN}_GEMPAK | tr [a-z] [A-Z]`
 fi
-
-#
-# Now set up GEMPAK/NTRANS environment
-#
-. ${NWROOTp1}/gempak/.gempak
 
 #
 # Copy special table wmogrib2.tbl, ncepgrib2.tbl
@@ -165,8 +125,8 @@ else
   export COMIN=${COM_IN}/${RUN}.${PDY}/${cyc}/ensprod
 fi
 
-export COM_AWIPS=${COM_AWIPS:-${COMROOT}/nawips/${envir}}
-export COMOUT=${COMOUT:-${COM_AWIPS}/${RUN}.${PDY}}
+export COM_AWIPS=${COM_AWIPS:-${COMROOT}/${NET}/${envir}/${RUN}.${PDY}}
+export COMOUT=${COMOUT:-${COMROOT}/${NET}/${envir}/${RUN}.${PDY}/${cyc}/gempak}
 
 if [ ! -f $COMOUT ] ; then
   mkdir -p -m 775 $COMOUT
@@ -181,7 +141,7 @@ if [ $ens_mem_cnt -eq 1 ]; then
 for member in $ens_mem
 do
   export member
-  $HOMEsref/scripts/exsref_nawips.sh.ecf $member
+  $HOMEsref/scripts/exsref_nawips.sh.ecf $member >$DATA/sref_${member}.out.$$ 2>&1
 done
 ########################################################
 
@@ -193,26 +153,30 @@ else
 
 for member in $ens_mem
 do
-  echo "$HOMEsref/scripts/exsref_nawips.sh.ecf $member " >> poescript
+  echo "$HOMEsref/scripts/exsref_nawips.sh.ecf $member &> $DATA/sref_${member}.out.$$" >> $DATA/poescript
 done
 ######################################################################
 
 cat poescript
 
 chmod 775 $DATA/poescript
-export MP_PGMMODEL=mpmd
-export MP_CMDFILE=$DATA/poescript
+#export MP_PGMMODEL=mpmd
+export CMDFILE=$DATA/poescript
 
 # Execute the script.
-mpirun.lsf
+mpirun cfp $CMDFILE
 fi
 
-cat $pgmout
+for file in `ls $DATA/sref_${member}.out.*`
+do
+  echo "=================sref_${member}.out=========="
+  cat $file
+done
 
 ################################
 # Remove the Working Directory
 ################################
 cd $DATA_IN
-if [ ${RM_TMPDIR:-YES} = YES ]; then rm -rf $DATA; fi
+if [ ${KEEPDATA:-NO} != YES ]; then rm -rf $DATA; fi
 
 date

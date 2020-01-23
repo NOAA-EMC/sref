@@ -190,7 +190,7 @@ export FLXIOUT=/dev/null
 export PGBOUT=pgbfile
 export PGIOUT=pgifile
 export IGEN=${IGEN_FCST}
-export ANOMCATSH=${USHglobal}/global_anomcat.sh
+#export ANOMCATSH=${USHglobal}/global_anomcat.sh
 export POSTGPSH=${POSTGPSH:-${USHglobal}/global_postgp.sh}
 
 $POSTGPSH

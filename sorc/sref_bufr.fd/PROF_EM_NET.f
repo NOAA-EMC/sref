@@ -46,7 +46,7 @@ C
 
 C-----------------------------------------------------------------------
                              P A R A M E T E R
-     & (NSTAT=1790,LCL1ML=15,LCL1SL=52)
+     & (NSTAT=1815,LCL1ML=15,LCL1SL=52)
 !    & (NSTAT=1500,LCL1ML=13,LCL1SL=50)
 !       NWORDM=(LCL1ML+1)*LM+2*LCL1SL
 !     &, LRECPR=4*(8+9+LCL1ML*LM+LCL1SL))

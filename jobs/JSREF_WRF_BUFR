@@ -18,11 +18,9 @@
 set -xa
 export PS4='$SECONDS + '
 
+export N_TASK=$LSB_DJOB_NUMPROC
 export OMP_NUM_THREADS=1
 export MP_MPILIB=mpich2
-
-# The grib_util module should be loaded prior to running this J-job
-#module load grib_util
 
 #
 # Specify whether the run is production or development
@@ -47,16 +45,6 @@ then
   export DATA_IN=${DATA_IN:-/gpfs/dell2/ptmp/$userid}
 fi
 
-###############################################################
-# This block can be modified for different test environment
-###############################################################
-if [ $RUN_ENVIR = nco -a $envir != prod ]; then
-  export SENDDBN=${SENDDBN:-NO}
-# export DBNROOT=${NWROOTp1}/spa_util/fakedbn
-# export jlogfile=${jlogfile:-${COMROOT}/logs/${envir}/jlogfile}
-  export RM_TMPDIR=${RM_TMPDIR:-NO}
-fi
-
 echo `date` $0 `date -u` begin
 
 export CYC=${CYC:-${cyc}}
@@ -70,7 +58,6 @@ export runflag=${runflag:-3hrly}
 # Note: ctl member needs to be run only once and can be used 
 # for both NMM and ARW cores!
 ###########################################################
-export pid=$$
 export DATA_IN=${DATA_IN:-${DATAROOT}}
 
 export DATA=$DATA_IN/sref_${MODEL}_bufr_${CYC}_${envir}/bufr.$MEMBER
@@ -82,14 +69,12 @@ cd $DATA
 ####################################
 # File To Log Msgs
 ####################################
-export jlogfile=${jlogfile:-${COMROOT}/logs/jlogfiles/jlogfile.${job}.${pid}}
+export jlogfile=${jlogfile:-$DATA/jlogfile.${job}.$$}
 
 ####################################
 # Determine Job Output Name on System
 ####################################
-export outid="LL$job"
-export jobid="${outid}.o${pid}"
-export pgmout="OUTPUT.${pid}"
+export pgmout="OUTPUT.$$"
 
 export cycle=t${cyc}z 
 
@@ -116,21 +101,7 @@ export FIXsref=${FIXsref:-$HOMEsref/fix}
 export PARMsref=${PARMsref:-$HOMEsref/parm}
 export USHsref=${USHsref:-$HOMEsref/ush}
 
-#export HOMEnam=${HOMEnam:-${NWROOTp1}}
-#export HOMEnam=${HOMEnam:-${NWROOTp1}/nam.${nam_ver}}
-#export HOMEnam=${HOMEnam:-${HOMEsref}}
-#export EXECnam=${EXECnam:-$HOMEnam/exec}
-#export PARMnam=${PARMnam:-$HOMEnam/parm}
-
 export PARMgempak=$GEMPAK/tables/pack
-###################################
-# Set up the UTILITIES
-###################################
-#export utilscript=${NWROOTp1}/util/ush
-#export utilexec=${NWROOTp1}/util/exec
-
-# Run setup to initialize working directory and utility scripts
-## setup.sh  # no need, since using module load prod_util 
 
 # Run setpdy and initialize PDY variables
 setpdy.sh
@@ -141,7 +112,7 @@ setpdy.sh
 #############################################
 export COM_OUT=${COM_OUT:-${COMROOT}/${NET}/${envir}}
 
-export COMOUT=$COM_OUT/${RUN}.${PDY}/${cyc}
+export COMOUT=${COMOUT:-$COM_OUT/${RUN}.${PDY}/${cyc}}
 
 mkdir -p -m 775 $COMOUT 
  
@@ -167,12 +138,12 @@ $HOMEsref/scripts/exsref_wrfbufr.sh.ecf
 cat $pgmout
 
 msg="JOB COMPLETED NORMALLY"
-postmsg "$jlogfile" "$msg"
+postmsg $jlogfile "$msg"
 
 ################################
 # Remove the Working Directory
 ################################
 cd $DATA_IN
-#if [ ${RM_TMPDIR:-YES} = YES ] ; then rm -rf $DATA ; fi
+#if [ ${KEEPDATA:-NO} != YES ] ; then rm -rf $DATA ; fi
 
 date

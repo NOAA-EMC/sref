@@ -2,10 +2,10 @@
 
 set -eux
 
-if [ $MACHINE == wcoss ]; then
+if [ $MACHINE == dell ]; then
 
-  . /usrx/local/Modules/default/init/sh
-  module load cfp
+#  . /usrx/local/Modules/default/init/sh
+#  module load cfp
 
   CMDFILE=cmdfile
   rm -f $CMDFILE

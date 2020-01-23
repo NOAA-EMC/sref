@@ -10,17 +10,17 @@
 ############################################
 set -xa
 
-# ###################################
-# SET SHELL PROCESSING VARIABLES
-# ###################################
-export PS4='$SECONDS + ' 
-date
-
 export OMP_NUM_THREADS=1
 export MP_EUIDEVICE=sn_all
 export MP_EUILIB=us
 export MP_MPILIB=mpich2
 export MP_TASK_AFFINITY=core:1
+
+# ###################################
+# SET SHELL PROCESSING VARIABLES
+# ###################################
+export PS4='$SECONDS + ' 
+date
 
 ###############################
 # Specify NET and RUN name
@@ -40,37 +40,24 @@ then
   export DATA_IN=${DATA_IN:-/gpfs/dell2/ptmp/$userid}
 fi
 
-###############################################################
-# This block can be modified for different test environment
-###############################################################
-if [ $RUN_ENVIR = nco -a $envir != prod ]; then
-  export SENDECF=${SENDECF:-NO}
-# export DBNROOT=${NWROOTp1}/spa_util/fakedbn
-# export jlogfile=${jlogfile:-${COMROOT}/logs/${envir}/jlogfile}
-fi
-
 #
 # obtain unique process id (pid) and make temp directories
 #
-export pid=$$
 export DATA_IN=${DATA_IN:-${DATAROOT}}
 
-#export DATA=$DATA_IN/${jobid:?}
-export DATA=$DATA_IN/sref_gefs2sref_${CYC}_${envir}
+export DATA=$DATA_IN/${jobid:?}
 mkdir $DATA
 cd $DATA
 
 ####################################
 # File To Log Msgs
 ####################################
-export jlogfile=${COMROOT}/logs/jlogfiles/jlogfile.${job}.${pid}
+export jlogfile=${jlogfile:-$DATA/jlogfile.${job}.$$}
 
 ####################################
 # Determine Job Output Name on System
 ####################################
-export outid="LL$job"
-export jobid="${outid}.o${pid}"
-export pgmout="OUTPUT.${pid}"
+export pgmout="OUTPUT.$$"
 export pgmerr=errfile
 
 export cycle=t${cyc}z
@@ -86,7 +73,6 @@ export cycle=t${cyc}z
 export SENDCOM=${SENDCOM:-YES}
 export SENDECF=${SENDECF:-YES}
 export SENDDBN=${SENDDBN:-YES}
-export RUN_TCTRACK=${RUN_TCTRACK:-NO}
 
 export HOMEsref=${HOMEsref:-${NWROOT}/${NET}.${sref_ver}}
 export EXECsref=${EXECsref:-$HOMEsref/exec}
@@ -95,26 +81,16 @@ export PARMsref=${PARMsref:-$HOMEsref/parm}
 export USHsref=${USHsref:-$HOMEsref/ush}
 export GEMPAKsref=${GEMPAKsref:-$HOMEsref/gempak}
 
-###################################
-# Set up the UTILITIES
-###################################
-#export utilscript=${NWROOTp1}/util/ush
-#export utilexec=${NWROOTp1}/util/exec
-
-## setup.sh  # no need, since using module load prod_util 
 
 # Run setpdy and initialize PDY variables
 setpdy.sh
 . ./PDY
 
-# The grib_util module should be loaded prior to running this J-job
-#module load grib_util
 
 # Run setup to initialize working directory and utility scripts
 msg="JOB $job HAS BEGUN"
-postmsg "$jlogfile" "$msg"
+postmsg $jlogfile "$msg"
 
-#typeset -Z2 gefscyc
 if [ $cyc -eq 03 ]; then
  export gefscyc=00
 fi
@@ -156,7 +132,6 @@ mkdir -m 775 $DATA/gefs2sref
 cd $DATA/gefs2sref
 rm -rf $DATA/gefs2sref/poescript
 
-#typeset -Z2 HR
 HR=00
 while [ $HR -le $ENDHOUR ]
 do
@@ -169,7 +144,6 @@ done
 chmod 775 $DATA/gefs2sref/poescript
 export MP_PGMMODEL=mpmd
 export MP_CMDFILE=$DATA/gefs2sref/poescript
-#mpirun.lsf -cmdfile $DATA/gefs2sref/poescript -pgmmodel mpmd -ilevel 3 -labelio yes -stdoutmode ordered
 mpirun cfp $DATA/gefs2sref/poescript
 
 #2. Create ensemble product
@@ -206,6 +180,6 @@ postmsg "$jlogfile" "$msg"
 # Remove the Working Directory
 ################################
 cd $DATA_IN
- if [ ${RM_TMPDIR:-YES} = YES ]; then rm -rf $DATA; fi
+ if [ ${KEEPDATA:-NO} != YES ]; then rm -rf $DATA; fi
 
 date

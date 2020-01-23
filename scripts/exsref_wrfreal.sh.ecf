@@ -422,8 +422,8 @@ if [ $lsm = ndas ]; then
      icnt=1
      while [ $icnt -lt 1500 ]
      do
-      if [ -s ${GESndas}/nam.t06z.nmm_b_restart_nemsio_anl.tm03 ] ; then
-       str=`ls -s ${GESndas}/nam.t06z.nmm_b_restart_nemsio_anl.tm03`  #get file size in block (1024 bytes)
+      if [ -s ${GESINndas}/nam.t06z.nmm_b_restart_nemsio_anl.tm03 ] ; then
+       str=`ls -s ${GESINndas}/nam.t06z.nmm_b_restart_nemsio_anl.tm03`  #get file size in block (1024 bytes)
        set -A fsize $str
        if [ ${fsize[0]} -gt 8000 ] ; then
         dump=0
@@ -435,20 +435,20 @@ if [ $lsm = ndas ]; then
       fi
       if [ $icnt -ge 1200 ]
        then
-       echo ${GESndas}/nam.t06z.nmm_b_restart_nemsio_anl.tm03 "not exist"
-       msg="ABORTING after 20 minutes of waiting for ${GESndas}/nam.t06z.nmm_b_restart_nemsio_anl.tm03"
+       echo ${GESINndas}/nam.t06z.nmm_b_restart_nemsio_anl.tm03 "not exist"
+       msg="ABORTING after 20 minutes of waiting for ${GESINndas}/nam.t06z.nmm_b_restart_nemsio_anl.tm03"
        err_exit $msg
       fi
      done
-  ln -sf ${GESndas}/nam.t06z.nmm_b_restart_nemsio_anl.tm03      edas12rst_ndas
+  ln -sf ${GESINndas}/nam.t06z.nmm_b_restart_nemsio_anl.tm03      edas12rst_ndas
  fi
 
  if [ $CYC -eq 09 ]; then
      icnt=1
      while [ $icnt -lt 1500 ]
      do
-      if [ -s ${GESndas}/nam.t12z.nmm_b_restart_nemsio_anl.tm03 ] ; then
-       str=`ls -s ${GESndas}/nam.t12z.nmm_b_restart_nemsio_anl.tm03`  #get file size in block (1024 bytes)
+      if [ -s ${GESINndas}/nam.t12z.nmm_b_restart_nemsio_anl.tm03 ] ; then
+       str=`ls -s ${GESINndas}/nam.t12z.nmm_b_restart_nemsio_anl.tm03`  #get file size in block (1024 bytes)
        set -A fsize $str
        if [ ${fsize[0]} -gt 8000 ] ; then
         dump=0
@@ -460,20 +460,20 @@ if [ $lsm = ndas ]; then
       fi
       if [ $icnt -ge 1200 ]
        then
-       echo ${GESndas}/nam.t12z.nmm_b_restart_nemsio_anl.tm03 "not exist"
-       msg="ABORTING after 20 minutes of waiting for ${GESndas}/nam.t12z.nmm_b_restart_nemsio_anl.tm03"
+       echo ${GESINndas}/nam.t12z.nmm_b_restart_nemsio_anl.tm03 "not exist"
+       msg="ABORTING after 20 minutes of waiting for ${GESINndas}/nam.t12z.nmm_b_restart_nemsio_anl.tm03"
        err_exit $msg
       fi
      done
-  ln -sf ${GESndas}/nam.t12z.nmm_b_restart_nemsio_anl.tm03      edas12rst_ndas
+  ln -sf ${GESINndas}/nam.t12z.nmm_b_restart_nemsio_anl.tm03      edas12rst_ndas
  fi
 
  if [ $CYC -eq 15 ]; then
      icnt=1
      while [ $icnt -lt 1500 ]
      do
-      if [ -s ${GESndas}/nam.t18z.nmm_b_restart_nemsio_anl.tm03 ] ; then
-       str=`ls -s ${GESndas}/nam.t18z.nmm_b_restart_nemsio_anl.tm03`  #get file size in block (1024 bytes)
+      if [ -s ${GESINndas}/nam.t18z.nmm_b_restart_nemsio_anl.tm03 ] ; then
+       str=`ls -s ${GESINndas}/nam.t18z.nmm_b_restart_nemsio_anl.tm03`  #get file size in block (1024 bytes)
        set -A fsize $str
        if [ ${fsize[0]} -gt 8000 ] ; then
         dump=0
@@ -485,12 +485,12 @@ if [ $lsm = ndas ]; then
       fi
       if [ $icnt -ge 1200 ]
        then
-       echo ${GESndas}/nam.t18z.nmm_b_restart_nemsio_anl.tm03 "not exist"
-       msg="ABORTING after 20 minutes of waiting for ${GESndas}/nam.t18z.nmm_b_restart_nemsio_anl.tm03"
+       echo ${GESINndas}/nam.t18z.nmm_b_restart_nemsio_anl.tm03 "not exist"
+       msg="ABORTING after 20 minutes of waiting for ${GESINndas}/nam.t18z.nmm_b_restart_nemsio_anl.tm03"
        err_exit $msg
       fi
      done
-  ln -sf ${GESndas}/nam.t18z.nmm_b_restart_nemsio_anl.tm03      edas12rst_ndas
+  ln -sf ${GESINndas}/nam.t18z.nmm_b_restart_nemsio_anl.tm03      edas12rst_ndas
  fi
 
  if [ $CYC -eq 21 ]; then

@@ -171,15 +171,14 @@ export IGEN=${8:-${IGEN:-0}}
 #  Directories.
 #export EXECUTIL=${EXECUTIL:-${NWROOTp1}/util/exec}
 #export USHUTIL=${USHUTIL:-${NWROOTp1}/util/ush}
-export EXECGLOBAL=${EXECGLOBAL:-${NWROOTp1}/exec}
-export USHGLOBAL=${USHGLOBAL:-${NWROOTp1}/ush}
+#export EXECGLOBAL=${EXECGLOBAL:-${NWROOTp1}/exec}
+#export USHGLOBAL=${USHGLOBAL:-${NWROOTp1}/ush}
 export workdir=${workdir:-$(pwd)}
 #  Filenames.
 export MP=${MP:-$([[ $LOADL_STEP_TYPE = PARALLEL ]]&&echo "p"||echo "s")}
 export XC=${XC}
-export POSTGPEXEC=${POSTGPEXEC:-${EXECGLOBAL}/global_postg$MP$XC}
 #export GRBINDEX=${GRBINDEX:-${EXECUTIL}/grbindex$XC}
-export ANOMCATSH=${ANOMCATSH:-${USHGLOBAL}/global_anomcat.sh}
+#export ANOMCATSH=${ANOMCATSH:-${USHGLOBAL}/global_anomcat.sh}
 export POSTGPLIST=${POSTGPLIST:-/dev/null}
 export INISCRIPT=${INISCRIPT}
 export ERRSCRIPT=${ERRSCRIPT:-'eval [[ $err = 0 ]]'}

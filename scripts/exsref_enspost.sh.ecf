@@ -683,12 +683,12 @@ done
 ln -f -s $ptmp/r_gribawips.${PAIR[$nf]} $ptmp/$hh/r_gribawips.${PAIR[$nf]}
 done
 
-echo "cd $ptmp/$hh" >> run_poe.$hh
-echo "$ptmp/$hh/sref_ens < $ptmp/input.$hh > $DATA/output132.$hh " >> run_poe.$hh
-#echo "$ptmp/$hh/sref_ens" > $DATA/output132.$hh >> run_poe.$hh
-echo "mv $ptmp/$hh/*sref.f* $ptmp/." >> run_poe.$hh
-chmod +x run_poe.$hh
-echo "run_poe.$hh" >> poescript.1
+echo "cd $ptmp/$hh" >> $DATA/run_poe.$hh
+echo "$ptmp/$hh/sref_ens < $ptmp/input.$hh > $DATA/output132.$hh " >> $DATA/run_poe.$hh
+#echo "$ptmp/$hh/sref_ens" > $DATA/output132.$hh >> $DATA/run_poe.$hh
+echo "mv $ptmp/$hh/*sref.f* $ptmp/." >> $DATA/run_poe.$hh
+chmod +x $DATA/run_poe.$hh
+echo "$DATA/run_poe.$hh" >> poescript.1
 done
 
 chmod 775 poescript.1
@@ -696,6 +696,7 @@ export MP_PGMMODEL=mpmd
 export MP_CMDFILE=poescript.1
 #/usr/bin/poe -cmdfile poescript.1 -pgmmodel mpmd -ilevel3 -labelio yes -stdoutmode ordered
 #mpirun.lsf -cmdfile poescript.1 -pgmmodel mpmd -ilevel3 -labelio yes -stdoutmode ordered
+pwd
 mpirun cfp poescript.1
 
 else

@@ -25,23 +25,23 @@ export CPGB=${COPYGB:-${NWROOTp1}/util/exec/copygb}
 export EXECnam=${EXECnam:-${NWROOTp1}/exec}
 
 if [ $option = ST2 ]; then
-# get Stage2 hourly data
- export OBSPPT_DIR=${COMROOTp1}/hourly/prod/nam_pcpn_anal.
+ get Stage2 hourly data
+ export COMINccpa=${COMROOTp1}/hourly/prod/nam_pcpn_anal.
 else
-# get 3hrly CCPA data
- export OBSPPT_DIR=${COMROOT}/ccpa/prod
+ get 3hrly CCPA data
+ export COMINccpa=$(compath.py ccpa/prod)
 fi
 
 # Get Stage II data:
 if [ $option = ST2 ]; then
 # get Stage2 hourly accumulated precip data from /com directory 
 # covering 21Z $vdaym1 - 21Z $vday
-cp ${OBSPPT_DIR}${vdaym1}/ST2ml${vdaym1}22.Grb.Z .
-cp ${OBSPPT_DIR}${vdaym1}/ST2ml${vdaym1}23.Grb.Z .
-cp ${OBSPPT_DIR}${vday}/ST2ml${vday}0*.Grb.Z .
-cp ${OBSPPT_DIR}${vday}/ST2ml${vday}1*.Grb.Z .
-cp ${OBSPPT_DIR}${vday}/ST2ml${vday}20.Grb.Z .
-cp ${OBSPPT_DIR}${vday}/ST2ml${vday}21.Grb.Z .
+cp ${COMINccpa}${vdaym1}/ST2ml${vdaym1}22.Grb.Z .
+cp ${COMINccpa}${vdaym1}/ST2ml${vdaym1}23.Grb.Z .
+cp ${COMINccpa}${vday}/ST2ml${vday}0*.Grb.Z .
+cp ${COMINccpa}${vday}/ST2ml${vday}1*.Grb.Z .
+cp ${COMINccpa}${vday}/ST2ml${vday}20.Grb.Z .
+cp ${COMINccpa}${vday}/ST2ml${vday}21.Grb.Z .
 
 uncompress ST2ml*.Grb.Z
 
@@ -82,22 +82,22 @@ if [ $option = CCPA3 ]; then
  hr=0
  while [ $hr -le 21 ]; do
   if [ $hr -lt 10 ];then hr=0$hr;fi
-# $CPGB -g${grid} -i3 -x ${OBSPPT_DIR}/gefs.$vday/$hr/ccpa.t${hr}z.03h.hrap.conus ppt$hr
+# $CPGB -g${grid} -i3 -x ${COMINccpa}/gefs.$vday/$hr/ccpa.t${hr}z.03h.hrap.conus ppt$hr
 
   if [ $hr -eq 00 ];then
-   $CPGB -g${grid} -i3 -x ${OBSPPT_DIR}/ccpa.$vday/00/ccpa.t${hr}z.03h.hrap.conus ppt$hr
+   $CPGB -g${grid} -i3 -x ${COMINccpa}/ccpa.$vday/00/ccpa.t${hr}z.03h.hrap.conus ppt$hr
   fi
   if [ $hr -eq 03 -o $hr -eq 06 ];then
-   $CPGB -g${grid} -i3 -x ${OBSPPT_DIR}/ccpa.$vday/06/ccpa.t${hr}z.03h.hrap.conus ppt$hr
+   $CPGB -g${grid} -i3 -x ${COMINccpa}/ccpa.$vday/06/ccpa.t${hr}z.03h.hrap.conus ppt$hr
   fi
   if [ $hr -eq 09 -o $hr -eq 12 ];then
-   $CPGB -g${grid} -i3 -x ${OBSPPT_DIR}/ccpa.$vday/12/ccpa.t${hr}z.03h.hrap.conus ppt$hr
+   $CPGB -g${grid} -i3 -x ${COMINccpa}/ccpa.$vday/12/ccpa.t${hr}z.03h.hrap.conus ppt$hr
   fi
   if [ $hr -eq 15 -o $hr -eq 18 ];then
-   $CPGB -g${grid} -i3 -x ${OBSPPT_DIR}/ccpa.$vday/18/ccpa.t${hr}z.03h.hrap.conus ppt$hr
+   $CPGB -g${grid} -i3 -x ${COMINccpa}/ccpa.$vday/18/ccpa.t${hr}z.03h.hrap.conus ppt$hr
   fi
   if [ $hr -eq 21 ];then
-   $CPGB -g${grid} -i3 -x ${OBSPPT_DIR}/ccpa.$vdayp1/00/ccpa.t${hr}z.03h.hrap.conus ppt$hr
+   $CPGB -g${grid} -i3 -x ${COMINccpa}/ccpa.$vdayp1/00/ccpa.t${hr}z.03h.hrap.conus ppt$hr
   fi
 
   hr=`expr $hr + 3`

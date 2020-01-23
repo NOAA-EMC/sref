@@ -36,32 +36,16 @@ msg="Begin job for $job - $member"
 postmsg "$jlogfile" "$msg"
 
 #
-NAGRIB_TABLE=${NWROOTp1}/gempak/fix/nagrib.tbl
-utilfix_nam=${utilfix_nam:-${NWROOTp1}/util/fix}
-#NAGRIB=nagrib_nc
- NAGRIB=nagrib2_nc
+ NAGRIB=nagrib2
  
-entry=`grep "^$RUN " $NAGRIB_TABLE | awk 'index($1,"#") != 1 {print $0}'`
-
-if [ "$entry" != "" ] ; then
-  cpyfil=`echo $entry  | awk 'BEGIN {FS="|"} {print $2}'`
-  garea=`echo $entry   | awk 'BEGIN {FS="|"} {print $3}'`
-  gbtbls=`echo $entry  | awk 'BEGIN {FS="|"} {print $4}'`
-  maxgrd=`echo $entry  | awk 'BEGIN {FS="|"} {print $5}'`
-  kxky=`echo $entry    | awk 'BEGIN {FS="|"} {print $6}'`
-  grdarea=`echo $entry | awk 'BEGIN {FS="|"} {print $7}'`
-  proj=`echo $entry    | awk 'BEGIN {FS="|"} {print $8}'`
-  output=`echo $entry  | awk 'BEGIN {FS="|"} {print $9}'`
-else
   cpyfil=gds
   garea=dset
   gbtbls=
-  maxgrd=4999
+  maxgrd=6000
   kxky=
   grdarea=
   proj=
   output=T
-fi  
 pdsext=no
 
 echo $job |grep 132
@@ -139,7 +123,7 @@ while [ $fhcnt -le $fend ] ; do
 
   startmsg
 
-  $GEMEXE/$NAGRIB << EOF
+  $NAGRIB << EOF
    GBFILE   = grib$fhr
    INDXFL   = 
    GDOUTF   = $GEMGRD

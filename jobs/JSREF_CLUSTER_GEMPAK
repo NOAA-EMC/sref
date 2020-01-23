@@ -55,7 +55,6 @@ fi
 if [ $RUN_ENVIR = nco -a $envir != prod ]; then
   export SENDDBN=${SENDDBN:-NO}
 # export DBNROOT=${NWROOTp1}/spa_util/fakedbn
-# export jlogfile=${jlogfile:-${COMROOT}/logs/${envir}/jlogfile}
 fi
 
 ########################################################### 
@@ -75,14 +74,12 @@ cd $DATA
 ####################################
 # File To Log Msgs
 ####################################
-export jlogfile=${jlogfile:-${COMROOT}/logs/jlogfiles/jlogfile.${job}.${pid}}
+export jlogfile=${jlogfile:-$DATA/jlogfile.${job}.$$}
 
 ####################################
 # Determine Job Output Name on System
 ####################################
-export outid="LL$job"
-export jobid="${outid}.o${pid}"
-export pgmout="OUTPUT.${pid}"
+export pgmout="OUTPUT.$$"
 export pgmerr=errfile
 
 export cycle=t${cyc}z
@@ -106,18 +103,6 @@ export PARMsref={PARMsref:-$HOMEsref/parm}
 export USHsref=${USHsref:-$HOMEsref/ush}
 export GEMPAKsref=${GEMPAKsref:-$HOMEsref/gempak}
 
-###################################
-# Set up the UTILITIES
-###################################
-# The grib_util module should be loaded prior to running this J-job
-#module load grib_util
-
-#export utilscript=${NWROOTp1}/util/ush
-#export utilities=${NWROOTp1}/util/ush
-#export utilexec=${NWROOTp1}/util/exec
-
-## setup.sh  # no need, since using module load prod_util 
-
 # Run setpdy and initialize PDY variables
 setpdy.sh
 . ./PDY
@@ -131,11 +116,6 @@ export fstart=00
 export fend=87
 export finc=03
 export DBN_ALERT_TYPE=SREF_CLUSTER_GEMPAK
-
-#
-# Now set up GEMPAK/NTRANS environment
-#
-. ${NWROOTp1}/gempak/.gempak
 
 #
 # Copy special table wmogrib2.tbl, ncepgrib2.tbl
@@ -153,8 +133,8 @@ cp $GEMPAKsref/fix/g2vcrdwmo2.tbl g2vcrdwmo2.tbl
 # Determine COMIN and COMOUT
 ####################################
 export COM_IN=${COM_IN:-${COMROOT}/${NET}/${envir}}
-export COM_AWIPS=${COM_AWIPS:-${COMROOT}/nawips/${envir}}
-export COMOUT=${COMOUT:-${COM_AWIPS}/${RUN}.${PDY}/cluster}
+export COM_AWIPS=${COM_AWIPS:-${COMROOT}/${NET}/${envir}/${RUN}.${PDY}/${cyc}/gempak}
+export COMOUT=${COMOUT:-${COM_AWIPS}/cltr}
 
 if [ ! -f $COMOUT ] ; then
   mkdir -p -m 775 $COMOUT
@@ -174,12 +154,12 @@ done
 cat $pgmout
 
 msg="JOB COMPLETED NORMALLY"
-postmsg "$jlogfile" "$msg"
+postmsg $jlogfile "$msg"
 
 ################################
 # Remove the Working Directory
 ################################
 cd $DATA_IN
-if [ ${RM_TMPDIR:-YES} = YES ]; then rm -rf $DATA; fi
+if [ ${KEEPDATA:-NO} != YES ]; then rm -rf $DATA; fi
 
 date

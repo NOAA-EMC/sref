@@ -272,6 +272,9 @@ fi
 
 tar -cvf anl_data *grib*
 
+#pwd
+#ls -l grib212.ndas.f*
+
 ##############################################
 # copy data to a directory for next job to use
 ##############################################

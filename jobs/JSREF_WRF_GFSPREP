@@ -49,27 +49,14 @@ then
   export DATA_IN=${DATA_IN:-/gpfs/dell2/ptmp/$userid}
 fi
 
-###############################################################
-# This block can be modified for different test environment
-###############################################################
-if [ $RUN_ENVIR = nco -a $envir != prod ]; then
-  export SENDDBN=${SENDDBN:-NO}
-# export DBNROOT=${NWROOTp1}/spa_util/fakedbn
-# export jlogfile=${jlogfile:-${COMROOT}/logs/${envir}/jlogfile}
-# export COMINgens=${COMINgens:-${COMROOT}/gens/para}
-fi
-
-
 ########################################################### 
 # obtain unique process id (pid) and make temp directories
 # Note: ctl member needs to be run only once and can be used 
 # for both NMM and ARW cores!
 ###########################################################
-export pid=$$
 export DATA_IN=${DATA_IN:-${DATAROOT}}
 
-#export DATA=$DATA_IN/${jobid:?}
-export DATA=$DATA_IN/sref_gfsprep_${CYC}_${envir}/$MEMBER
+export DATA=$DATA_IN/sref_gfsprep_${cyc}_${envir}/$MEMBER
 # Remove old directory if it exists
 rm -rf $DATA
 mkdir -p $DATA
@@ -78,14 +65,12 @@ cd $DATA
 ####################################
 # File To Log Msgs
 ####################################
-export jlogfile=${jlogfile:-${COMROOT}/logs/jlogfiles/jlogfile.${job}.${pid}}
+export jlogfile=${jlogfile:-$DATA/jlogfile.${job}.$$}
 
 ####################################
 # Determine Job Output Name on System
 ####################################
-export outid="LL$job"
-export jobid="${outid}.o${pid}"
-export pgmout="OUTPUT.${pid}"
+export pgmout="OUTPUT.$$"
 export pgmerr=errfile
 
 export cycle=t${cyc}z 
@@ -118,24 +103,15 @@ export PARMsref=${PARMsref:-$HOMEsref/parm}
 export USHsref=${USHsref:-$HOMEsref/ush}
 
 # used for those global scripts
-export HOMEglobal=${HOMEglobal:-${NWROOTp1}}
-export EXECglobal=${EXECglobal:-$HOMEglobal/exec}
-export FIXglobal=${FIXglobal:-$HOMEglobal/fix}
-export PARMglobal=${PARMglobal:-$HOMEglobal/parm}
-export USHglobal=${USHglobal:-$HOMEglobal/ush}
+#export HOMEglobal=${HOMEglobal:-${NWROOTp1}}
+#export EXECglobal=${EXECglobal:-$HOMEglobal/exec}
+#export FIXglobal=${FIXglobal:-$HOMEglobal/fix}
+#export PARMglobal=${PARMglobal:-$HOMEglobal/parm}
+#export USHglobal=${USHglobal:-$HOMEglobal/ush}
 
 ##XXW for global_postgp
 export POSTGPSH=$HOMEsref/ush/global_postgp.sh
 export POSTGPEXEC=$HOMEsref/exec/global_postgs
-
-###################################
-# Set up the UTILITIES
-###################################
-export utilscript=${NWROOTp1}/util/ush
-export utilexec=${NWROOTp1}/util/exec
-
-# Run setup to initialize working directory and utility scripts
-## setup.sh  # no need, since using module load prod_util 
 
 # Run setpdy and initialize PDY variables
 setpdy.sh
@@ -169,12 +145,12 @@ $HOMEsref/scripts/exsref_wrf_gfsprep.sh.ecf
 cat $pgmout
 
 msg="JOB COMPLETED NORMALLY"
-postmsg "$jlogfile" "$msg"
+postmsg $jlogfile "$msg"
 
 ################################
 # Remove the Working Directory
 ################################
 cd $DATA_IN
-if [ ${RM_TMPDIR:-YES} = YES ]; then rm -rf $DATA; fi
+if [ ${KEEPDATA:-NO} != YES ]; then rm -rf $DATA; fi
 
 date

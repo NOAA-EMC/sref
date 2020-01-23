@@ -17,6 +17,7 @@
 set -aeux
 export PS4='$SECONDS + '
 
+export N_TASK=$LSB_DJOB_NUMPROC
 export OMP_NUM_THREADS=1
 export MP_MPILIB=mpich2
 export MP_I_BINDPROC=NO
@@ -44,15 +45,6 @@ then
   export DATA_IN=${DATA_IN:-/gpfs/dell2/ptmp/$userid}
 fi
 
-###############################################################
-# This block can be modified for different test environment
-###############################################################
-if [ $RUN_ENVIR = nco -a $envir != prod ]; then
-  export SENDDBN=${SENDDBN:-NO}
-# export DBNROOT=${NWROOTp1}/spa_util/fakedbn
-# export jlogfile=${jlogfile:-${COMROOT}/logs/${envir}/jlogfile}
-fi
-
 echo `date` $0 `date -u` begin
 
 export CYC=${CYC:-${cyc}}
@@ -67,7 +59,6 @@ export OUTGRD=${OUTGRD:-255}
 # Note: ctl member needs to be run only once and can be used
 # for both NMM and ARW cores!
 ###########################################################
-export pid=$$
 export DATA_IN=${DATA_IN:-${DATAROOT}}
 
 export DATA=$DATA_IN/sref_${MODEL}_post${runflag}${OUTGRD}_${CYC}_${envir}
@@ -87,14 +78,12 @@ cd $WORK_DIR
 ####################################
 # File To Log Msgs
 ####################################
-export jlogfile=${jlogfile:-${COMROOT}/logs/jlogfiles/jlogfile.${job}.${pid}}
+export jlogfile=${jlogfile:-$DATA/jlogfile.${job}.$$}
 
 ####################################
 # Determine Job Output Name on System
 ####################################
-export outid="LL$job"
-export jobid="${outid}.o${pid}"
-export pgmout="OUTPUT.${pid}"
+export pgmout="OUTPUT.$$"
 
 export cycle=t${cyc}z
 
@@ -114,7 +103,6 @@ export RUN=sref
 export SENDCOM=${SENDCOM:-YES}
 export SENDECF=${SENDECF:-YES}
 export SENDDBN=${SENDDBN:-YES}
-export RUN_TCTRACK=${RUN_TCTRACK:-NO}
 export RERUN=${RERUN:-NO}
 
 export HOMEsref=${HOMEsref:-${NWROOT}/${NET}.${sref_ver}}
@@ -129,15 +117,9 @@ export USHsref=${USHsref:-$HOMEsref/ush}
 machine=`hostname |cut -c1`
 if [ $machine = t -o $machine = g ]; then
   export MACHINE=wcoss
+elif [ $machine = m -o $machine = v ]; then
+  export MACHINE=dell
 fi
-
-if [ $MACHINE == zeus ]; then
-  export utilscript=/scratch2/portfolios/NCEPDEV/meso/save/$USER${NWROOTp1}/util/ush
-  export utilexec=/scratch2/portfolios/NCEPDEV/meso/save/$USER${NWROOTp1}/util/exec
-fi
-
-# Run setup to initialize working directory and utility scripts
-## setup.sh  # no need, since using module load prod_util
 
 # Run setpdy and initialize PDY variables
 setpdy.sh
@@ -149,11 +131,10 @@ setpdy.sh
 export COM_IN=${COM_IN:-${COMROOT}/${NET}/${envir}}
 export COM_OUT=${COM_OUT:-${COMROOT}/${NET}/${envir}}
 
-export COMIN=$COM_IN/${RUN}.${PDY}
-export COMOUT=$COM_OUT/${RUN}.${PDY}/$cyc/pgrb
-export COMOUT_TRACK=$COM_OUT/${RUN}.${PDY}/$CYC/track
+export COMIN=${COMIN:-$COM_IN/${RUN}.${PDY}}
+export COMOUT=${COMOUT:-$COM_OUT/${RUN}.${PDY}/$cyc/pgrb}
 
-mkdir -p -m 775 $COMOUT $COMOUT_TRACK
+mkdir -p -m 775 $COMOUT
 
 env
 
@@ -185,7 +166,7 @@ then
 
    if test $RERUN = "NO"
    then
-      NEW_SHOUR=`expr $recvy_shour + $INCR`
+      NEW_SHOUR=`expr $recvy_shour - $INCR`
       if test $NEW_SHOUR -ge $SFHR
       then
          export SFHR=$NEW_SHOUR
@@ -194,15 +175,16 @@ then
       if test $recvy_shour -ge $FLENGTH
       then
          msg="Forecast Post Already Completed to $FLENGTH"
-         postmsg "$jlogfile" "$msg"
+         postmsg $jlogfile "$msg"
       else
          msg="add message here"
-         postmsg "$jlogfile" "$msg"
+         postmsg $jlogfile "$msg"
       fi
    fi
 fi
 
 export IOFORM=2
+export KEEPDATA=YES
 ########################################################
 # Execute the script.
 ########################################################
@@ -235,30 +217,18 @@ then
   export COMIN=$COMIN/${CYC}/pgrb
   ksh $USHsref/sref_thin_post.sh
 
- #
- # Run the cyclone tracker
- #
- if [ ${RUN_TCTRACK} = 'YES' ]
- then
-  export cmodel=sref
-  export sref_pert=$member
-  export sref_model=$model
-  export srefdir=$COMOUT
-  export COM=$COMOUT_TRACK
-  sh $utilscript/extrkr.sh
- fi
 fi
 
 ########################################################
 #cat $pgmout
 
 msg="JOB COMPLETED NORMALLY"
-postmsg "$jlogfile" "$msg"
+postmsg $jlogfile "$msg"
 
 ################################
 # Remove the Working Directory
 ################################
 cd $DATA_IN
-if [ ${RM_TMPDIR:-NO} = YES ] ; then rm -rf $DATA ; fi
+if [ ${KEEPDATA:-NO} != YES ] ; then rm -rf $DATA ; fi
 
 date
