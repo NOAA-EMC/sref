@@ -1109,7 +1109,6 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          end do      
         end if
 
-        write(*,*) 'I am here at 1'
         call pack(itime,eps,vrbl_mn,vrbl_sp,vrbl_pr,
      +            derv_mn,derv_sp,derv_pr,
      +            ptype_mn,ptype_pr,derv_dtra,
@@ -1118,7 +1117,6 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      +            jf,iens,iyr,imon,idy,ihr,
      +            gribid,lb,kgds,interval)
 
-        write(*,*) 'I am here at 2'
         call pack_mxp(itime,eps,mxp8,
      +    jf,iens,iyr,imon,idy,ihr,gribid,lb,kgds,interval)
 
