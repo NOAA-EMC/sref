@@ -55,7 +55,8 @@
   export gespath=$PTMP/$LOGNAME/nwges/${envir}
 # export gespath=/nwges/${envir}
 # export GESNDAS=/ptmpp1/$LOGNAME/nwges/prod
-  export GESNDAS=/gpfs/${machine}/nco/ops/nwges/prod
+  export GESNAM=/gpfs/dell1/nco/ops/nwges/prod
+  export GESNDAS=/gpfs/dell1/nco/ops/nwges/prod
 
 # com
 # export COMGFS=/gpfs/hps/nco/ops/com/gfs/prod
@@ -64,7 +65,7 @@
   export COMENS=/gpfs/${machine}/nco/ops/com/gens/prod
   export COMINgens=/gpfs/${machine}/nco/ops/com/gens/prod
 
-  export COMRTMA=/gpfs/${machine}p2/nco/ops/com/rtma/prod
-  export COMINnam=/gpfs/${machine}/nco/ops/com/nam/prod
+  export COMRTMA=/gpfs/${machine}/nco/ops/com/rtma/prod
+  export COMINnam=/gpfs/dell1/nco/ops/com/nam/prod
   export COMINrap=/gpfs/hps/nco/ops/com/rap/prod
 
