@@ -46,8 +46,8 @@
 # export com=/com/sref/${envir}
 # export COM=/com/sref/${envir}
 
-# export COMglb_IN=/gpfs/${machine}/nco/ops/com/sref/${envir}
-  export COMglb_IN=$PTMP/$LOGNAME/com/sref/${envir}
+  export COMglb_IN=/gpfs/${machine}/nco/ops/com/sref/${envir}
+# export COMglb_IN=$PTMP/$LOGNAME/com/sref/${envir}
   export COM_IN=$PTMP/$LOGNAME/com/sref/${envir}
 #
 # ---------------------------------------
