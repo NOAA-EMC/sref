@@ -131,7 +131,7 @@ setpdy.sh
 #
 # Now set up GEMPAK/NTRANS environment
 #
-. ${NWROOTp1}/gempak/.gempak
+# . ${NWROOTp1}/gempak/.gempak
 
 #
 # Copy special table wmogrib2.tbl, ncepgrib2.tbl
