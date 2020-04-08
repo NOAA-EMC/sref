@@ -320,7 +320,8 @@ if [ $method -eq 1 ]; then
 else
  type=stdv
 fi
-chgrd=${COPYGB:-${NWROOTp1}/util/exec/copygb}
+#chgrd=${COPYGB:-${NWROOTp1}/util/exec/copygb}
+chgrd=${chgrd:-${COPYGB}}
 
 HR=00
 while [ $HR -le $ENDHOUR ]
