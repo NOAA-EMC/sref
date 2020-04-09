@@ -13,7 +13,8 @@
 #                                                                                    #
 # Script history log:                                                                #
 # 2017-01-10  Jun Du  - Initial script                                               #
-# 2018-08-28  Jun Du  - Use fv3gfs data
+# 2018-08-28  Jun Du  - Use fv3gfs data                                              #
+# 2020-04-08  Jun Du - Use GEFS.v12 pgrb                                             #
 #                                                                                    #
 ######################################################################################
 

@@ -24,7 +24,7 @@
 ####################################################################
 set -aux
 
-export EXECGLOBAL=${NWROOTp1}/exec
+#export EXECGLOBAL=${NWROOTp1}/exec
 
 fhr=$1
 CYC=$2
