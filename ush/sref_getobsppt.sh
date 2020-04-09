@@ -21,12 +21,15 @@ vdayp1=`$NDATE +24 ${vday}12 | cut -c 1-8`
 YYYY=`echo $vday | cut -c 1-4`
 MM=`echo $vday   | cut -c 5-6`
 
-export CPGB=${COPYGB:-${NWROOTp1}/util/exec/copygb}
-export EXECnam=${EXECnam:-${NWROOTp1}/exec}
+#export CPGB=${COPYGB:-${NWROOTp1}/util/exec/copygb}
+export CPGB=${CPGB:-${COPYGB:?}}
+#export EXECnam=${EXECnam:-${NWROOTp1}/exec}
+export EXECnam=${EXECnam:-${NWROOTp3}/nam.${nam.ver}/exec/dell.exec}
 
 if [ $option = ST2 ]; then
  get Stage2 hourly data
- export COMINccpa=${COMROOTp1}/hourly/prod/nam_pcpn_anal.
+#export COMINccpa=${COMROOTp1}/hourly/prod/nam_pcpn_anal.
+ export COMINccpa=${COMROOT}/pcpanl/prod/pcpanl.
 else
  get 3hrly CCPA data
  export COMINccpa=$(compath.py ccpa/prod)

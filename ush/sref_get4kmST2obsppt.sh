@@ -18,9 +18,11 @@ YYYY=`echo $vday | cut -c 1-4`
 MM=`echo $vday   | cut -c 5-6`
 
 #export CPGB=${COPYGB:-${NWROOTp1}/util/exec/copygb}
-export EXECnam=${EXECnam:-${NWROOTp1}/exec}
+#export EXECnam=${EXECnam:-${NWROOTp1}/exec}
+export EXECnam=${EXECnam:-${NWROOTp3}/nam.${nam.ver}/exec/dell.exec}
 
-export ftpdir=${COMROOTp1}/hourly/prod/nam_pcpn_anal.
+#export ftpdir=${COMROOTp1}/hourly/prod/nam_pcpn_anal.
+export ftpdir=${COMROOT}/pcpanl/prod/pcpanl.
 # get Stage2 hourly accumulated precip data from /com directory 
 # covering 21Z $vdaym1 - 21Z $vday
 cp ${ftpdir}${vdaym1}/ST2ml${vdaym1}22.Grb.Z .

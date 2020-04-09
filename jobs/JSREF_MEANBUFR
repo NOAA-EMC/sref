@@ -73,7 +73,8 @@ export jlogfile=${jlogfile:-$DATA/jlogfile.${job}.$$}
 #
 export DATA_IN=${DATA_IN:-${DATAROOT}}
 
-export DATA=$DATA_IN/${jobid:?}
+export DATA=$DATA_IN/${jobid:?}   !for NCO production
+#export DATA=$DATA_IN/sref_meanbufr_${CYC}_${envir}           !for developer test
 
 rm -rf $DATA
 mkdir -p $DATA
