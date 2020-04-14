@@ -423,7 +423,7 @@ if [ $MEMBER == ctl -o $MEMBER == n01 -o $MEMBER == p01 -o $MEMBER == n02 -o $ME
   elif [ $MACHINE == wcoss ]; then
   mpirun.lsf $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   elif [ $MACHINE == dell ]; then
-  mpirun -l -n $N_TASK $EXECsref/sref_ungribp_nems >> $pgmout 2>errfile
+  mpirun -l -n $N_TASK $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   else
   poe $EXECsref/sref_ungrib_nems >> $pgmout 2>errfile
   fi
