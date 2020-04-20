@@ -10,7 +10,7 @@ FLENGTH=87
 INCR=3
 ymdh=`cat /gpfs/hps/nco/ops/com/date/t${cyc}z | cut -c7-16`
 
-ymdh=20200408${cyc}
+ymdh=20200410${cyc}
 
 export SMSBIN=${HOME}/sms
 export MACHINE=dell
