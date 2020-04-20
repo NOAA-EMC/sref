@@ -96,10 +96,10 @@ $CNVGRIB -g21 temp_grib2.$$ $GFSOUT/gfs.t${newCYC}z.master.grbf$newfhr
 fi
 
 if [ $model = gens ]; then
- str=`ls -s $COMINgens/gefs.$DATE/${CYC}/pgrb2bp5/gep20.t${CYC}z.pgrb2b.0p50.f090`  #get file size in block (1024 bytes)
+ str=`ls -s $COMINgens/gefs.$DATE/${CYC}/atmos/pgrb2bp5/gep20.t${CYC}z.pgrb2b.0p50.f090`  #get file size in block (1024 bytes)
      set -A fsize $str
-     if [ -s ${COMINgens}/gefs.$DATE/${CYC}/pgrb2bp5/gep20.t${CYC}z.pgrb2b.0p50.f090 ] && [ ${fsize[0]} -gt 800 ] ; then # fcst file is finished?
-       echo  ${COMINgens}/gefs.$DATE/${CYC}/pgrb2bp5/gep20.t${CYC}z.pgrb2b.0p50.f090 " exist"
+     if [ -s ${COMINgens}/gefs.$DATE/${CYC}/atmos/pgrb2bp5/gep20.t${CYC}z.pgrb2b.0p50.f090 ] && [ ${fsize[0]} -gt 800 ] ; then # fcst file is finished?
+       echo  ${COMINgens}/gefs.$DATE/${CYC}/atmos/pgrb2bp5/gep20.t${CYC}z.pgrb2b.0p50.f090 " exist"
 
        export COMIN_SIG=$COMINgens/gefs.$DATE/$CYC
 
@@ -129,9 +129,9 @@ if [ $model = gens ]; then
      fi
 
        if [ $newfhr -lt 100 ];then
-  cat ${COMIN_SIG}/pgrb2ap5/ge${GLBPAIR}.t${newCYC}z.pgrb2a.0p50.f0$newfhr ${COMIN_SIG}/pgrb2bp5/ge${GLBPAIR}.t${newCYC}z.pgrb2b.0p50.f0$newfhr > tempfile_grib2
+  cat ${COMIN_SIG}/atmos/pgrb2ap5/ge${GLBPAIR}.t${newCYC}z.pgrb2a.0p50.f0$newfhr ${COMIN_SIG}/atmos/pgrb2bp5/ge${GLBPAIR}.t${newCYC}z.pgrb2b.0p50.f0$newfhr > tempfile_grib2
        else
-  cat ${COMIN_SIG}/pgrb2ap5/ge${GLBPAIR}.t${newCYC}z.pgrb2a.0p50.f$newfhr ${COMIN_SIG}/pgrb2bp5/ge${GLBPAIR}.t${newCYC}z.pgrb2b.0p50.f$newfhr > tempfile_grib2
+  cat ${COMIN_SIG}/atmos/pgrb2ap5/ge${GLBPAIR}.t${newCYC}z.pgrb2a.0p50.f$newfhr ${COMIN_SIG}/atmos/pgrb2bp5/ge${GLBPAIR}.t${newCYC}z.pgrb2b.0p50.f$newfhr > tempfile_grib2
        fi
 ## ENSURE FILE HAS BEEN TOTALLY SYNC'D
 #if [[ -f tempfile_grib2 ]]; then
