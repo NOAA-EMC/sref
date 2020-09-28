@@ -126,7 +126,7 @@ export COMOUT=$COM_OUT/${RUN}.${PDY}
 export GFSOUT=$COMOUT/global_pgrb
 
 export COMINgfs=${COMINgfs:-$(compath.py gfs/prod)}
-export COMINgens=${COMINgens:-$(compath.py gens/prod)}
+export COMINgens=${COMINgens:-$(compath.py gefs/prod)}
 
 mkdir -p -m 775 $COMOUT $GFSOUT
 
