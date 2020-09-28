@@ -11,7 +11,7 @@ INCR=3
 INCRBUFR=1
 ymdh=`cat /gpfs/hps/nco/ops/com/date/t${cyc}z | cut -c7-16`
 
-ymdh=20190225${1}
+ymdh=20200130${1}
 
 export SMSBIN=${HOME}/sms
 export MACHINE=dell
@@ -31,11 +31,11 @@ CYC=`echo $ymdh | cut -c9-10`
 
 #rm -f *.bsub *.log
 
-for MODEL in ARW NMB ; do
+ for MODEL in ARW NMB ; do
 #for MODEL in ARW; do
 
-for MEMBER in ctl n01 p01 n02 p02 n03 p03 n04 p04 n05 p05 n06 p06; do
-#for MEMBER in n01; do
+ for MEMBER in ctl n01 p01 n02 p02 n03 p03 n04 p04 n05 p05 n06 p06; do
+#for MEMBER in ctl; do
 
 cat SREF_BUFR.bsub.in | \
     sed s:_PDY_:$PDY:g | \

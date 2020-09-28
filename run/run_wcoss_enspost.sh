@@ -13,7 +13,7 @@ cd $SREFDIR/run
 cyc=$1
 ymdh=`cat /gpfs/hps/nco/ops/com/date/t${cyc}z | cut -c7-16`
 
-ymdh=20190311${1}
+ymdh=20190617${1}
 
 export SMSBIN=${HOME}/sms
 
