@@ -15,6 +15,7 @@
 # 2017-01-10  Jun Du  - Initial script                                               #
 # 2018-08-28  Jun Du  - Use fv3gfs data                                              #
 # 2020-04-08  Jun Du - Use GEFS.v12 pgrb                                             #
+# 2020-09-08  Jun Du - Use GFS.v16 data structure
 #                                                                                    #
 ######################################################################################
 
@@ -36,10 +37,10 @@ cd $DATA/${GLBPAIR}_$fhr
 #
 if [ $model = GFS ]; then
 
- str=`ls -s $COMINgfs/gfs.$DATE/$CYC/gfs.t${CYC}z.pgrb2.1p00.f090`  #get file size in block (1024 bytes)
+ str=`ls -s $COMINgfs/gfs.$DATE/$CYC/atmos/gfs.t${CYC}z.pgrb2.1p00.f090`  #get file size in block (1024 bytes)
      set -A fsize $str
-     if [ -s ${COMINgfs}/gfs.$DATE/$CYC/gfs.t${CYC}z.pgrb2.1p00.f090 ] && [ ${fsize[0]} -gt 800 ] ; then # fcst file is finished?
-       echo  ${COMINgfs}/gfs.$DATE/$CYC/gfs.t${CYC}z.pgrb2.1p00.f090 " exist"
+     if [ -s ${COMINgfs}/gfs.$DATE/$CYC/atmos/gfs.t${CYC}z.pgrb2.1p00.f090 ] && [ ${fsize[0]} -gt 800 ] ; then # fcst file is finished?
+       echo  ${COMINgfs}/gfs.$DATE/$CYC/atmos/gfs.t${CYC}z.pgrb2.1p00.f090 " exist"
 
        export COMIN_SIG=$COMINgfs/gfs.$DATE/$CYC
 
@@ -69,9 +70,9 @@ if [ $model = GFS ]; then
      fi
 
        if [ $newfhr -lt 100 ];then
-cp ${COMIN_SIG}/gfs.t${newCYC}z.pgrb2.1p00.f0${newfhr} temp_grib2.$$
+cp ${COMIN_SIG}/atmos/gfs.t${newCYC}z.pgrb2.1p00.f0${newfhr} temp_grib2.$$
        else
-cp ${COMIN_SIG}/gfs.t${newCYC}z.pgrb2.1p00.f${newfhr} temp_grib2.$$
+cp ${COMIN_SIG}/atmos/gfs.t${newCYC}z.pgrb2.1p00.f${newfhr} temp_grib2.$$
        fi
 ## ENSURE FILE HAS BEEN TOTALLY SYNC'D
 #if [[ -f temp_grib2.$$ ]]; then
